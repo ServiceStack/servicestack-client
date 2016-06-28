@@ -1,0 +1,32 @@
+{
+  "name": "servicestack-client",
+  "title": "ServiceStack JavaScript Utils",
+  "version": "0.0.1",
+  "description": "ServiceStack's TypeScript library providing a number of convenience utilities in developing web apps. Integrates with ServiceStack's Server features including Error Handling, Validation and Server Events",
+  "homepage": "https://github.com/ServiceStack/servicestack-client",
+  "bugs": "https://github.com/ServiceStack/Issues",
+  "author": {
+    "name": "Service Stack",
+    "email": "team@servicestack.net",
+    "url": "https:/servicestack.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ServiceStack/servicestack-client.git"
+  },
+  "keywords": [
+    "servicestack",
+    "utils",
+    "validation",
+    "ajax",
+    "serverevents",
+    "error-handling"
+  ],
+  "licenses": [],
+  "main": "lib/index.ts",
+  "typings": "lib/index",
+  "dependencies": {
+    "isomorphic-fetch": ">=2.2.0",
+    "es6-shim": ">=0.35.0"
+  }
+}
