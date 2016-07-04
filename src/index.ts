@@ -1,6 +1,4 @@
-﻿/// <reference path='../typings/browser.d.ts'/>
-
-export interface IReturnVoid {
+﻿export interface IReturnVoid {
     createResponse();
 }
 export interface IReturn<T> {
@@ -258,7 +256,8 @@ export class JsonServiceClient
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
-    mode:string;
+    mode: string;
+    credentials: string;
     headers:Headers;
 
     constructor(baseUrl: string) {
@@ -270,6 +269,7 @@ export class JsonServiceClient
         this.oneWayBaseUrl = combinePaths(baseUrl, "json", "oneway") + "/";
 
         this.mode = "cors";
+        this.credentials = 'include';
         this.headers = new Headers();
         this.headers.set("Content-Type", "application/json");
     }
@@ -305,6 +305,7 @@ export class JsonServiceClient
         {
             method: method,
             mode: this.mode,
+            credentials: this.credentials,
             headers: this.headers            
         });
 
@@ -322,14 +323,48 @@ export class JsonServiceClient
             })
             .catch(res => {
                 return res.json().then(o => {
-                    var r = (o as ErrorResponse);
-                    return r;
+                    var errorDto = sanitize(o);
+                    if (!errorDto["responseStatus"]) {
+                        const error = new ErrorResponse();
+                        error.responseStatus = new ResponseStatus();
+                        error.responseStatus.errorCode = res.statusCode;
+                        error.responseStatus.message = res.statusText;
+                        throw error;
+                    }
+                    throw o;
                 });
             });
     }
 }
 
-const nameOf = (o: any) => {
+export const toCamelCase = (key:string) => {
+    return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
+}
+
+export const sanitize = (status:any):any => {
+    if (status["errors"])
+        return status;
+    var to:any = {};
+    for (let k in status)
+        to[toCamelCase(k)] = status[k];
+    to.errors = [];
+
+    (status.Errors || []).forEach(o => {
+        var err = {};
+        for (var k in o)
+            err[toCamelCase(k)] = o[k];
+        to.errors.push(err);
+    });
+    return to;
+}
+
+export const nameOf = (o: any) => {
+    if (!o)
+        return "null";
+
+    if (typeof o.getTypeName == "function")
+        return o.getTypeName();
+
     var ctor = o && o.constructor;
     if (ctor == null)
         throw `${o} doesn't have constructor`;
@@ -361,6 +396,19 @@ export const splitOnFirst = (s, c) : string[] => {
     var pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
 };
+
+export const splitOnLast = (s, c): string[] => {
+    if (!s) return [s];
+    var pos = s.lastIndexOf(c);
+    return pos >= 0
+        ? [s.substring(0, pos), s.substring(pos + 1)]
+        : [s];
+};
+
+const splitCase = (t) => 
+    typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ');
+
+export const humanize = s => (!s || s.indexOf(' ') >= 0 ? s : splitCase(s));
 
 export const queryString = (url) : any => {
     if (!url || url.indexOf('?') === -1) return {};
