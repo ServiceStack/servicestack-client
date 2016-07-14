@@ -1,5 +1,5 @@
 /* Options:
-Date: 2016-07-14 13:43:11
+Date: 2016-07-14 16:35:20
 Version: 4.061
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://localhost:48088
@@ -31,9 +31,9 @@ export class HelloResponse
 }
 
 // @Route("/hello/{Name}")
-export class Hello implements IReturn<HelloResponse>
+export class HelloThere implements IReturn<HelloResponse>
 {
     Name: string;
     createResponse() { return new HelloResponse(); }
-    getTypeName() { return "Hello"; }
+    getTypeName() { return "HelloThere"; }
 }

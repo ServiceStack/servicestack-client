@@ -16,7 +16,7 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
-    "test": "mocha ./tests/*.js"
+    "test": "mocha -t 5000 ./tests/*.js"
   },
   "keywords": [
     "servicestack",

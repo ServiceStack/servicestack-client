@@ -12,7 +12,10 @@
     "outDir": "lib/"
   },
   "files": [
-     "./src/index.ts",
-     "./tests/client.spec.ts"
+    "./src/index.ts",
+    "./tests/dtos/techstacks.dtos.ts",
+    "./tests/dtos/checkweb.dtos.ts",
+    "./tests/dtos/testing.dtos.ts",
+    "./tests/client.spec.ts"
    ]
 }

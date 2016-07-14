@@ -476,8 +476,10 @@ export const createUrl = (route: string, args: any) => {
 
 export const appendQueryString = (url: string, args: any): string => {
     for (let k in args) {
-        url += url.indexOf("?") >= 0 ? "&" : "?";
-        url += k + "=" + encodeURIComponent(args[k]);
+        if(args.hasOwnProperty(k)) {
+            url += url.indexOf("?") >= 0 ? "&" : "?";
+            url += k + "=" + encodeURIComponent(args[k]);
+        }
     }
     return url;
-}
+};
