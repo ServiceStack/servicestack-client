@@ -12,6 +12,7 @@
     "outDir": "lib/"
   },
   "files": [
-     "./src/index.ts"
+     "./src/index.ts",
+     "./tests/client.spec.ts"
    ]
 }

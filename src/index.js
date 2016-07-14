@@ -1,5 +1,6 @@
-/// <reference path='../typings/browser.d.ts'/>
 "use strict";
+/// <reference path="../typings/index.d.ts" />
+require('isomorphic-fetch');
 var ResponseStatus = (function () {
     function ResponseStatus() {
     }
@@ -194,6 +195,7 @@ var JsonServiceClient = (function () {
         this.replyBaseUrl = exports.combinePaths(baseUrl, "json", "reply") + "/";
         this.oneWayBaseUrl = exports.combinePaths(baseUrl, "json", "oneway") + "/";
         this.mode = "cors";
+        this.credentials = 'include';
         this.headers = new Headers();
         this.headers.set("Content-Type", "application/json");
     }
@@ -213,13 +215,14 @@ var JsonServiceClient = (function () {
         return this.send(HttpMethods.Patch, request);
     };
     JsonServiceClient.prototype.send = function (method, request) {
-        var url = exports.combinePaths(this.replyBaseUrl, nameOf(request));
+        var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
         var hasRequestBody = HttpMethods.hasRequestBody(method);
         if (!hasRequestBody)
             url = exports.appendQueryString(url, request);
         var req = new Request(url, {
             method: method,
             mode: this.mode,
+            credentials: this.credentials,
             headers: this.headers
         });
         if (hasRequestBody)
@@ -235,15 +238,44 @@ var JsonServiceClient = (function () {
         })
             .catch(function (res) {
             return res.json().then(function (o) {
-                var r = o;
-                return r;
+                var errorDto = exports.sanitize(o);
+                if (!errorDto["responseStatus"]) {
+                    var error = new ErrorResponse();
+                    error.responseStatus = new ResponseStatus();
+                    error.responseStatus.errorCode = res.statusCode;
+                    error.responseStatus.message = res.statusText;
+                    throw error;
+                }
+                throw o;
             });
         });
     };
     return JsonServiceClient;
 }());
 exports.JsonServiceClient = JsonServiceClient;
-var nameOf = function (o) {
+exports.toCamelCase = function (key) {
+    return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
+};
+exports.sanitize = function (status) {
+    if (status["errors"])
+        return status;
+    var to = {};
+    for (var k in status)
+        to[exports.toCamelCase(k)] = status[k];
+    to.errors = [];
+    (status.Errors || []).forEach(function (o) {
+        var err = {};
+        for (var k in o)
+            err[exports.toCamelCase(k)] = o[k];
+        to.errors.push(err);
+    });
+    return to;
+};
+exports.nameOf = function (o) {
+    if (!o)
+        return "null";
+    if (typeof o.getTypeName == "function")
+        return o.getTypeName();
     var ctor = o && o.constructor;
     if (ctor == null)
         throw o + " doesn't have constructor";
@@ -270,6 +302,18 @@ exports.splitOnFirst = function (s, c) {
     var pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
 };
+exports.splitOnLast = function (s, c) {
+    if (!s)
+        return [s];
+    var pos = s.lastIndexOf(c);
+    return pos >= 0
+        ? [s.substring(0, pos), s.substring(pos + 1)]
+        : [s];
+};
+var splitCase = function (t) {
+    return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
+};
+exports.humanize = function (s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(s)); };
 exports.queryString = function (url) {
     if (!url || url.indexOf('?') === -1)
         return {};

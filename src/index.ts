@@ -1,4 +1,7 @@
-﻿export interface IReturnVoid {
+﻿/// <reference path="../typings/index.d.ts" />
+import 'isomorphic-fetch';
+
+export interface IReturnVoid {
     createResponse();
 }
 export interface IReturn<T> {
