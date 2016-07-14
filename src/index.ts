@@ -325,6 +325,9 @@ export class JsonServiceClient
                 });
             })
             .catch(res => {
+                if(res instanceof Error) {
+                    throw res;
+                }
                 return res.json().then(o => {
                     var errorDto = sanitize(o);
                     if (!errorDto["responseStatus"]) {
