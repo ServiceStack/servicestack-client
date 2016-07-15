@@ -41,7 +41,6 @@ typings
 .idea/
 # TS Output
 /lib/
-!/lib/index.d.ts
 
 # Built JS files
 src/**/*.js
