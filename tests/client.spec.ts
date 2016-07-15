@@ -1,31 +1,28 @@
 /// <reference path="../typings/index.d.ts" />
 
 import * as servicestack from '../src/index';
-import * as techstacks from "./dtos/techstacks.dtos";
-import * as checkWeb from './dtos/checkweb.dtos';
+import * as dtos from "./dtos/techstacks.dtos";
 import chai = require('chai');
+import {JsonServiceClient} from "../src/index";
+import {ErrorResponse} from "../src/index";
 
 describe('JsonServiceClient Tests', () => {
     var client : servicestack.JsonServiceClient;
-    var techStacksClient : servicestack.JsonServiceClient;
 
     beforeEach(() => {
-        client = new servicestack.JsonServiceClient('http://localhost:55799/');
-        techStacksClient = new servicestack.JsonServiceClient('http://techstacks.io/')
+        client = new servicestack.JsonServiceClient('http://techstacks.io/')
     });
 
-    it('Should get hello response', (done) => {
+    it('Should get techs response', (done) => {
         var testPromise = new Promise((resolve,reject) => {
-            var request = new checkWeb.Hello();
-            request.Name = 'World';
-            client.get(request).then((response) => {
+            client.get(new dtos.GetAllTechnologies()).then((response) => {
                 resolve(response);
             });
         });
 
-        testPromise.then((res: checkWeb.HelloResponse) => {
+        testPromise.then((res: dtos.GetAllTechnologiesResponse) => {
             try {
-                chai.expect(res.Result).to.equal('World');
+                chai.expect(res.Results.length).to.be.greaterThan(0);
                 done();
             } catch(error) {
                 done(error);
@@ -35,14 +32,35 @@ describe('JsonServiceClient Tests', () => {
 
     it('Should get techstacks overview', (done) => {
         var testPromise = new Promise((resolve,reject) => {
-            techStacksClient.get(new techstacks.Overview()).then((response) => {
+            client.get(new dtos.Overview()).then((response) => {
                 resolve(response);
             });
         });
 
-        testPromise.then((res: techstacks.OverviewResponse) => {
+        testPromise.then((res: dtos.OverviewResponse) => {
             try {
                 chai.expect(res.TopTechnologies.length).to.be.greaterThan(0);
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
+    });
+
+    it('Should throw 405', (done) => {
+        var testClient = new JsonServiceClient('https://servicestack.net/');
+        var testPromise = new Promise((resolve,reject) => {
+            testClient.get(new dtos.Overview()).then((response) => {
+                reject(response);
+            }).catch((err) => {
+                resolve(err);
+            });
+        });
+
+        testPromise.then((res: ErrorResponse) => {
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal('NotImplementedException');
+                chai.expect(res.responseStatus.message).to.be.equal('The operation \'Overview\' does not exist for this service');
                 done();
             } catch(error) {
                 done(error);

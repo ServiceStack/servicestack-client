@@ -304,13 +304,16 @@ export class JsonServiceClient
         if (!hasRequestBody)
             url = appendQueryString(url, request);
 
-        const req = new Request(url,
-        {
+        // Set `compress` false due to common error
+        // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
+        var reqOptions = {
             method: method,
             mode: this.mode,
             credentials: this.credentials,
-            headers: this.headers            
-        });
+            headers: this.headers,
+            compress: false
+        };
+        const req = new Request(url,reqOptions);
 
         if (hasRequestBody)
             (req as any).body = JSON.stringify(request);
@@ -328,39 +331,51 @@ export class JsonServiceClient
                 if(res instanceof Error) {
                     throw res;
                 }
+                // res.json can only be called once.
+                if(res.bodyUsed) {
+                    const error = new ErrorResponse();
+                    error.responseStatus = new ResponseStatus();
+                    error.responseStatus.errorCode = res.status;
+                    error.responseStatus.message = res.statusText;
+                    throw error;
+                }
                 return res.json().then(o => {
                     var errorDto = sanitize(o);
-                    if (!errorDto["responseStatus"]) {
+                    if (!errorDto.responseStatus) {
                         const error = new ErrorResponse();
                         error.responseStatus = new ResponseStatus();
-                        error.responseStatus.errorCode = res.statusCode;
+                        error.responseStatus.errorCode =
                         error.responseStatus.message = res.statusText;
                         throw error;
                     }
-                    throw o;
+                    throw errorDto;
                 });
             });
     }
+
+
 }
 
 export const toCamelCase = (key:string) => {
     return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
-}
+};
 
 export const sanitize = (status:any):any => {
-    if (status["errors"])
+    if(status.responseStatus)
+        return status;
+    if (status.errors)
         return status;
     var to:any = {};
-    for (let k in status)
-        to[toCamelCase(k)] = status[k];
-    to.errors = [];
+    for (let k in status) {
+        if (status.hasOwnProperty(k)) {
+            if(status[k] instanceof Object)
+                to[toCamelCase(k)] = sanitize(status[k]);
+            else
+                to[toCamelCase(k)] = status[k];
+        }
+    }
 
-    (status.Errors || []).forEach(o => {
-        var err = {};
-        for (var k in o)
-            err[toCamelCase(k)] = o[k];
-        to.errors.push(err);
-    });
+    to.errors = [];
     return to;
 }
 
