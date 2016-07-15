@@ -14,6 +14,10 @@
     "type": "git",
     "url": "https://github.com/ServiceStack/servicestack-client.git"
   },
+  "scripts": {
+    "pretest": "node_modules/.bin/tsc",
+    "test": "mocha -t 5000 ./tests/*.js"
+  },
   "keywords": [
     "servicestack",
     "utils",
@@ -26,7 +30,12 @@
   "main": "lib/index.ts",
   "typings": "lib/index",
   "dependencies": {
+    "es6-shim": ">=0.35.0",
     "isomorphic-fetch": ">=2.2.0",
-    "es6-shim": ">=0.35.0"
+    "typescript": "^1.8.10"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
   }
 }

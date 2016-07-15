@@ -36,3 +36,14 @@ typings
 
 # Optional REPL history
 .node_repl_history
+
+# IDEA
+.idea/
+# TS Output
+/lib/
+
+# Built JS files
+src/**/*.js
+src/**/*.map
+tests/**/*.js
+tests/**/*.map
