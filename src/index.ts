@@ -331,30 +331,35 @@ export class JsonServiceClient
                 if(res instanceof Error) {
                     throw res;
                 }
+
                 // res.json can only be called once.
                 if(res.bodyUsed) {
-                    const error = new ErrorResponse();
-                    error.responseStatus = new ResponseStatus();
-                    error.responseStatus.errorCode = res.status;
-                    error.responseStatus.message = res.statusText;
-                    throw error;
+                    throw createErrorResponse(res.status, res.statusText);
                 }
+
                 return res.json().then(o => {
                     var errorDto = sanitize(o);
                     if (!errorDto.responseStatus) {
-                        const error = new ErrorResponse();
-                        error.responseStatus = new ResponseStatus();
-                        error.responseStatus.errorCode =
-                        error.responseStatus.message = res.statusText;
-                        throw error;
+                        throw createErrorResponse(res.status, res.statusText);
                     }
                     throw errorDto;
+                }).catch(responseStatusError => {
+                    if(responseStatusError instanceof Error) {
+                        // No responseStatus body, set from `res` Body object
+                        throw createErrorResponse(res.status, res.statusText);
+                    }
                 });
             });
     }
-
-
 }
+
+const createErrorResponse = (errorCode:string, message:string) => {
+    const error = new ErrorResponse();
+    error.responseStatus = new ResponseStatus();
+    error.responseStatus.errorCode = errorCode;
+    error.responseStatus.message = message;
+    return error;
+};
 
 export const toCamelCase = (key:string) => {
     return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);

@@ -67,4 +67,25 @@ describe('JsonServiceClient Tests', () => {
             }
         },done);
     });
+
+    it('Should throw 401', (done) => {
+        var testPromise = new Promise((resolve,reject) => {
+            client.post(new dtos.CreateTechnology()).then((response) => {
+                reject(response);
+            }).catch((error) => {
+                resolve(error);
+            })
+        });
+
+        testPromise.then((res: ErrorResponse) => {
+            try {
+                console.log(res);
+                chai.expect(res.responseStatus.errorCode).to.be.equal(401);
+                chai.expect(res.responseStatus.message).to.be.equal('Unauthorized');
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
+    })
 });
