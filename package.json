@@ -43,5 +43,17 @@
     "typescript": "^1.8.10",
     "chai": "^3.5.0",
     "mocha": "^2.5.3"
+  },
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "es6-shim": "npm:es6-shim@>=0.35.0",
+      "isomorphic-fetch": "npm:isomorphic-fetch@>=2.2.0"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^1.8.10",
+      "chai": "npm:chai@^3.5.0",
+      "mocha": "npm:mocha@^2.5.3"
+    }
   }
 }
