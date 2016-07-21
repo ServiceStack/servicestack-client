@@ -20,7 +20,9 @@
     "prepublish": "node_modules/.bin/tsc && node scripts/prepack"
   },
   "files": [
-    "lib/**/*"
+    "lib/index.d.ts",
+    "lib/index.js",
+    "lib/index.js.map"
   ],
   "keywords": [
     "servicestack",
