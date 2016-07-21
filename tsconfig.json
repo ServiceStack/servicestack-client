@@ -12,6 +12,7 @@
     "outDir": "lib/"
   },
   "files": [
+    "./typings/index.d.ts",
     "./src/index.ts",
     "./tests/dtos/techstacks.dtos.ts",
     "./tests/client.spec.ts"
