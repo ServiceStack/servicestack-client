@@ -5,7 +5,7 @@ export interface IReturnVoid {
     createResponse();
 }
 export interface IReturn<T> {
-    createResponse():T;
+    createResponse(): T;
 }
 export class ResponseStatus {
     errorCode: string;
@@ -79,7 +79,7 @@ export interface IOnMessageEvent {
     data: string;
 }
 
-declare var EventSource:IEventSourceStatic;
+declare var EventSource: IEventSourceStatic;
 
 export class ServerEventsClient {
     eventSourceUrl: string;
@@ -207,7 +207,7 @@ export class ServerEventsClient {
         }
     }
 
-    reconnectServerEvents(opt:any={}) {
+    reconnectServerEvents(opt: any = {}) {
         if (this.eventSourceStop)
             return this.eventSource;
 
@@ -224,7 +224,7 @@ export class ServerEventsClient {
 
     invokeReceiver(r, cmd, el, msg, e, name) {
         if (r) {
-            if (typeof(r[cmd]) == "function") {
+            if (typeof (r[cmd]) == "function") {
                 r[cmd].call(el || r[cmd], msg, e);
             } else {
                 r[cmd] = msg;
@@ -254,14 +254,13 @@ export class HttpMethods {
         !(method === "GET" || method === "DELETE" || method === "HEAD" || method === "OPTIONS");
 }
 
-export class JsonServiceClient
-{
+export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
     mode: string;
     credentials: string;
-    headers:Headers;
+    headers: Headers;
 
     constructor(baseUrl: string) {
         if (baseUrl == null)
@@ -313,7 +312,7 @@ export class JsonServiceClient
             headers: this.headers,
             compress: false
         };
-        const req = new Request(url,reqOptions);
+        const req = new Request(url, reqOptions);
 
         if (hasRequestBody)
             (req as any).body = JSON.stringify(request);
@@ -328,12 +327,12 @@ export class JsonServiceClient
                 });
             })
             .catch(res => {
-                if(res instanceof Error) {
+                if (res instanceof Error) {
                     throw res;
                 }
 
                 // res.json can only be called once.
-                if(res.bodyUsed) {
+                if (res.bodyUsed) {
                     throw createErrorResponse(res.status, res.statusText);
                 }
 
@@ -344,7 +343,7 @@ export class JsonServiceClient
                     }
                     throw errorDto;
                 }).catch(responseStatusError => {
-                    if(responseStatusError instanceof Error) {
+                    if (responseStatusError instanceof Error) {
                         // No responseStatus body, set from `res` Body object
                         throw createErrorResponse(res.status, res.statusText);
                     }
@@ -353,7 +352,7 @@ export class JsonServiceClient
     }
 }
 
-const createErrorResponse = (errorCode:string, message:string) => {
+const createErrorResponse = (errorCode: string, message: string) => {
     const error = new ErrorResponse();
     error.responseStatus = new ResponseStatus();
     error.responseStatus.errorCode = errorCode;
@@ -361,19 +360,19 @@ const createErrorResponse = (errorCode:string, message:string) => {
     return error;
 };
 
-export const toCamelCase = (key:string) => {
+export const toCamelCase = (key: string) => {
     return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
 };
 
-export const sanitize = (status:any):any => {
-    if(status.responseStatus)
+export const sanitize = (status: any): any => {
+    if (status.responseStatus)
         return status;
     if (status.errors)
         return status;
-    var to:any = {};
+    var to: any = {};
     for (let k in status) {
         if (status.hasOwnProperty(k)) {
-            if(status[k] instanceof Object)
+            if (status[k] instanceof Object)
                 to[toCamelCase(k)] = sanitize(status[k]);
             else
                 to[toCamelCase(k)] = status[k];
@@ -404,7 +403,7 @@ export const nameOf = (o: any) => {
 
 /* utils */
 
-export const css = (selector: string | NodeListOf<Element>, name: string, value:string) => {
+export const css = (selector: string | NodeListOf<Element>, name: string, value: string) => {
     const els = typeof selector == "string"
         ? document.querySelectorAll(selector as string)
         : selector as NodeListOf<Element>;
@@ -417,7 +416,7 @@ export const css = (selector: string | NodeListOf<Element>, name: string, value:
     }
 }
 
-export const splitOnFirst = (s: string, c: string) : string[] => {
+export const splitOnFirst = (s: string, c: string): string[] => {
     if (!s) return [s];
     var pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
@@ -431,12 +430,12 @@ export const splitOnLast = (s: string, c: string): string[] => {
         : [s];
 };
 
-const splitCase = (t:string) => 
+const splitCase = (t: string) =>
     typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
 
 export const humanize = s => (!s || s.indexOf(' ') >= 0 ? s : splitCase(s));
 
-export const queryString = (url: string) : any => {
+export const queryString = (url: string): any => {
     if (!url || url.indexOf('?') === -1) return {};
     var pairs = splitOnFirst(url, '?')[1].split('&');
     var map = {};
@@ -449,7 +448,7 @@ export const queryString = (url: string) : any => {
     return map;
 };
 
-export const combinePaths = (...paths:string[]) : string => {
+export const combinePaths = (...paths: string[]): string => {
     var parts = [], i, l;
     for (i = 0, l = paths.length; i < l; i++) {
         var arg = paths[i];
@@ -467,7 +466,6 @@ export const combinePaths = (...paths:string[]) : string => {
     if (parts[0] === "") combinedPaths.unshift("");
     return combinedPaths.join("/") || (combinedPaths.length ? "/" : ".");
 };
-
 
 export const createPath = (route: string, args: any) => {
     var argKeys = {};
@@ -499,10 +497,17 @@ export const createUrl = (route: string, args: any) => {
 
 export const appendQueryString = (url: string, args: any): string => {
     for (let k in args) {
-        if(args.hasOwnProperty(k)) {
+        if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
             url += k + "=" + encodeURIComponent(args[k]);
         }
     }
     return url;
 };
+
+export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
+export const toDateFmt = (s: string) => dateFmt(toDate(s));
+export const padInt = (n: number) => n < 10 ? '0' + n : n;
+export const dateFmt = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
+export const dateFmtHM = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes());
+export const timeFmt12 = (d: Date = new Date()) => padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
