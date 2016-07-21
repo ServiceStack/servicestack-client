@@ -47,3 +47,4 @@ src/**/*.js
 src/**/*.map
 tests/**/*.js
 tests/**/*.map
+*.tgz
