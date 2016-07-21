@@ -16,8 +16,12 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
-    "test": "mocha -t 5000 ./tests/*.js"
+    "test": "mocha -t 5000 ./tests/*.js",
+    "prepublish": "node_modules/.bin/tsc && node scripts/prepack"
   },
+  "files": [
+    "lib/src/**/*"
+  ],
   "keywords": [
     "servicestack",
     "utils",
@@ -27,7 +31,7 @@
     "error-handling"
   ],
   "licenses": [],
-  "main": "lib/index.ts",
+  "main": "lib/index.js",
   "typings": "lib/index",
   "dependencies": {
     "es6-shim": ">=0.35.0",
