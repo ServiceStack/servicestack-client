@@ -20,7 +20,7 @@
     "prepublish": "node_modules/.bin/tsc && node scripts/prepack"
   },
   "files": [
-    "lib/src/**/*"
+    "lib/**/*"
   ],
   "keywords": [
     "servicestack",
