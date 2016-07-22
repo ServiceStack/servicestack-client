@@ -1,4 +1,5 @@
 ﻿import 'isomorphic-fetch'
+
 export interface IReturnVoid {
     createResponse();
 }
@@ -150,11 +151,7 @@ export class ServerEventsClient {
                             return;
                         }
 
-                        fetch(new Request(opt.heartbeatUrl, {
-                                method: "POST",
-                                mode: "cors",
-                                headers: headers
-                            }))
+                        fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers }))
                             .then(res => {
                                 if (!res.ok)
                                     throw res;
@@ -166,11 +163,7 @@ export class ServerEventsClient {
                 }
                 if (opt.unRegisterUrl) {
                     window.onunload = () => {
-                        fetch(new Request(opt.unRegisterUrl, {
-                                method: "POST",
-                                mode: "cors",
-                                headers: headers
-                            }))
+                        fetch(new Request(opt.unRegisterUrl, { method: "POST", mode: "cors", headers: headers }))
                             .then(res => {
                                 if (!res.ok)
                                     throw res;
@@ -497,7 +490,7 @@ export const appendQueryString = (url: string, args: any): string => {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
-            url += k + "=" + encodeURIComponent(args[k]);
+            url += k + "=" + (args[k] && encodeURIComponent(args[k]) || "");
         }
     }
     return url;
