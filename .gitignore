@@ -40,8 +40,11 @@ typings
 # IDEA
 .idea/
 # TS Output
-/lib/
-!/lib/isomorphic-fetch.d.ts
+/lib/src
+/lib/tests/
+/lib/*.js
+/lib/*.js.map
+/lib/isomorphic-fetch.d.ts
 !/lib/index.d.ts
 
 # Built JS files
