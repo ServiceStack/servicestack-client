@@ -42,6 +42,7 @@ typings
 # TS Output
 /lib/
 !/lib/isomorphic-fetch.d.ts
+!/lib/index.d.ts
 
 # Built JS files
 src/**/*.js
