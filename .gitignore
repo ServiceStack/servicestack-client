@@ -41,6 +41,7 @@ typings
 .idea/
 # TS Output
 /lib/
+!/lib/isomorphic-fetch.d.ts
 
 # Built JS files
 src/**/*.js
