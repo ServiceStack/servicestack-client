@@ -1,16 +1,14 @@
 /// <reference path="../typings/index.d.ts" />
 
-import * as servicestack from '../src/index';
 import * as dtos from "./dtos/techstacks.dtos";
 import chai = require('chai');
-import {JsonServiceClient} from "../src/index";
-import {ErrorResponse} from "../src/index";
+import {JsonServiceClient,ErrorResponse} from  '../src/index';
 
 describe('JsonServiceClient Tests', () => {
-    var client : servicestack.JsonServiceClient;
+    var client : JsonServiceClient;
 
     beforeEach(() => {
-        client = new servicestack.JsonServiceClient('http://techstacks.io/')
+        client = new JsonServiceClient('http://techstacks.io/')
     });
 
     it('Should get techs response', (done) => {
