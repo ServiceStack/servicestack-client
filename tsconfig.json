@@ -4,7 +4,7 @@
     "noImplicitAny": false,
     "noEmitOnError": true,
     "removeComments": false,
-    "declaration": true,
+    "declaration": false,
     "sourceMap": true,
     "target": "es5",
     "module": "commonjs",
