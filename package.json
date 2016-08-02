@@ -1,7 +1,7 @@
 {
   "name": "servicestack-client",
   "title": "ServiceStack JavaScript Utils",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "ServiceStack's TypeScript library providing a number of convenience utilities in developing web apps. Integrates with ServiceStack's Server features including Error Handling, Validation and Server Events",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
   "bugs": "https://github.com/ServiceStack/Issues",
@@ -20,7 +20,6 @@
     "prepublish": "node_modules/.bin/tsc && node scripts/prepack"
   },
   "files": [
-    "lib/index.d.ts",
     "lib/index.js",
     "lib/index.js.map"
   ],

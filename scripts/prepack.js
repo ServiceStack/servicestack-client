@@ -10,4 +10,5 @@
 
     fs.rename('./src/index.js','./lib/index.js',renameComplete);
     fs.rename('./src/index.js.map','./lib/index.js.map',renameComplete);
+    fs.rename('./src/index.d.ts','./lib/index.d.ts',renameComplete);
 })();

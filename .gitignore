@@ -53,3 +53,5 @@ src/**/*.map
 tests/**/*.js
 tests/**/*.map
 *.tgz
+tests/client.spec.d.ts
+tests/dtos/techstacks.dtos.d.ts
