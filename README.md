@@ -48,7 +48,7 @@ to `gistlyn.com` and installing the [servicestack-client](https://www.npmjs.com/
 npm package: 
 
 ```ts
-import { JsonServiceClient } from 'servicesack-client';
+import { JsonServiceClient } from 'servicestack-client';
 import { StoreGist, GithubFile } from './Gistlyn.dtos';
 
 var client = new JsonServiceClient("http://gistlyn.com");
