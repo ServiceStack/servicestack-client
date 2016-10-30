@@ -1,8 +1,13 @@
 /// <reference path="../typings/index.d.ts" />
 
 import * as dtos from "./dtos/techstacks.dtos";
+import { HelloTypes } from "./dtos/test.dtos";
 import chai = require('chai');
-import {JsonServiceClient,ErrorResponse} from  '../src/index';
+import { 
+    JsonServiceClient,
+    ErrorResponse,
+    appendQueryString
+} from  '../src/index';
 
 describe('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
@@ -85,5 +90,14 @@ describe('JsonServiceClient Tests', () => {
                 done(error);
             }
         },done);
+    })
+
+    it ('Should generate default value', () => {
+        var url = "http://test.servicestack.net";
+        var request = new HelloTypes();
+        request.bool = false;
+        request.int = 0;
+        var requestUrl = appendQueryString(url, request);
+        chai.expect(requestUrl).to.equal("http://test.servicestack.net?bool=false&int=0");
     })
 });

@@ -487,7 +487,7 @@ export const appendQueryString = (url: string, args: any): string => {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
-            url += k + "=" + (args[k] && encodeURIComponent(args[k]) || "");
+            url += k + "=" + (args[k] != null && encodeURIComponent(args[k]) || "");
         }
     }
     return url;
