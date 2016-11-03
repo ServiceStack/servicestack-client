@@ -1,19 +1,24 @@
 /// <reference path="../typings/index.d.ts" />
 
 import * as dtos from "./dtos/techstacks.dtos";
-import { HelloTypes } from "./dtos/test.dtos";
+import { 
+    HelloTypes,
+    ReturnString, ReturnBytes, ReturnStream
+} from "./dtos/test.dtos";
 import chai = require('chai');
 import { 
     JsonServiceClient,
     ErrorResponse,
-    appendQueryString
+    appendQueryString,
 } from  '../src/index';
 
 describe('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
+    var test : JsonServiceClient;
 
     beforeEach(() => {
-        client = new JsonServiceClient('http://techstacks.io/')
+        client = new JsonServiceClient('http://techstacks.io/');
+        test = new JsonServiceClient('http://test.servicestack.net');
     });
 
     it('Should get techs response', (done) => {
@@ -100,4 +105,29 @@ describe('JsonServiceClient Tests', () => {
         var requestUrl = appendQueryString(url, request);
         chai.expect(requestUrl).to.equal("http://test.servicestack.net?bool=false&int=0");
     })
+
+    it ('Should return raw text', (done) => {
+
+        var request = new ReturnString();
+        request.data = "0x10";
+
+        test.get(request)
+            .then(s => {
+                chai.expect(s).to.equal("0x10");
+                done();
+            }, done);
+    })
+
+    // node-fetch v2 will implement arrayBuffer: https://github.com/bitinn/node-fetch/issues/51#issuecomment-253998195
+    // it ('Should return raw bytes', (done) => {
+    //     var request = new ReturnBytes();
+    //     request.data = new Uint8Array([0x01]);
+    //     test.get(request)
+    //         .then(r => {
+    //             console.log('r',r);
+    //             chai.expect(r[0]).to.equal(0x01);
+    //             done();
+    //         }, done);
+    // })
+
 });

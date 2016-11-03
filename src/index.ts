@@ -312,10 +312,49 @@ export class JsonServiceClient {
             .then(res => {
                 if (!res.ok)
                     throw res;
-                return res.json().then(o => {
-                    var r = (o as T);
-                    return r;
-                });
+                
+                var x = typeof request.createResponse == 'function'
+                    ? request.createResponse()
+                    : null;
+
+                if (typeof x === 'string')
+                    return res.text().then(o => o as Object as T);
+
+                var contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return res.json().then(o => o as Object as T);
+                }
+
+                var hasArrayBuffer = typeof res.arrayBuffer == 'function';
+                var hasBlob = typeof res.blob == 'function';
+
+                if (x instanceof Uint8Array) {
+                    if (hasArrayBuffer) {
+                        return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
+                    }
+                    if (hasBlob) {
+                        return res.blob().then(o => {
+                            return new Promise<T>((resolve, reject) => {
+                                var reader = new FileReader();
+                                reader.onload = () => {
+                                    var r = new Uint8Array(reader.result);
+                                    resolve(r as Object as T);
+                                };
+                                reader.readAsArrayBuffer(o);
+                            });
+                        });
+                    }
+
+                    throw new Error("This fetch polyfill does not implement 'arrayBuffer' or 'blob'");
+
+                } else if (x instanceof Blob) {
+                    if (!hasBlob)
+                        throw new Error("This fetch polyfill does not implement 'blob'");
+
+                    return res.blob().then(o => o as Object as T);
+                }
+
+                return res.json().then(o => o as Object as T); //fallback
             })
             .catch(res => {
                 if (res instanceof Error)
