@@ -325,30 +325,14 @@ export class JsonServiceClient {
                     return res.json().then(o => o as Object as T);
                 }
 
-                var hasArrayBuffer = typeof res.arrayBuffer == 'function';
-                var hasBlob = typeof res.blob == 'function';
-
                 if (x instanceof Uint8Array) {
-                    if (hasArrayBuffer) {
-                        return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
-                    }
-                    if (hasBlob) {
-                        return res.blob().then(o => {
-                            return new Promise<T>((resolve, reject) => {
-                                var reader = new FileReader();
-                                reader.onload = () => {
-                                    var r = new Uint8Array(reader.result);
-                                    resolve(r as Object as T);
-                                };
-                                reader.readAsArrayBuffer(o);
-                            });
-                        });
-                    }
+                    if (typeof res.arrayBuffer != 'function')
+                        throw new Error("This fetch polyfill does not implement 'arrayBuffer'");
 
-                    throw new Error("This fetch polyfill does not implement 'arrayBuffer' or 'blob'");
+                    return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
 
                 } else if (x instanceof Blob) {
-                    if (!hasBlob)
+                    if (typeof res.blob != 'function')
                         throw new Error("This fetch polyfill does not implement 'blob'");
 
                     return res.blob().then(o => o as Object as T);
