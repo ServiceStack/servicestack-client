@@ -35,7 +35,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "es6-shim": ">=0.35.0",
-    "isomorphic-fetch": ">=2.2.0"
+    "isomorphic-fetch": ">=2.2.1"
   },
   "devDependencies": {
     "typescript": "^1.8.10",
@@ -46,7 +46,7 @@
     "directories": {},
     "dependencies": {
       "es6-shim": ">=0.35.0",
-      "isomorphic-fetch": ">=2.2.0"
+      "isomorphic-fetch": ">=2.2.1"
     },
     "devDependencies": {
       "typescript": "^1.8.10",

@@ -249,8 +249,8 @@ export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
-    mode: string;
-    credentials: string;
+    mode: RequestMode;
+    credentials: RequestCredentials;
     headers: Headers;
 
     constructor(baseUrl: string) {
@@ -312,7 +312,7 @@ export class JsonServiceClient {
             .then(res => {
                 if (!res.ok)
                     throw res;
-                
+
                 var x = typeof request.createResponse == 'function'
                     ? request.createResponse()
                     : null;
@@ -510,11 +510,45 @@ export const appendQueryString = (url: string, args: any): string => {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
-            url += k + "=" + (args[k] != null && encodeURIComponent(args[k]) || "");
+            url += k + "=" + qsValue(args[k]);
         }
     }
     return url;
 };
+
+const qsValue = (arg: any) => {
+    if (arg == null)
+        return "";
+    if (arg instanceof Uint8Array)
+        return bytesToBase64(arg as Uint8Array);
+    return encodeURIComponent(arg) || "";
+}
+
+//from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
+export const bytesToBase64 = (aBytes: Uint8Array): string => {
+    var eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
+    for (var nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
+        nMod3 = nIdx % 3;
+        nUint24 |= aBytes[nIdx] << (16 >>> nMod3 & 24);
+        if (nMod3 === 2 || aBytes.length - nIdx === 1) {
+            sB64Enc += String.fromCharCode(uint6ToB64(nUint24 >>> 18 & 63), uint6ToB64(nUint24 >>> 12 & 63), uint6ToB64(nUint24 >>> 6 & 63), uint6ToB64(nUint24 & 63));
+            nUint24 = 0;
+        }
+    }
+    return eqLen === 0
+        ? sB64Enc
+        : sB64Enc.substring(0, sB64Enc.length - eqLen) + (eqLen === 1 ? "=" : "==");
+}
+
+const uint6ToB64 = (nUint6: number) : number =>
+     nUint6 < 26 ?
+      nUint6 + 65
+    : nUint6 < 52 ?
+      nUint6 + 71
+    : nUint6 < 62 ?
+      nUint6 - 4
+    : nUint6 === 62 ? 43
+    : nUint6 === 63 ? 47 : 65;
 
 export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
