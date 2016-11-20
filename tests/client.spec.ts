@@ -2,8 +2,10 @@
 
 import * as dtos from "./dtos/techstacks.dtos";
 import { 
+    ResponseStatus, ResponseError,
     HelloTypes,
-    ReturnString, ReturnBytes, ReturnStream
+    ReturnString, ReturnBytes, ReturnStream,
+    TestAuth, TestAuthResponse
 } from "./dtos/test.dtos";
 import chai = require('chai');
 import { 
@@ -130,4 +132,15 @@ describe('JsonServiceClient Tests', () => {
     //         }, done);
     // })
 
+    it ('Should allow HTTP Basic Auth requests', done => {
+        let testAuth = new JsonServiceClient('http://test.servicestack.net');
+        testAuth.userName = "test";
+        testAuth.password = "test";
+
+        testAuth.get(new TestAuth())
+            .then(r => {
+                chai.expect(r.userName).to.equal("test");
+                done();
+            }, done);
+    })
 });

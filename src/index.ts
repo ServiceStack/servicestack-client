@@ -252,6 +252,9 @@ export class JsonServiceClient {
     mode: RequestMode;
     credentials: RequestCredentials;
     headers: Headers;
+    userName: string;
+    password: string;
+    static toBase64: (rawString:string) => string;
 
     constructor(baseUrl: string) {
         if (baseUrl == null)
@@ -265,6 +268,11 @@ export class JsonServiceClient {
         this.credentials = 'include';
         this.headers = new Headers();
         this.headers.set("Content-Type", "application/json");
+    }
+
+    setCredentials(userName:string, password:string): void {
+        this.userName = userName;
+        this.password = password;
     }
 
     get<T>(request: IReturn<T>): Promise<T> {
@@ -293,6 +301,10 @@ export class JsonServiceClient {
         const hasRequestBody = HttpMethods.hasRequestBody(method);
         if (!hasRequestBody)
             url = appendQueryString(url, request);
+
+        if (this.userName != null && this.password != null) {
+            this.headers.set('Authorization', 'Basic '+ JsonServiceClient.toBase64(`${this.userName}:${this.password}`));
+        }
 
         // Set `compress` false due to common error
         // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
@@ -549,6 +561,24 @@ const uint6ToB64 = (nUint6: number) : number =>
       nUint6 - 4
     : nUint6 === 62 ? 43
     : nUint6 === 63 ? 47 : 65;
+
+//JsonServiceClient.toBase64 requires IE10+ or node
+interface NodeBuffer extends Uint8Array {
+    toString(encoding?: string, start?: number, end?: number): string;
+}
+interface Buffer extends NodeBuffer { }
+declare var Buffer: {
+    new (str: string, encoding?: string): Buffer;
+}
+var _btoa = typeof btoa == 'function'
+    ? btoa
+    : (str) => new Buffer(str).toString('base64');
+
+//from: http://stackoverflow.com/a/30106551/85785
+JsonServiceClient.toBase64 = (str:string) => 
+    _btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match:any, p1:string) =>
+        String.fromCharCode(new Number('0x' + p1).valueOf())
+    ));
 
 export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
