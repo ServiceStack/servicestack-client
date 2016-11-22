@@ -1,6 +1,6 @@
 {
   "name": "servicestack-client",
-  "version": "0.0.10",
+  "version": "0.0.15",
   "main": "./lib/index.d.ts",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
   "globalDependencies": {
