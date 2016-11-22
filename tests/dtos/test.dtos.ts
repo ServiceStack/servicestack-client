@@ -1,5 +1,5 @@
 /* Options:
-Date: 2016-11-20 04:22:23
+Date: 2016-11-22 05:21:22
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,11 +10,15 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid
 //ExcludeTypes: 
 //DefaultImports: 
 */
 
+
+export interface IReturnVoid
+{
+}
 
 export interface IReturn<T>
 {
@@ -72,6 +76,13 @@ export class TestAuthResponse
     userName: string;
     displayName: string;
     responseStatus: ResponseStatus;
+}
+
+export class HelloReturnVoid implements IReturnVoid
+{
+    id: number;
+    createResponse() {}
+    getTypeName() { return "HelloReturnVoid"; }
 }
 
 // @Route("/return/string")

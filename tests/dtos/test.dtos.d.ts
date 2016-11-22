@@ -1,3 +1,5 @@
+export interface IReturnVoid {
+}
 export interface IReturn<T> {
 }
 export declare class ResponseError {
@@ -30,6 +32,11 @@ export declare class TestAuthResponse {
     userName: string;
     displayName: string;
     responseStatus: ResponseStatus;
+}
+export declare class HelloReturnVoid implements IReturnVoid {
+    id: number;
+    createResponse(): void;
+    getTypeName(): string;
 }
 export declare class ReturnString implements IReturn<string> {
     data: string;

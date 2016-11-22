@@ -5,7 +5,8 @@ import {
     ResponseStatus, ResponseError,
     HelloTypes,
     ReturnString, ReturnBytes, ReturnStream,
-    TestAuth, TestAuthResponse
+    TestAuth, TestAuthResponse,
+    HelloReturnVoid
 } from "./dtos/test.dtos";
 import chai = require('chai');
 import { 
@@ -23,7 +24,7 @@ describe('JsonServiceClient Tests', () => {
         test = new JsonServiceClient('http://test.servicestack.net');
     });
 
-    it('Should get techs response', (done) => {
+    it('Should get techs response', done => {
         var testPromise = new Promise((resolve,reject) => {
             client.get(new dtos.GetAllTechnologies()).then((response) => {
                 resolve(response);
@@ -40,7 +41,7 @@ describe('JsonServiceClient Tests', () => {
         },done);
     });
 
-    it('Should get techstacks overview', (done) => {
+    it('Should get techstacks overview', done => {
         var testPromise = new Promise((resolve,reject) => {
             client.get(new dtos.Overview()).then((response) => {
                 resolve(response);
@@ -57,7 +58,7 @@ describe('JsonServiceClient Tests', () => {
         },done);
     });
 
-    it('Should throw 405', (done) => {
+    it('Should throw 405', done => {
         var testClient = new JsonServiceClient('https://servicestack.net/');
         var testPromise = new Promise((resolve,reject) => {
             testClient.get(new dtos.Overview()).then((response) => {
@@ -78,7 +79,7 @@ describe('JsonServiceClient Tests', () => {
         },done);
     });
 
-    it('Should throw 401', (done) => {
+    it('Should throw 401', done => {
         var testPromise = new Promise((resolve,reject) => {
             client.post(new dtos.CreateTechnology()).then((response) => {
                 reject(response);
@@ -108,7 +109,7 @@ describe('JsonServiceClient Tests', () => {
         chai.expect(requestUrl).to.equal("http://test.servicestack.net?bool=false&int=0");
     })
 
-    it ('Should return raw text', (done) => {
+    it ('Should return raw text', done => {
 
         var request = new ReturnString();
         request.data = "0x10";
@@ -121,7 +122,7 @@ describe('JsonServiceClient Tests', () => {
     })
 
     // node-fetch v2 will implement arrayBuffer: https://github.com/bitinn/node-fetch/issues/51#issuecomment-253998195
-    // it ('Should return raw bytes', (done) => {
+    // it ('Should return raw bytes', done => {
     //     var request = new ReturnBytes();
     //     request.data = new Uint8Array([0x01]);
     //     test.get(request)
@@ -142,5 +143,19 @@ describe('JsonServiceClient Tests', () => {
                 chai.expect(r.userName).to.equal("test");
                 done();
             }, done);
+    })
+
+    it ('Can GET IReturnVoid requests', done => {
+        let request = new HelloReturnVoid();
+        request.id = 1;
+        test.get(request)
+            .then(r => done(), done)
+    })
+
+    it ('Can POST IReturnVoid requests', done => {
+        let request = new HelloReturnVoid();
+        request.id = 1;
+        test.post(request)
+            .then(r => done(), done)
     })
 });

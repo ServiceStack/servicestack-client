@@ -333,7 +333,8 @@ export class JsonServiceClient {
                     return res.text().then(o => o as Object as T);
 
                 var contentType = res.headers.get("content-type");
-                if (contentType && contentType.indexOf("application/json") !== -1) {
+                var isJson = contentType && contentType.indexOf("application/json") !== -1;
+                if (isJson) {
                     return res.json().then(o => o as Object as T);
                 }
 
@@ -343,11 +344,16 @@ export class JsonServiceClient {
 
                     return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
 
-                } else if (x instanceof Blob) {
+                } else if (typeof Blob == "function" && x instanceof Blob) {
                     if (typeof res.blob != 'function')
                         throw new Error("This fetch polyfill does not implement 'blob'");
 
                     return res.blob().then(o => o as Object as T);
+                }
+
+                let contentLength = res.headers.get("content-length");
+                if (contentLength === "0" || (contentLength == null && !isJson)) {
+                    return x;
                 }
 
                 return res.json().then(o => o as Object as T); //fallback
