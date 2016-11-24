@@ -213,7 +213,7 @@ export class ServerEventsClient {
         return this.eventSource = es;
     }
 
-    invokeReceiver(r, cmd, el, msg, e, name) {
+    invokeReceiver(r:any, cmd:string, el:Element, msg:string, e:any, name:string) {
         if (r) {
             if (typeof (r[cmd]) == "function") {
                 r[cmd].call(el || r[cmd], msg, e);
@@ -223,7 +223,7 @@ export class ServerEventsClient {
         }
     }
 
-    updateChannels(channels) {
+    updateChannels(channels:string[]) {
         this.channels = channels;
         const url = this.eventSource != null
             ? this.eventSource.url

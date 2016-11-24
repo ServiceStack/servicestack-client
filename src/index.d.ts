@@ -91,8 +91,8 @@ export declare class ServerEventsClient {
     constructor(baseUrl: string, channels: string[], options?: any, eventSource?: IEventSourceStatic);
     onMessage(e: IOnMessageEvent): void;
     reconnectServerEvents(opt?: any): IEventSourceStatic;
-    invokeReceiver(r: any, cmd: any, el: any, msg: any, e: any, name: any): void;
-    updateChannels(channels: any): void;
+    invokeReceiver(r: any, cmd: string, el: Element, msg: string, e: any, name: string): void;
+    updateChannels(channels: string[]): void;
 }
 export declare class HttpMethods {
     static Get: string;
