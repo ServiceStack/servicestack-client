@@ -5,6 +5,7 @@
   "description": "ServiceStack's TypeScript library providing a number of convenience utilities in developing web apps. Integrates with ServiceStack's Server features including Error Handling, Validation and Server Events",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
   "bugs": "https://github.com/ServiceStack/Issues",
+  "license": "BSD-3-Clause",
   "author": {
     "name": "Service Stack",
     "email": "team@servicestack.net",
