@@ -17,8 +17,7 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
-    "test": "mocha -t 5000 ./tests/*.js",
-    "prepublish": "node_modules/.bin/tsc"
+    "test": "mocha -t 5000 ./tests/*.js"
   },
   "files": [
     "src/index.js",
@@ -37,13 +36,14 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "es6-shim": ">=0.35.0",
-    "isomorphic-fetch": ">=2.2.1"
+    "@types/isomorphic-fetch": "0.0.31",
+    "es6-shim": "^0.35.1",
+    "isomorphic-fetch": "^2.2.1"
   },
   "devDependencies": {
-    "typescript": "^1.8.10",
     "chai": "^3.5.0",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "typescript": "^2.0.10"
   },
   "jspm": {
     "directories": {},
@@ -52,7 +52,7 @@
       "isomorphic-fetch": ">=2.2.1"
     },
     "devDependencies": {
-      "typescript": "^1.8.10",
+      "typescript": "^2.0.10",
       "chai": "^3.5.0",
       "mocha": "^2.5.3"
     }

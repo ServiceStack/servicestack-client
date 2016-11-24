@@ -8,12 +8,13 @@
     "sourceMap": true,
     "target": "es5",
     "module": "commonjs",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "lib": ["es2015","dom"]
   },
   "files": [
-    "./typings/index.d.ts",
     "./src/index.ts",
     "./tests/dtos/techstacks.dtos.ts",
+    "./tests/dtos/test.dtos.ts",
     "./tests/client.spec.ts"
    ]
 }

@@ -1,3 +1,4 @@
+/// <reference types="isomorphic-fetch" />
 import 'isomorphic-fetch';
 export interface IReturnVoid {
     createResponse(): any;

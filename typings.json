@@ -1,14 +1,6 @@
 {
-  "name": "servicestack-client",
-  "version": "0.0.15",
-  "main": "./lib/index.d.ts",
-  "homepage": "https://github.com/ServiceStack/servicestack-client",
   "globalDependencies": {
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
-    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046"
-  },
-  "globalDevDependencies": {
     "chai": "registry:dt/chai#3.4.0+20160601211834",
-    "mocha": "registry:dt/mocha#2.2.5+20160619032855"
+    "mocha": "registry:dt/mocha#2.2.5+20161028141524"
   }
 }
