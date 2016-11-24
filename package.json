@@ -17,11 +17,12 @@
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
     "test": "mocha -t 5000 ./tests/*.js",
-    "prepublish": "node_modules/.bin/tsc && node scripts/prepack"
+    "prepublish": "node_modules/.bin/tsc"
   },
   "files": [
-    "lib/index.js",
-    "lib/index.js.map"
+    "src/index.js",
+    "src/index.js.map",
+    "src/index.d.ts"
   ],
   "keywords": [
     "servicestack",
@@ -32,7 +33,8 @@
     "error-handling"
   ],
   "licenses": [],
-  "main": "lib/index.js",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "dependencies": {
     "es6-shim": ">=0.35.0",
     "isomorphic-fetch": ">=2.2.1"
