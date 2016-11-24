@@ -7,9 +7,9 @@
   "bugs": "https://github.com/ServiceStack/Issues",
   "license": "BSD-3-Clause",
   "author": {
-    "name": "Service Stack",
+    "name": "ServiceStack Inc",
     "email": "team@servicestack.net",
-    "url": "https:/servicestack.net"
+    "url": "https://servicestack.net"
   },
   "repository": {
     "type": "git",
