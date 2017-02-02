@@ -71,6 +71,43 @@ client.post(request)
 
 Where the `r` param in the returned `then()` Promise callback is typed to `StoreGistResponse` DTO Type.
 
+### Support for Basic Auth
+
+Basic Auth support is implemented in `JsonServiceClient` and follows the same API made available in the C# 
+Service Clients where the `userName/password` properties can be set individually, e.g:
+
+```ts
+var client = new JsonServiceClient(baseUrl);
+client.userName = user;
+client.password = pass;
+
+client.get(new SecureRequest())
+    .then(r => ...);
+```
+
+Or use `client.setCredentials()` to have them set both together.
+
+### Raw Data Responses
+
+The `JsonServiceClient` also supports Raw Data responses like `string` and `byte[]` which also get a Typed API 
+once declared on Request DTOs using the `IReturn<T>` marker:
+
+```csharp
+public class ReturnString : IReturn<string> {}
+public class ReturnBytes : IReturn<byte[]> {}
+```
+
+Which can then be accessed as normal, with their Response typed to a JavaScript `string` or `Uint8Array` for 
+raw `byte[]` responses:
+
+```ts
+client.get(new ReturnString())
+    .then(str => ...);  //= str:string
+
+client.get(new ReturnBytes())
+    .then(data => ...); //= data:Uint8Array
+```
+
 ### ServerEventsClient
 
 In addition to `JsonServiceClient` this package contains most of the JavaScript utils in 
