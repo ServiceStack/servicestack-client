@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-02-10 03:58:19
+Date: 2017-02-10 15:25:37
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -86,6 +86,29 @@ export class TestAuthResponse
     userName: string;
     displayName: string;
     responseStatus: ResponseStatus;
+}
+
+// @Route("/echo/types")
+export class EchoTypes implements IReturn<EchoTypes>
+{
+    byte: number;
+    short: number;
+    int: number;
+    long: number;
+    uShort: number;
+    uInt: number;
+    uLong: number;
+    float: number;
+    double: number;
+    decimal: number;
+    string: string;
+    dateTime: string;
+    timeSpan: string;
+    dateTimeOffset: string;
+    guid: string;
+    char: string;
+    createResponse() { return new EchoTypes(); }
+    getTypeName() { return "EchoTypes"; }
 }
 
 // @Route("/throwvalidation")

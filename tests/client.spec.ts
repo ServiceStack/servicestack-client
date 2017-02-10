@@ -7,7 +7,8 @@ import {
     ReturnString, ReturnBytes, ReturnStream,
     TestAuth, TestAuthResponse,
     HelloReturnVoid,
-    ThrowValidation, ThrowValidationResponse
+    ThrowValidation, ThrowValidationResponse,
+    EchoTypes
 } from "./dtos/test.dtos";
 import chai = require('chai');
 import { 
@@ -142,6 +143,20 @@ describe('JsonServiceClient Tests', () => {
         testAuth.get(new TestAuth())
             .then(r => {
                 chai.expect(r.userName).to.equal("test");
+                done();
+            }, done);
+    })
+
+    it ('Can POST to EchoTypes', done => {
+        let request = new EchoTypes();
+        request.int = 1;
+        request.string = "foo";
+
+        test.post(request)
+            .then(r => {
+                console.log(r);
+                chai.expect(r.int).to.equal(request.int);
+                chai.expect(r.string).to.equal(request.string);
                 done();
             }, done);
     })

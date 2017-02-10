@@ -41,6 +41,26 @@ export declare class TestAuthResponse {
     displayName: string;
     responseStatus: ResponseStatus;
 }
+export declare class EchoTypes implements IReturn<EchoTypes> {
+    byte: number;
+    short: number;
+    int: number;
+    long: number;
+    uShort: number;
+    uInt: number;
+    uLong: number;
+    float: number;
+    double: number;
+    decimal: number;
+    string: string;
+    dateTime: string;
+    timeSpan: string;
+    dateTimeOffset: string;
+    guid: string;
+    char: string;
+    createResponse(): EchoTypes;
+    getTypeName(): string;
+}
 export declare class ThrowValidation implements IReturn<ThrowValidationResponse> {
     age: number;
     required: string;
