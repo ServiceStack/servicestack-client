@@ -113,6 +113,8 @@ export declare class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    requestFilter: (req: Request) => void;
+    responseFilter: (res: IResponse) => void;
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;

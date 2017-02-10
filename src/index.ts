@@ -254,6 +254,9 @@ export class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    requestFilter: (req:Request) => void;
+    responseFilter: (res:IResponse) => void;
+
     static toBase64: (rawString:string) => string;
 
     constructor(baseUrl: string) {
@@ -320,10 +323,16 @@ export class JsonServiceClient {
         if (hasRequestBody)
             (req as any).body = JSON.stringify(request);
 
-        return fetch(url, req)
+        if (this.requestFilter != null)
+            this.requestFilter(req);
+
+        return fetch(req)
             .then(res => {
                 if (!res.ok)
                     throw res;
+
+                if (this.responseFilter != null)
+                    this.responseFilter(res);
 
                 var x = typeof request.createResponse == 'function'
                     ? request.createResponse()
