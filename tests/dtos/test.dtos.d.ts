@@ -1,6 +1,8 @@
 export interface IReturnVoid {
+    createResponse(): void;
 }
 export interface IReturn<T> {
+    createResponse(): T;
 }
 export declare class ResponseError {
     errorCode: string;
@@ -19,6 +21,12 @@ export declare class ResponseStatus {
         [index: string]: string;
     };
 }
+export declare class ThrowValidationResponse {
+    age: number;
+    required: string;
+    email: string;
+    responseStatus: ResponseStatus;
+}
 export declare class HelloTypes implements IReturn<HelloTypes> {
     string: string;
     bool: boolean;
@@ -32,6 +40,13 @@ export declare class TestAuthResponse {
     userName: string;
     displayName: string;
     responseStatus: ResponseStatus;
+}
+export declare class ThrowValidation implements IReturn<ThrowValidationResponse> {
+    age: number;
+    required: string;
+    email: string;
+    createResponse(): ThrowValidationResponse;
+    getTypeName(): string;
 }
 export declare class HelloReturnVoid implements IReturnVoid {
     id: number;

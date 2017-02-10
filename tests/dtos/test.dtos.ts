@@ -1,5 +1,5 @@
 /* Options:
-Date: 2016-11-22 05:21:22
+Date: 2017-02-10 03:58:19
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -18,10 +18,12 @@ IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,HelloTypes,Retu
 
 export interface IReturnVoid
 {
+    createResponse() : void;
 }
 
 export interface IReturn<T>
 {
+    createResponse() : T;
 }
 
 // @DataContract
@@ -59,6 +61,14 @@ export class ResponseStatus
     meta: { [index:string]: string; };
 }
 
+export class ThrowValidationResponse
+{
+    age: number;
+    required: string;
+    email: string;
+    responseStatus: ResponseStatus;
+}
+
 // @Route("/hellotypes/{Name}")
 export class HelloTypes implements IReturn<HelloTypes>
 {
@@ -76,6 +86,16 @@ export class TestAuthResponse
     userName: string;
     displayName: string;
     responseStatus: ResponseStatus;
+}
+
+// @Route("/throwvalidation")
+export class ThrowValidation implements IReturn<ThrowValidationResponse>
+{
+    age: number;
+    required: string;
+    email: string;
+    createResponse() { return new ThrowValidationResponse(); }
+    getTypeName() { return "ThrowValidation"; }
 }
 
 export class HelloReturnVoid implements IReturnVoid

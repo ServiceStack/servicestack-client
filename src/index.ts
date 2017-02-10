@@ -408,6 +408,7 @@ export const sanitize = (status: any): any => {
     if (status.errors)
         return status;
     var to: any = {};
+
     for (let k in status) {
         if (status.hasOwnProperty(k)) {
             if (status[k] instanceof Object)
@@ -418,6 +419,16 @@ export const sanitize = (status: any): any => {
     }
 
     to.errors = [];
+    if (status.Errors != null) {
+        for (var i=0, len = status.Errors.length; i<len; i++) {
+            var o = status.Errors[i];
+            var err = {};
+            for (var k in o)
+                err[toCamelCase(k)] = o[k];
+            to.errors.push(err);
+        }
+    }
+
     return to;
 }
 

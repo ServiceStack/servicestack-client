@@ -6,7 +6,8 @@ import {
     HelloTypes,
     ReturnString, ReturnBytes, ReturnStream,
     TestAuth, TestAuthResponse,
-    HelloReturnVoid
+    HelloReturnVoid,
+    ThrowValidation, ThrowValidationResponse
 } from "./dtos/test.dtos";
 import chai = require('chai');
 import { 
@@ -157,5 +158,59 @@ describe('JsonServiceClient Tests', () => {
         request.id = 1;
         test.post(request)
             .then(r => done(), done)
+    })
+
+    it ('Can handle Validation Errors with Camel Casing', done => {
+        var testPromise = new Promise((resolve,reject) => {
+            test.requestFilter = req => {
+                req.url += "?jsconfig=EmitCamelCaseNames:true";
+            };
+            test.get(new ThrowValidation()).then((response) => {
+                reject(response);
+            }).catch((err) => {
+                resolve(err);
+            });
+        });
+
+        testPromise.then((res: ThrowValidationResponse) => {
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal("InclusiveBetween");
+                chai.expect(res.responseStatus.message).to.be.equal("'Age' must be between 1 and 120. You entered 0.");
+                chai.expect(res.responseStatus.errors.length).to.be.equal(3);
+                chai.expect(res.responseStatus.errors[1].errorCode).to.be.equal("NotEmpty");
+                chai.expect(res.responseStatus.errors[1].fieldName).to.be.equal("Required");
+                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' should not be empty.");
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
+    })
+
+    it ('Can handle Validation Errors with Pascal Casing', done => {
+        var testPromise = new Promise((resolve,reject) => {
+            test.requestFilter = req => {
+                req.url += "?jsconfig=EmitCamelCaseNames:false";
+            };
+            test.get(new ThrowValidation()).then((response) => {
+                reject(response);
+            }).catch((err) => {
+                resolve(err);
+            });
+        });
+
+        testPromise.then((res: ThrowValidationResponse) => {
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal("InclusiveBetween");
+                chai.expect(res.responseStatus.message).to.be.equal("'Age' must be between 1 and 120. You entered 0.");
+                chai.expect(res.responseStatus.errors.length).to.be.equal(3);
+                chai.expect(res.responseStatus.errors[1].errorCode).to.be.equal("NotEmpty");
+                chai.expect(res.responseStatus.errors[1].fieldName).to.be.equal("Required");
+                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' should not be empty.");
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
     })
 });
