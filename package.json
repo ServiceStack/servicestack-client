@@ -37,8 +37,8 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "@types/isomorphic-fetch": "0.0.31",
-    "es6-shim": "^0.35.1",
+    "@types/isomorphic-fetch": "^0.0.31",
+    "es6-shim": "^0.35.3",
     "isomorphic-fetch": "^2.2.1"
   },
   "devDependencies": {
@@ -47,6 +47,7 @@
     "typescript": "^2.0.10"
   },
   "jspm": {
+    "registry": "npm",
     "directories": {},
     "dependencies": {
       "es6-shim": ">=0.35.0",
