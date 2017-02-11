@@ -326,7 +326,7 @@ export class JsonServiceClient {
         if (this.requestFilter != null)
             this.requestFilter(req);
 
-        return fetch(req)
+        return fetch(req.url, req)
             .then(res => {
                 if (!res.ok)
                     throw res;
