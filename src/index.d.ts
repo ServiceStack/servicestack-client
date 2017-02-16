@@ -115,6 +115,7 @@ export declare class JsonServiceClient {
     password: string;
     requestFilter: (req: Request) => void;
     responseFilter: (res: IResponse) => void;
+    exceptionFilter: (res: IResponse, error: any) => void;
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
@@ -124,6 +125,7 @@ export declare class JsonServiceClient {
     put<T>(request: IReturn<T>): Promise<T>;
     patch<T>(request: IReturn<T>): Promise<T>;
     send<T>(method: string, request: IReturn<T>): Promise<T>;
+    raiseError(res: IResponse, error: any): any;
 }
 export declare const toCamelCase: (key: string) => string;
 export declare const sanitize: (status: any) => any;

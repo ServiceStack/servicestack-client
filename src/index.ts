@@ -256,6 +256,7 @@ export class JsonServiceClient {
     password: string;
     requestFilter: (req:Request) => void;
     responseFilter: (res:IResponse) => void;
+    exceptionFilter: (res:IResponse, error:any) => void;
 
     static toBase64: (rawString:string) => string;
 
@@ -326,8 +327,11 @@ export class JsonServiceClient {
         if (this.requestFilter != null)
             this.requestFilter(req);
 
+        var holdRes:IResponse  = null;
+
         return fetch(req.url, req)
             .then(res => {
+                holdRes = res;
                 if (!res.ok)
                     throw res;
 
@@ -368,12 +372,13 @@ export class JsonServiceClient {
                 return res.json().then(o => o as Object as T); //fallback
             })
             .catch(res => {
+
                 if (res instanceof Error)
-                    throw res;
+                    throw this.raiseError(holdRes, res);
 
                 // res.json can only be called once.
                 if (res.bodyUsed)
-                    throw createErrorResponse(res.status, res.statusText);
+                    throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
 
                 return res.json().then(o => {
                     var errorDto = sanitize(o);
@@ -383,10 +388,17 @@ export class JsonServiceClient {
                 }).catch(responseStatusError => {
                     // No responseStatus body, set from `res` Body object
                     if (responseStatusError instanceof Error)
-                        throw createErrorResponse(res.status, res.statusText);
-                    throw responseStatusError;
+                        throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
+                    throw this.raiseError(res, responseStatusError);
                 });
             });
+    }
+
+    raiseError(res:IResponse, error:any) : any {
+        if (this.exceptionFilter != null) {
+            this.exceptionFilter(res, error);
+        }
+        return error;
     }
 }
 
