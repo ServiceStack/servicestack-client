@@ -27,10 +27,10 @@ node server projects can instead install it with:
 
     npm install servicestack-client --save
 
-Then fetch the Type Definitions for either project type with:
+The Type Definitions are contained in the above `servicestack-client` npm package, if using jspm it 
+can be installed with:
 
-    typings install servicestack-client --save
-    typings install dt~isomorphic-fetch --global --save
+    npm install servicestack-client --save-dev
 
 ### Ideal Typed Message-based API
 
