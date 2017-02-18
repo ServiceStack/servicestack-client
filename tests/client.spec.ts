@@ -19,11 +19,11 @@ import {
 
 describe('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
-    var test : JsonServiceClient;
+    var testClient : JsonServiceClient;
 
     beforeEach(() => {
         client = new JsonServiceClient('http://techstacks.io/');
-        test = new JsonServiceClient('http://test.servicestack.net');
+        testClient = new JsonServiceClient('http://test.servicestack.net');
     });
 
     it('Should get techs response', done => {
@@ -92,7 +92,6 @@ describe('JsonServiceClient Tests', () => {
 
         testPromise.then((res: ErrorResponse) => {
             try {
-                console.log(res);
                 chai.expect(res.responseStatus.errorCode).to.be.equal(401);
                 chai.expect(res.responseStatus.message).to.be.equal('Unauthorized');
                 done();
@@ -116,7 +115,7 @@ describe('JsonServiceClient Tests', () => {
         var request = new ReturnString();
         request.data = "0x10";
 
-        test.get(request)
+        testClient.get(request)
             .then(s => {
                 chai.expect(s).to.equal("0x10");
                 done();
@@ -136,15 +135,103 @@ describe('JsonServiceClient Tests', () => {
     // })
 
     it ('Should allow HTTP Basic Auth requests', done => {
-        let testAuth = new JsonServiceClient('http://test.servicestack.net');
-        testAuth.userName = "test";
-        testAuth.password = "test";
+        testClient.userName = "test";
+        testClient.password = "test";
 
-        testAuth.get(new TestAuth())
+        testClient.get(new TestAuth())
             .then(r => {
                 chai.expect(r.userName).to.equal("test");
                 done();
             }, done);
+    })
+
+    it ('Should return 401 for failed HTTP Basic Auth requests', done => {
+        testClient.userName = "test";
+        testClient.password = "wrong";
+
+        testClient.exceptionFilter = (res,error) => {
+            chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+        };
+
+        var testPromise = new Promise((resolve,reject) => {
+            testClient.post(new TestAuth()).then(response => {
+                reject(response);
+            }).catch((error) => {
+                resolve(error);
+            })
+        });
+
+        testPromise.then((res: ErrorResponse) => {
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal('Unauthorized');
+                chai.expect(res.responseStatus.message).to.be.equal('Invalid UserName or Password');
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
+    })
+
+    it ('Should return 401 for failed Auth requests (HttpBenchmarks)', done => {
+        var client = new JsonServiceClient("https://httpbenchmarks.servicestack.net");
+        client.exceptionFilter = (res,error) => {
+            chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+        };
+
+        var request = new dtos.Authenticate();
+        request.provider = "credentials";
+        request.UserName = "test";
+        request.Password = "wrong";
+
+        var testPromise = new Promise((resolve,reject) => {
+            client.post(request).then(response => {
+                reject(response);
+            }).catch((error) => {
+                resolve(error);
+            })
+        });
+
+        testPromise.then((error: ErrorResponse) => {
+            try {
+                chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
+                chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+                done();
+            } catch(ex) {
+                done(ex);
+            }
+        },done);
+    })
+
+    it ('Should return 401 for failed Auth requests (Test)', done => {
+        testClient.exceptionFilter = (res,error) => {
+            chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+        };
+
+        var request = new dtos.Authenticate();
+        request.provider = "credentials";
+        request.UserName = "test";
+        request.Password = "wrong";
+
+        var testPromise = new Promise((resolve,reject) => {
+            testClient.post(request).then(response => {
+                reject(response);
+            }).catch((error) => {
+                resolve(error);
+            })
+        });
+
+        testPromise.then((res: ErrorResponse) => {
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal('Unauthorized');
+                chai.expect(res.responseStatus.message).to.be.equal('Invalid UserName or Password');
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
     })
 
     it ('Can POST to EchoTypes', done => {
@@ -152,9 +239,8 @@ describe('JsonServiceClient Tests', () => {
         request.int = 1;
         request.string = "foo";
 
-        test.post(request)
+        testClient.post(request)
             .then(r => {
-                console.log(r);
                 chai.expect(r.int).to.equal(request.int);
                 chai.expect(r.string).to.equal(request.string);
                 done();
@@ -164,23 +250,23 @@ describe('JsonServiceClient Tests', () => {
     it ('Can GET IReturnVoid requests', done => {
         let request = new HelloReturnVoid();
         request.id = 1;
-        test.get(request)
+        testClient.get(request)
             .then(r => done(), done)
     })
 
     it ('Can POST IReturnVoid requests', done => {
         let request = new HelloReturnVoid();
         request.id = 1;
-        test.post(request)
+        testClient.post(request)
             .then(r => done(), done)
     })
 
     it ('Can handle Validation Errors with Camel Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            test.requestFilter = req => {
+            testClient.requestFilter = req => {
                 req.url += "?jsconfig=EmitCamelCaseNames:true";
             };
-            test.get(new ThrowValidation()).then((response) => {
+            testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);
             }).catch((err) => {
                 resolve(err);
@@ -204,10 +290,10 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can handle Validation Errors with Pascal Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            test.requestFilter = req => {
+            testClient.requestFilter = req => {
                 req.url += "?jsconfig=EmitCamelCaseNames:false";
             };
-            test.get(new ThrowValidation()).then((response) => {
+            testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);
             }).catch((err) => {
                 resolve(err);
