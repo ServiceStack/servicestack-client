@@ -385,11 +385,11 @@ export class JsonServiceClient {
                     if (!errorDto.responseStatus)
                         throw createErrorResponse(res.status, res.statusText);
                     throw errorDto;
-                }).catch(responseStatusError => {
+                }).catch(error => {
                     // No responseStatus body, set from `res` Body object
-                    if (responseStatusError instanceof Error)
+                    if (error instanceof Error)
                         throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
-                    throw this.raiseError(res, responseStatusError);
+                    throw this.raiseError(res, error);
                 });
             });
     }
