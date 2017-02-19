@@ -10,7 +10,7 @@ import {
     ThrowValidation, ThrowValidationResponse,
     EchoTypes
 } from "./dtos/test.dtos";
-import chai = require('chai');
+import * as chai from "chai";
 import { 
     JsonServiceClient,
     ErrorResponse,
@@ -61,7 +61,7 @@ describe('JsonServiceClient Tests', () => {
     });
 
     it('Should throw 405', done => {
-        var testClient = new JsonServiceClient('https://servicestack.net/');
+        var testClient = new JsonServiceClient('http://test.servicestack.net/');
         var testPromise = new Promise((resolve,reject) => {
             testClient.get(new dtos.Overview()).then((response) => {
                 reject(response);
@@ -263,8 +263,8 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can handle Validation Errors with Camel Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            testClient.requestFilter = req => {
-                req.url += "?jsconfig=EmitCamelCaseNames:true";
+            testClient.requestFilter = (req,opt) => {
+                opt.url += "?jsconfig=EmitCamelCaseNames:true";
             };
             testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);
@@ -290,8 +290,8 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can handle Validation Errors with Pascal Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            testClient.requestFilter = req => {
-                req.url += "?jsconfig=EmitCamelCaseNames:false";
+            testClient.requestFilter = (req,opt) => {
+                opt.url += "?jsconfig=EmitCamelCaseNames:false";
             };
             testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);

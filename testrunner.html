@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mocha Tests</title>
+    <link rel="stylesheet" href="node_modules/mocha/mocha.css">
+  </head>
+  <body>
+    <-- run from http://localhost:8080/testrunner.html -->
+    <div id="mocha"></div>
+    <script src="node_modules/mocha/mocha.js"></script>
+    <script src="node_modules/chai/chai.js"></script>
+
+    <script>
+    var globalImports = {
+        chai: window.chai,
+        moch: window.mocha,
+        'isomorphic-fetch': window.fetch
+    };
+    
+    //require shim
+    (function () {
+        // c is cache, the rest are the constants
+        var c = {},s="status",t="Text",e="exports",E="Error",r="require",m="module",S=" ",w=window;
+        w[r]=function R(url) {
+            if (globalImports[url])
+                return globalImports[url];
+            if (url.startsWith("./"))
+                url = "tests/" + url.substring(2);
+
+            url+=/.js$/i.test(url) ? "" : ".js";// to allow loading without js suffix;
+
+            var X=new XMLHttpRequest(),module = { id: url, uri: url }; //according to the modules 1.1 standard
+            if (!c[url])
+                try {
+                    X.open("GET", url, 0); // sync
+                    X.send();
+                    if (X[s] && X[s] != 200) 
+                        throw X[s+t];
+                    Function(r, e, m, X['response'+t])(R, c[url]={}, module); // Execute the module
+                    module[e] && (c[url]=module[e]);
+                } catch (x) {
+                    throw w[E](E+" in "+r+": Can't load "+m+S+url+":"+S+x);
+                }
+            return c[url];
+        }
+    })();    
+    </script>
+
+    <script>mocha.setup('bdd')</script>
+
+    <!-- load code you want to test here -->
+
+    <script src="tests/client.spec.js"></script>
+
+    <!-- load your test files here -->
+
+    <script>
+      mocha.run();
+    </script>
+  </body>
+</html>
