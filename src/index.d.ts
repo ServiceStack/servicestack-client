@@ -104,6 +104,9 @@ export declare class HttpMethods {
     static Options: string;
     static hasRequestBody: (method: string) => boolean;
 }
+export interface IRequestFilterOptions {
+    url: string;
+}
 export declare class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -113,7 +116,7 @@ export declare class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
-    requestFilter: (req: Request) => void;
+    requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
     responseFilter: (res: IResponse) => void;
     exceptionFilter: (res: IResponse, error: any) => void;
     static toBase64: (rawString: string) => string;

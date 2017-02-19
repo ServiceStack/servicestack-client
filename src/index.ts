@@ -245,6 +245,10 @@ export class HttpMethods {
         !(method === "GET" || method === "DELETE" || method === "HEAD" || method === "OPTIONS");
 }
 
+export interface IRequestFilterOptions {
+    url:string
+}
+
 export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -254,7 +258,7 @@ export class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
-    requestFilter: (req:Request) => void;
+    requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
     responseFilter: (res:IResponse) => void;
     exceptionFilter: (res:IResponse, error:any) => void;
 
@@ -324,12 +328,13 @@ export class JsonServiceClient {
         if (hasRequestBody)
             (req as any).body = JSON.stringify(request);
 
+        var opt:IRequestFilterOptions = { url: req.url };
         if (this.requestFilter != null)
-            this.requestFilter(req);
+            this.requestFilter(req, opt);
 
         var holdRes:IResponse  = null;
 
-        return fetch(req.url, req)
+        return fetch(opt.url || req.url, req)
             .then(res => {
                 holdRes = res;
                 if (!res.ok)
