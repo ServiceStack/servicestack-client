@@ -253,14 +253,14 @@ export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
-    mode: RequestMode;
-    credentials: RequestCredentials;
+    mode: string;
+    credentials: string;
     headers: Headers;
     userName: string;
     password: string;
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
-    responseFilter: (res:IResponse) => void;
-    exceptionFilter: (res:IResponse, error:any) => void;
+    responseFilter: (res:Response) => void;
+    exceptionFilter: (res:Response, error:any) => void;
 
     static toBase64: (rawString:string) => string;
 
@@ -332,7 +332,7 @@ export class JsonServiceClient {
         if (this.requestFilter != null)
             this.requestFilter(req, opt);
 
-        var holdRes:IResponse  = null;
+        var holdRes:Response  = null;
 
         return fetch(opt.url || req.url, req)
             .then(res => {
@@ -399,7 +399,7 @@ export class JsonServiceClient {
             });
     }
 
-    raiseError(res:IResponse, error:any) : any {
+    raiseError(res:Response, error:any) : any {
         if (this.exceptionFilter != null) {
             this.exceptionFilter(res, error);
         }

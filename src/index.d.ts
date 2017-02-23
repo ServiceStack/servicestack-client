@@ -1,4 +1,3 @@
-/// <reference types="isomorphic-fetch" />
 import 'isomorphic-fetch';
 export interface IReturnVoid {
     createResponse(): any;
@@ -111,14 +110,14 @@ export declare class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
-    mode: RequestMode;
-    credentials: RequestCredentials;
+    mode: string;
+    credentials: string;
     headers: Headers;
     userName: string;
     password: string;
     requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
-    responseFilter: (res: IResponse) => void;
-    exceptionFilter: (res: IResponse, error: any) => void;
+    responseFilter: (res: Response) => void;
+    exceptionFilter: (res: Response, error: any) => void;
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
@@ -128,7 +127,7 @@ export declare class JsonServiceClient {
     put<T>(request: IReturn<T>): Promise<T>;
     patch<T>(request: IReturn<T>): Promise<T>;
     send<T>(method: string, request: IReturn<T>): Promise<T>;
-    raiseError(res: IResponse, error: any): any;
+    raiseError(res: Response, error: any): any;
 }
 export declare const toCamelCase: (key: string) => string;
 export declare const sanitize: (status: any) => any;

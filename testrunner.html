@@ -5,12 +5,14 @@
     <link rel="stylesheet" href="node_modules/mocha/mocha.css">
   </head>
   <body>
-    <-- run from http://localhost:8080/testrunner.html -->
+    <!-- run from http://localhost:8080/testrunner.html -->
     <div id="mocha"></div>
     <script src="node_modules/mocha/mocha.js"></script>
     <script src="node_modules/chai/chai.js"></script>
 
     <script>
+    if (typeof exports == "undefined")
+        window.exports = {};
     var globalImports = {
         chai: window.chai,
         moch: window.mocha,
