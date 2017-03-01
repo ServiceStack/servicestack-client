@@ -352,11 +352,22 @@ describe('JsonServiceClient Tests', () => {
             }, done);
     })
 
-    it ('Can query AutoQuery with client args', done => {
+    it ('Can query AutoQuery with runtime args', done => {
         let request = new dtos.FindTechnologies();
         request.Take = 3;
         
         client.get(request, { VendorName: "Amazon" })
+            .then(r => {
+                chai.expect(r.Results.length).to.equal(3);
+                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon"]);
+                done();
+            }, done);
+    })
+
+    it ('Can query AutoQuery with anon object and runtime args', done => {
+        let request = { Take: 3, VendorName: "Amazon" };
+        
+        client.get<dtos.QueryResponse<dtos.Technology>>("/technology/search", request)
             .then(r => {
                 chai.expect(r.Results.length).to.equal(3);
                 chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon"]);
