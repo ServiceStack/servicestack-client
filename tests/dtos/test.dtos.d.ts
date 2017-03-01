@@ -27,6 +27,9 @@ export declare class ThrowValidationResponse {
     email: string;
     responseStatus: ResponseStatus;
 }
+export declare class HelloResponse {
+    result: string;
+}
 export declare class HelloTypes implements IReturn<HelloTypes> {
     string: string;
     bool: boolean;
@@ -66,6 +69,12 @@ export declare class ThrowValidation implements IReturn<ThrowValidationResponse>
     required: string;
     email: string;
     createResponse(): ThrowValidationResponse;
+    getTypeName(): string;
+}
+export declare class Hello implements IReturn<HelloResponse> {
+    name: string;
+    title: string;
+    createResponse(): HelloResponse;
     getTypeName(): string;
 }
 export declare class HelloReturnVoid implements IReturnVoid {

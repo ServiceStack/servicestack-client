@@ -283,32 +283,52 @@ export class JsonServiceClient {
         this.password = password;
     }
 
-    get<T>(request: IReturn<T>): Promise<T> {
-        return this.send(HttpMethods.Get, request);
+    get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Get, request, args);
     }
 
-    delete<T>(request: IReturn<T>): Promise<T> {
-        return this.send(HttpMethods.Delete, request);
+    delete<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Delete, request, args);
     }
 
-    post<T>(request: IReturn<T>): Promise<T> {
-        return this.send(HttpMethods.Post, request);
+    post<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Post, request, args);
     }
 
-    put<T>(request: IReturn<T>): Promise<T> {
-        return this.send(HttpMethods.Put, request);
+    put<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Put, request, args);
     }
 
-    patch<T>(request: IReturn<T>): Promise<T> {
-        return this.send(HttpMethods.Patch, request);
+    patch<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Patch, request, args);
     }
 
-    send<T>(method: string, request: IReturn<T>): Promise<T> {
+    createUrlFromDto<T>(method:string, request: IReturn<T>) : string {
         let url = combinePaths(this.replyBaseUrl, nameOf(request));
 
         const hasRequestBody = HttpMethods.hasRequestBody(method);
         if (!hasRequestBody)
             url = appendQueryString(url, request);
+
+        return url;
+    }
+
+    toAbsoluteUrl(method:string, relativeOrAbsoluteUrl:string) : string {
+        return relativeOrAbsoluteUrl.startsWith("http://") ||
+               relativeOrAbsoluteUrl.startsWith("https://")
+            ? relativeOrAbsoluteUrl
+            : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
+    }
+
+    send<T>(method: string, request: any|string, args?:any): Promise<T> {
+
+        let url = typeof request != "string"
+            ? this.createUrlFromDto(method, request)
+            : this.toAbsoluteUrl(method, request);
+
+        if (args) {
+            url = appendQueryString(url, args);
+        }
 
         if (this.userName != null && this.password != null) {
             this.headers.set('Authorization', 'Basic '+ JsonServiceClient.toBase64(`${this.userName}:${this.password}`));
@@ -325,7 +345,7 @@ export class JsonServiceClient {
         };
         const req = new Request(url, reqOptions);
 
-        if (hasRequestBody)
+        if (HttpMethods.hasRequestBody(method))
             (req as any).body = JSON.stringify(request);
 
         var opt:IRequestFilterOptions = { url: req.url };
@@ -343,7 +363,7 @@ export class JsonServiceClient {
                 if (this.responseFilter != null)
                     this.responseFilter(res);
 
-                var x = typeof request.createResponse == 'function'
+                var x = typeof request != "string" && typeof request.createResponse == 'function'
                     ? request.createResponse()
                     : null;
 

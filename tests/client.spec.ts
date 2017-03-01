@@ -1,8 +1,10 @@
 /// <reference path="../typings/index.d.ts" />
+/// <reference path="./dtos/test.interfaces.d.ts" />
 
 import * as dtos from "./dtos/techstacks.dtos";
 import { 
     ResponseStatus, ResponseError,
+    Hello, HelloResponse,
     HelloTypes,
     ReturnString, ReturnBytes, ReturnStream,
     TestAuth, TestAuthResponse,
@@ -314,4 +316,52 @@ describe('JsonServiceClient Tests', () => {
             }
         },done);
     })
+
+    it ('Can GET using only path info', done => {
+        testClient.get<HelloResponse>("/hello/World")
+            .then(r => {
+                chai.expect(r.result).to.equal("Hello, World!");
+                done();
+            }, done);
+    })
+
+    it ('Can GET using absolute url', done => {
+        testClient.get<HelloResponse>("http://test.servicestack.net/hello/World")
+            .then(r => {
+                chai.expect(r.result).to.equal("Hello, World!");
+                done();
+            }, done);
+    })
+
+    it ('Can GET using route and queryString', done => {
+        testClient.get<HelloResponse>("/hello", { name: "World" })
+            .then(r => {
+                chai.expect(r.result).to.equal("Hello, World!");
+                done();
+            }, done);
+    })
+
+    it ('Can GET EchoTypes using route and interface', done => {
+        let request:interfaces.EchoTypes = { int: 1, string: "foo" };
+
+        testClient.get<EchoTypes>("/echo/types", request)
+            .then(r => {
+                chai.expect(r.int).to.equal(request.int);
+                chai.expect(r.string).to.equal(request.string);
+                done();
+            }, done);
+    })
+
+    it ('Can query AutoQuery with client args', done => {
+        let request = new dtos.FindTechnologies();
+        request.Take = 3;
+        
+        client.get(request, { VendorName: "Amazon" })
+            .then(r => {
+                chai.expect(r.Results.length).to.equal(3);
+                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon"]);
+                done();
+            }, done);
+    })
 });
+

@@ -121,12 +121,14 @@ export declare class JsonServiceClient {
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
-    get<T>(request: IReturn<T>): Promise<T>;
-    delete<T>(request: IReturn<T>): Promise<T>;
-    post<T>(request: IReturn<T>): Promise<T>;
-    put<T>(request: IReturn<T>): Promise<T>;
-    patch<T>(request: IReturn<T>): Promise<T>;
-    send<T>(method: string, request: IReturn<T>): Promise<T>;
+    get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    post<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    put<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    patch<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    createUrlFromDto<T>(method: string, request: IReturn<T>): string;
+    toAbsoluteUrl(method: string, relativeOrAbsoluteUrl: string): string;
+    send<T>(method: string, request: any | string, args?: any): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
 export declare const toCamelCase: (key: string) => string;
