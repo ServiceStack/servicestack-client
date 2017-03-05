@@ -1,12 +1,12 @@
 # servicestack-client
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference)
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)](http://docs.servicestack.net/typescript-add-servicestack-reference)
 
 This library contains the Typed ServiceStack Client library that is an idiomatic port of ServiceStack's
-[ss-utils.js JavaScript Client](https://github.com/ServiceStack/ServiceStack/wiki/ss-utils.js-JavaScript-Client-Library) 
+[ss-utils.js JavaScript Client](http://docs.servicestack.net/ss-utils-js) 
 in native TypeScript. It provides integration with many ServiceStack features 
-including [TypeScript Add ServiceStack Reference](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference)
-and [Server Events](https://github.com/ServiceStack/ServiceStack/wiki/Server-Events).
+including [TypeScript Add ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
+and [Server Events](http://docs.servicestack.net/server-events).
 
 ### Isomorphic Fetch
 
@@ -35,7 +35,7 @@ can be installed with:
 ### Ideal Typed Message-based API
 
 The TypeScript `JsonServiceClient` enables the same productive, typed API development experience available 
-in ServiceStack's other [1st-class supported client platforms](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference). 
+in ServiceStack's other [1st-class supported client platforms](http://docs.servicestack.net/typescript-add-servicestack-reference). 
 
 The `JsonServiceClient` leverages the additional type hints ServiceStack embeds in each TypeScript Request DTO 
 to achieve the ideal typed, message-based API - so all API requests benefit from a succinct, boilerplate-free 
@@ -43,7 +43,7 @@ Typed API.
 
 Here's a quick look at what it looks like. The example below shows how to create a 
 [C# Gist in Gislyn](https://github.com/ServiceStack/Gistlyn) 
-after adding a [TypeScript ServiceStack Reference](TypeScript-Add-ServiceStack-Reference)
+after adding a [TypeScript ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
 to `gistlyn.com` and installing the [servicestack-client](https://www.npmjs.com/package/servicestack-client) 
 npm package: 
 
@@ -111,7 +111,7 @@ client.get(new ReturnBytes())
 ### ServerEventsClient
 
 In addition to `JsonServiceClient` this package contains most of the JavaScript utils in 
-[ss-utils.js](https://github.com/ServiceStack/ServiceStack/wiki/ss-utils.js-JavaScript-Client-Library),
+[ss-utils.js](http://docs.servicestack.net/ss-utils-js),
 including the new `ServerEventsClient` which [gistlyn.com](http://gistlyn.com) uses to process real-time 
 Server Events from the executing C# Gist with:
 
