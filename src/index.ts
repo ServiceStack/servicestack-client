@@ -265,6 +265,130 @@ export class ServerEventsClient {
             : this.eventSourceUrl;
         this.eventSourceUrl = url.substring(0, Math.min(url.indexOf("?"), url.length)) + "?channels=" + channels.join(",") + "&t=" + new Date().getTime();
     }
+
+    updateSubscriberInfo(subscribe:string|string[], unsubscribe:string|string[]) {
+        var sub = typeof subscribe == "string" ? subscribe.split(',') : subscribe;
+        var unsub = typeof unsubscribe == "string" ? unsubscribe.split(',') : unsubscribe;
+        var channels = [];
+        for (var i in this.channels) {
+            var c = this.channels[i];
+            if (unsub == null || unsub.indexOf(c) === -1) {
+                channels.push(c);
+            }
+        }
+        if (sub) {
+            for (var i in sub) {
+                var c = sub[i];
+                if (channels.indexOf(c) === -1) {
+                    channels.push(c);
+                }
+            }
+        }
+        this.updateChannels(channels);
+    }
+
+    getConnectionInfo(){
+        if (this.connectionInfo == null)
+            throw "Not Connected";
+
+        return this.connectionInfo;
+    }
+
+    getSubscriptionId() {
+        return this.getConnectionInfo().id;
+    }
+
+    updateSubscriber(request:UpdateEventSubscriber) {
+        if (request.id == null)
+            request.id = this.getSubscriptionId();
+
+        return this.client.post(request)
+            .then(x => {
+                this.updateSubscriberInfo(request.subscribeChannels, request.unsubscribeChannels);
+                return null;
+            });
+    }
+    
+    subscribeToChannels(channels:string[]) {
+        let request = new UpdateEventSubscriber();
+        request.id = this.getSubscriptionId();
+        request.subscribeChannels = channels;
+
+        return this.client.post(request)
+            .then(x => {
+                this.updateChannels(channels);
+            });
+    }
+    
+    unsubscribeFromChannels(channels:string[]) {
+        let request = new UpdateEventSubscriber();
+        request.id = this.getSubscriptionId();
+        request.unsubscribeChannels = channels;
+
+        return this.client.post(request)
+            .then(x => {
+                this.updateChannels(channels);
+            });
+    }
+
+    getChannelSubscribers(): Promise<ServerEventUser[]> {
+        let request = new GetEventSubscribers();
+        request.channels = this.channels;
+
+        return this.client.get(request)
+            .then(r => r.map(x => this.toServerEventUser(x)));
+    }
+
+    toServerEventUser(map: { [id: string] : string; }): ServerEventUser {
+        var channels = map["channels"];
+        var to = new ServerEventUser();
+        to.userId = map["userId"];
+        to.displayName = map["displayName"];
+        to.profileUrl = map["profileUrl"];
+        to.channels = channels ? channels.split(',') : null;
+
+        for (var k in map) {
+            if (k == "userId" || k == "displayName" ||
+                k == "profileUrl" || k == "channels") 
+                continue;
+
+            if (to.meta == null)
+                to.meta = {};
+
+            to.meta[k] = map[k];
+        }
+        return to;
+    } 
+}
+
+export class UpdateEventSubscriber implements IReturn<UpdateEventSubscriberResponse>
+{
+    id: string;
+    subscribeChannels: string[];
+    unsubscribeChannels: string[];
+    createResponse() { return new UpdateEventSubscriberResponse(); }
+    getTypeName() { return "UpdateEventSubscriber"; }
+}
+
+export class UpdateEventSubscriberResponse
+{
+    responseStatus: ResponseStatus;
+}
+
+export class GetEventSubscribers implements IReturn<any[]>
+{
+    channels: string[];
+    createResponse() { return []; }
+    getTypeName() { return "GetEventSubscribers"; }
+}
+
+export class ServerEventUser
+{
+    userId: string;
+    displayName: string;
+    profileUrl: string;
+    channels: string[];
+    meta: { [index:string]: string; };
 }
 
 export class HttpMethods {
