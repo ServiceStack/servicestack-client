@@ -23,17 +23,25 @@ export class ErrorResponse {
     responseStatus: ResponseStatus;
 }
 
-export interface ISseCommand {
+export interface ISseMessage {
+    type: string;
+    eventId: number;
+    channel: string;
+    data: string;
+    selector: string;
+    json: string;
+    op: string;
+    target: string;
+    cssSelector: string;
+    meta: { [index:string]: string; };
+}
+
+export interface ISseCommand extends ISseMessage {
     userId: string;
     displayName: string;
     channels: string;
     profileUrl: string;
 }
-
-export interface ISseHeartbeat extends ISseCommand { }
-export interface ISseJoin extends ISseCommand { }
-export interface ISseLeave extends ISseCommand { }
-export interface ISseUpdate extends ISseCommand { }
 
 export interface ISseConnect extends ISseCommand {
     id: string;
@@ -43,6 +51,19 @@ export interface ISseConnect extends ISseCommand {
     heartbeatIntervalMs: number;
     idleTimeoutMs: number;
 }
+
+export interface ISseHeartbeat extends ISseCommand { }
+export interface ISseJoin extends ISseCommand { }
+export interface ISseLeave extends ISseCommand { }
+export interface ISseUpdate extends ISseCommand { }
+
+const TypeMap = {
+    onConnect: "ISseCommand",
+    onHeartbeat: "ISseHeartbeat",
+    onJoin: "ISseJoin",
+    onLeave: "ISseLeave",
+    onUpdate: "ISseUpdate"
+};
 
 export interface IReconnectServerEventsOptions {
     url?: string;
@@ -81,9 +102,12 @@ export interface IOnMessageEvent {
 declare var EventSource: IEventSourceStatic;
 
 export class ServerEventsClient {
+    static UnknownChannel = "*";
     eventSourceUrl: string;
     updateSubscriberUrl: string;
-    eventSourceStop: boolean;
+    connectionInfo: ISseConnect;
+    client: JsonServiceClient;
+    closed: boolean;
 
     constructor(
         baseUrl: string,
@@ -95,25 +119,36 @@ export class ServerEventsClient {
 
         this.eventSourceUrl = combinePaths(baseUrl, "event-stream") + "?";
         this.updateChannels(channels);
+        this.client = new JsonServiceClient(baseUrl);
+
+        if (!this.options.handlers)
+            this.options.handlers = {};
 
         if (eventSource == null) {
             this.eventSource = new EventSource(this.eventSourceUrl);
             this.eventSource.onmessage = this.onMessage.bind(this);
+            this.eventSource.onerror = this.onError.bind(this);
         }
     }
 
     onMessage(e: IOnMessageEvent) {
+        if (this.closed) return;
         var opt = this.options;
 
+        if (typeof document == "undefined") {
+            var document:any = {}; //node
+        }
+
         var parts = splitOnFirst(e.data, " ");
+        var channel = null;
         var selector = parts[0];
         var selParts = splitOnFirst(selector, "@");
         if (selParts.length > 1) {
-            (e as any).channel = selParts[0];
+            channel = selParts[0];
             selector = selParts[1];
         }
         const json = parts[1];
-        const msg = json ? JSON.parse(json) : null;
+        var msg = json ? JSON.parse(json) : null;
 
         parts = splitOnFirst(selector, ".");
         if (parts.length <= 1)
@@ -126,24 +161,37 @@ export class ServerEventsClient {
             return;
 
         const tokens = splitOnFirst(target, "$");
-        const [cmd, cssSel] = tokens;
-        const els = cssSel && document.querySelectorAll(cssSel);
+        const [cmd, cssSelector] = tokens;
+        const els = cssSelector && document.querySelectorAll(cssSelector);
         const el = els && els[0];
+
+        if (msg) {
+            var type = TypeMap[cmd] || "ISseMessage";
+            msg.eventId = (e as any).lastEventId;
+            Object.assign(msg, { type, channel, selector, json, op, target, cssSelector });
+        }
 
         var headers = new Headers();
         headers.set("Content-Type", "text/plain");
 
         if (op === "cmd") {
             if (cmd === "onConnect") {
+                this.connectionInfo = msg;
                 Object.assign(opt, msg);
+
+                var fn = opt.handlers["onConnect"];
+                if (fn){
+                    fn.call(el || document.body, this.connectionInfo, e);
+                }
+
                 if (opt.heartbeatUrl) {
                     if (opt.heartbeat) {
-                        window.clearInterval(opt.heartbeat);
+                        clearInterval(opt.heartbeat);
                     }
-                    opt.heartbeat = window.setInterval(() => {
+                    opt.heartbeat = setInterval(() => {
                         if (this.eventSource.readyState === 2) //CLOSED
                         {
-                            window.clearInterval(opt.heartbeat);
+                            clearInterval(opt.heartbeat);
                             const stopFn = opt.handlers["onStop"];
                             if (stopFn != null)
                                 stopFn.apply(this.eventSource);
@@ -159,24 +207,26 @@ export class ServerEventsClient {
                             .catch(res => {
                                 this.reconnectServerEvents({ errorArgs: [res] });
                             });
-                    }, parseInt(opt.heartbeatIntervalMs) || 10000);
+                    }, parseInt(this.connectionInfo.heartbeatIntervalMs || opt.heartbeatIntervalMs) || 10000);
                 }
                 if (opt.unRegisterUrl) {
-                    window.onunload = () => {
-                        fetch(new Request(opt.unRegisterUrl, { method: "POST", mode: "cors", headers: headers }))
-                            .then(res => {
-                                if (!res.ok)
-                                    throw res;
-                            })
-                            .catch(res => null); //ignore
-                    };
+                    if (typeof window != "undefined") {
+                        window.onunload = () => this.close();
+                    }
                 }
                 this.updateSubscriberUrl = opt.updateSubscriberUrl;
                 this.updateChannels((opt.channels || "").split(","));
-            }
-            var fn = opt.handlers[cmd];
-            if (fn) {
-                fn.call(el || document.body, msg, e);
+            } else {
+                var fn = opt.handlers[cmd];
+                if (fn) {
+                    fn.call(el || document.body, msg, e);
+                }            
+                if (cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate") {
+                    fn = opt.handlers["onCommand"];
+                    if (fn) {
+                        fn.call(el || document.body, msg, e);
+                    }
+                }
             }
         }
         else if (op === "trigger") {
@@ -196,17 +246,41 @@ export class ServerEventsClient {
         if (opt.success) {
             opt.success(selector, msg, e);
         }
+
+        if (!TypeMap[cmd])
+        {
+            var fn = opt.handlers["onMessage"];
+            if (fn) {
+                fn.call(el || document.body, msg, e);
+            }
+        }
+
+        if (opt.onTick) 
+            opt.onTick();
+    }
+
+    onError(e:any){
+        if (this.closed) return;
+        if (!e)
+            e = event;
+        var fn = this.options.handlers["onException"];
+        if (fn != null)
+            fn.apply(this.eventSource, e);                        
+
+        if (this.options.onTick) 
+            this.options.onTick();
     }
 
     reconnectServerEvents(opt: any = {}) {
-        if (this.eventSourceStop)
-            return this.eventSource;
+        if (this.closed) return;
+
+        this.onError(opt.errorArgs && opt.errorArgs[0]);
 
         const hold = this.eventSource;
         const es = new EventSource(opt.url || this.eventSourceUrl || hold.url);
         es.onerror = opt.onerror || hold.onerror;
         es.onmessage = opt.onmessage || hold.onmessage;
-        const fn = this.options.handlers["onReconnect"];
+        var fn = this.options.handlers["onReconnect"];
         if (fn != null)
             fn.apply(es, opt.errorArgs);
         hold.close();
