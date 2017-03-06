@@ -223,6 +223,26 @@ export class ServerEventsClient {
         }
     }
 
+    registerHandler(name:string, fn:Function) {
+        if (!this.options.handlers)
+            this.options.handlers = {};
+
+        this.options.handlers[name] = fn;
+    }
+
+    registerReceiver(name:string, receiver:any) {
+        if (!this.options.receivers)
+            this.options.receivers = {};
+
+        this.options.receivers[name] = receiver;
+    }
+
+    unregisterReceiver(name:string) {
+        if (this.options.receivers) {
+            delete this.options.receivers[name];
+        }
+    }
+
     updateChannels(channels:string[]) {
         this.channels = channels;
         const url = this.eventSource != null
