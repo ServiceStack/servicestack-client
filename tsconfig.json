@@ -15,6 +15,7 @@
     "./src/index.ts",
     "./tests/dtos/techstacks.dtos.ts",
     "./tests/dtos/test.dtos.ts",
-    "./tests/client.spec.ts"
+    "./tests/client.spec.ts",
+    "./tests/serverevents.spec.ts"
    ]
 }

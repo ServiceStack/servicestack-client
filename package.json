@@ -17,7 +17,8 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
-    "test": "mocha -t 5000 ./tests/*.js"
+    "test2": "mocha -t 5000 ./tests/*.js",
+    "test": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
   "files": [
     "src/index.js",
@@ -39,10 +40,12 @@
   "dependencies": {
     "@types/isomorphic-fetch": "^0.0.33",
     "es6-shim": "^0.35.3",
+    "eventsource": "^0.2.2",
     "isomorphic-fetch": "^2.2.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "eventsource": "^0.2.2",
     "mocha": "^2.5.3",
     "typescript": "^2.0.10"
   },
