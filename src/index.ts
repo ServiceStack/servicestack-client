@@ -213,6 +213,21 @@ export class ServerEventsClient {
         return this.eventSource = es;
     }
 
+    close() {
+        this.closed = true;
+
+        if (this.eventSource) {
+            this.eventSource.close();
+        }
+
+        var hold = this.connectionInfo;
+        if (hold == null || hold.unRegisterUrl == null)
+            return new Promise((resolve, reject) => resolve());
+
+        this.connectionInfo = null;
+        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }));
+    }
+
     invokeReceiver(r:any, cmd:string, el:Element, msg:string, e:any, name:string) {
         if (r) {
             if (typeof (r[cmd]) == "function") {
