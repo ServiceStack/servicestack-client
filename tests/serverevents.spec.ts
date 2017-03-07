@@ -11,7 +11,9 @@ import {
     appendQueryString,
     ServerEventsClient,
     ServerEventConnect, ServerEventJoin, ServerEventLeave, ServerEventUpdate, ServerEventMessage, ServerEventHeartbeat,
-    SingletonInstanceResolver
+    ServerEventUser,
+    SingletonInstanceResolver,
+    GetEventSubscribers
 } from  '../src/index';
 import {
     PostChatToChannel, ChatMessage,
@@ -38,13 +40,19 @@ const run = (states:any[], debug?:Function) => {
             console.log("states remaining: " + states.length);
             var ret = next.fn();
             if (ret && ret.then) //Promise
-                ret.then(() => fn(), () => fn());
+                ret.then(fn)
+                   .catch(console.log)
+                   .then(fn);
             else
                 fn();
         }
     };
     return fn;
 }
+
+const pause = () => {
+    return new Promise(resolve => setTimeout(resolve, 100));
+};
 
 const postChat = (sse:ServerEventsClient, message:string, channel?:string) => {
     var request = new PostChatToChannel();
@@ -83,7 +91,7 @@ const postObjectSetter = (sse:ServerEventsClient, dto:SetterType) => {
 }
 
 const complete = (done:Function, ...clients:ServerEventsClient[]) => {
-    Promise.all(clients.map(x => x.close()))
+    Promise.all(clients.map(x => x.stop()))
         .then(r => done());
 }
 
@@ -154,7 +162,7 @@ describe('ServerEventsClient Tests', () => {
             onTick: run(states)
         });
 
-        var client2;
+        var client2:ServerEventsClient;
         states.unshift(
         {   
             test: () => connectMsgs.length == 1 && commands.filter(x => x.type == "ServerEventJoin").length == 1,
@@ -187,7 +195,7 @@ describe('ServerEventsClient Tests', () => {
                 chai.expect(connectMsg).to.not.null;
                 chai.expect(joinMsg).to.not.null;
 
-                return client2.close();
+                return client2.stop();
             }
         }, 
         {
@@ -620,8 +628,346 @@ describe('ServerEventsClient Tests', () => {
         });
     })
 
-    // it('', done => {
+    it('Does receive messages on to clients subscribed on multiple channels', done => {
+        var msgsA:ServerEventMessage[] = [];
+        var msgsAB:ServerEventMessage[] = [];
+        var msgsABC:ServerEventMessage[] = [];
+        var msgsABCD:ServerEventMessage[] = [];
+
+        var states = [];
+        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+            handlers: { onMessage: e => msgsA.push(e) }, onTick: run(states)
+        });
+        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+            handlers: { onMessage: e => msgsAB.push(e) }, onTick: run(states)
+        });
+        var clientABC = new ServerEventsClient('http://chat.servicestack.net', ["A", "B", "C"], {
+            handlers: { onMessage: e => msgsABC.push(e) }, onTick: run(states)
+        });
+        var clientABCD = new ServerEventsClient('http://chat.servicestack.net', ["A", "B", "C", "D"], {
+            handlers: { onMessage: e => msgsABCD.push(e) }, onTick: run(states)
+        });
+        var allClients = [clientA,clientAB,clientABC,clientABCD];
+
+        var channelAsubscribers:ServerEventUser[] = [];
+        var channelABsubscribers:ServerEventUser[] = [];
+
+        states.unshift({
+            test: () => allClients.every(x => x.hasConnected()),
+            fn(){
+                return Promise.all([
+                    clientA.getChannelSubscribers()
+                        .then(r => channelAsubscribers = r),
+                    clientAB.getChannelSubscribers()
+                        .then(r => channelABsubscribers = r)
+                ]).then(r => {
+                    chai.expect(channelAsubscribers.length).to.equal(4);
+                    chai.expect(channelABsubscribers.length).to.equal(4);
+
+                    console.log("Publishing Msg Batch #1 ...");
+
+                    return Promise.all([
+                        postChat(clientA, "#1 hello to A", "A"),
+                        postChat(clientA, "#2 hello to B", "B"),
+                        postChat(clientA, "#3 hello to C", "C"),
+                        postChat(clientA, "#4 hello to D", "D")
+                    ]);
+                });
+            }
+        }, {test: () => (msgsA.length + msgsAB.length + msgsABC.length + msgsABCD.length) == 10,
+            fn(){
+                chai.expect(msgsA.length).to.equal(1);
+                chai.expect(msgsAB.length).to.equal(2);
+                chai.expect(msgsABC.length).to.equal(3);
+                chai.expect(msgsABCD.length).to.equal(4);
+
+                console.log("Publishing Msg Batch #2 ...");
+                return Promise.all([
+                    postChat(clientA, "#5 hello to A", "A"),
+                    postChat(clientA, "#6 hello to B", "B"),
+                    postChat(clientA, "#7 hello to C", "C"),
+                    postChat(clientA, "#8 hello to D", "D")
+                ]);
+            }
+        }, {test: () => (msgsA.length + msgsAB.length + msgsABC.length + msgsABCD.length) == 20,
+            fn(){
+                chai.expect(msgsA.length).to.equal(2);
+                chai.expect(msgsAB.length).to.equal(4);
+                chai.expect(msgsABC.length).to.equal(6);
+                chai.expect(msgsABCD.length).to.equal(8);
+
+                complete(done, ...allClients);
+            }
+        });
+    })
+
+    it('Does receive all join and leave messages', done => {
+        var joinA:ServerEventJoin[] = [];
+        var joinB:ServerEventJoin[] = [];
+        var joinAB:ServerEventJoin[] = [];
+
+        var leaveA:ServerEventJoin[] = [];
+        var leaveB:ServerEventJoin[] = [];
+        var leaveAB:ServerEventJoin[] = [];
+
+        var states = [];
+        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
+        });
+        var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
+        });
+        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
+        });
+
+        var allClients = [clientA, clientB, clientAB];
+
+        [clientA, clientB].forEach(x => x.start());
+
+        states.unshift({
+            test: () => clientA.hasConnected() && clientB.hasConnected(),
+            fn(){
+                return clientAB.start();
+            }
+        }, {test: () => joinA.length >= 2 && joinB.length >= 2 && joinAB.length >= 2,
+            fn(){
+                chai.expect(joinA.length).to.equal(2);  //A + [(A) B]
+                chai.expect(joinB.length).to.equal(2);  //B + [A (B)]
+                chai.expect(joinAB.length).to.equal(2); //[(A) B] + [A (B)]
+
+                return Promise.all([
+                    clientA.getChannelSubscribers().then(r => 
+                        chai.expect(r.length).to.equal(2)),
+
+                    clientB.getChannelSubscribers().then(r => 
+                        chai.expect(r.length).to.equal(2)),
+
+                    clientAB.getChannelSubscribers().then(r => 
+                        chai.expect(r.length).to.equal(3))
+                ])
+                .then(r => {
+                    const createRequest = (...channels) => {
+                        let request = new GetEventSubscribers();
+                        request.channels = channels;
+                        return request;
+                    }
+                    return Promise.all([
+                        clientA.serviceClient.get(createRequest("A")).then(r => 
+                            chai.expect(r.length).to.equal(2)),
+
+                        clientB.serviceClient.get(createRequest("B")).then(r => 
+                            chai.expect(r.length).to.equal(2)),
+
+                        clientAB.serviceClient.get(createRequest("A", "B")).then(r => 
+                            chai.expect(r.length).to.equal(3))
+                    ]);
+                })
+                .then(r => clientAB.stop())
+            }
+        }, {test: () => leaveA.length + leaveB.length >= 2,
+            fn(){
+                return Promise.all([ clientA.stop(), clientB.stop() ])
+                    .then(r => {
+                        chai.expect(leaveA.length).to.equal(1);
+                        chai.expect(leaveB.length).to.equal(1);
+                        chai.expect(leaveAB.length).to.equal(0);
+
+                        complete(done);
+                    });
+            }
+        });
+    })
+
+    it('MultiChannel Does receive all join and leave messages', done => {
+        var joinA:ServerEventJoin[] = [];
+        var joinB:ServerEventJoin[] = [];
+        var joinAB:ServerEventJoin[] = [];
+
+        var leaveA:ServerEventJoin[] = [];
+        var leaveB:ServerEventJoin[] = [];
+        var leaveAB:ServerEventJoin[] = [];
+
+        var states = [];
+        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
+        });
+        var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
+        });
+        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+            autoStart: false,
+            handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
+        });
+
+        var allClients = [clientA, clientB, clientAB];
+        clientAB.start();       
         
-    // })
+        states.unshift({
+            test: () => clientAB.hasConnected(),
+            fn(){
+                return Promise.all([clientA.start(), clientB.start()]);
+            }
+        }, {test: () => joinAB.length >= 4 && joinA.length >= 1 && joinB.length >= 1,
+            fn(){
+                chai.expect(joinAB.length).to.equal(4); //[(A) B] + [A (B)] + A + B
+                chai.expect(joinA.length).to.equal(1);
+                chai.expect(joinB.length).to.equal(1);
+
+                return Promise.all([ clientA.stop(), clientB.stop() ])
+                    .then(pause);
+            }
+        }, {test: () => leaveAB.length >= 2,
+            fn(){
+                chai.expect(leaveAB.length).to.equal(2);
+                chai.expect(leaveA.length).to.equal(0);
+                chai.expect(leaveB.length).to.equal(0);
+
+                complete(done, clientAB);
+            }
+        });
+    })
+
+    it('Can subscribe to channels whilst connected', done => {
+        var msgs1:ServerEventMessage[] = [];
+        var msgs2:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+            handlers: { onMessage: e => msgs1.push(e) }, 
+            onTick: run(states)
+        });
+        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+            handlers: { onMessage: e => msgs2.push(e) }, 
+            onTick: run(states)
+        });
+
+        states.unshift({
+            test: () => client1.hasConnected() && client2.hasConnected(),
+            fn(){
+                chai.expect(client1.channels).to.deep.equal(["A"]);
+
+                return postChat(client2, "#1 hello to B", "B");
+            }
+        }, {test: () => msgs1.length + msgs2.length >= 1,
+            fn() {
+                chai.expect(msgs1.length).to.equal(0);
+                chai.expect(msgs2.length).to.equal(1);
+
+                return client1.subscribeToChannels("B");
+            }
+        }, {test: () => client1.channels.indexOf("B") >= 0,
+            fn() {
+                chai.expect(client1.channels).to.deep.equal(["A","B"]);
+                chai.expect(client2.channels).to.deep.equal(["B"]);
+
+                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B"));
+                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
+
+                return Promise.all([
+                    postChat(client2, "#2 hello to B", "B"),
+                    postChat(client2, "#3 hello to C", "C")
+                ]);
+            }
+        }, {test: () => msgs1.length + msgs2.length >= 3,
+            fn(){
+                chai.expect(msgs1.length).to.equal(1);
+                chai.expect(msgs2.length).to.equal(2);
+
+                return Promise.all([
+                    client1.subscribeToChannels("C"),
+                    client2.subscribeToChannels("C")
+                ]);
+            }
+        }, {test: () => client1.channels.indexOf("C") >= 0 && client2.channels.indexOf("C") >= 0,
+            fn(){
+                return postChat(client2, "#4 hello to C", "C");
+            }
+        }, {test: () => msgs1.length + msgs2.length >= 5,
+            fn(){
+                chai.expect(client1.channels).to.deep.equal(["A","B","C"]);
+                chai.expect(client2.channels).to.deep.equal(["B","C"]);
+
+                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B,C"));
+                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
+
+                chai.expect(msgs1.length).to.equal(2);
+                chai.expect(msgs2.length).to.equal(3);
+
+                complete(done, client1, client2);
+            }
+        });
+    })
+
+    it('Can unsubscribe from channels whilst connected', done => {
+        var msgs1:ServerEventMessage[] = [];
+        var msgs2:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A","B","C"], {
+            handlers: { onMessage: e => msgs1.push(e) }, 
+            onTick: run(states)
+        });
+        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B","C"], {
+            handlers: { onMessage: e => msgs2.push(e) }, 
+            onTick: run(states)
+        });
+
+        states.unshift({
+            test: () => client1.hasConnected() && client2.hasConnected(),
+            fn(){
+                chai.expect(client1.channels).to.deep.equal(["A","B","C"]);
+
+                return postChat(client2, "#1 hello to B", "B");
+            }
+        }, {test: () => msgs1.length + msgs2.length >= 2,
+            fn(){
+                chai.expect(msgs1.length).to.equal(1);
+                chai.expect(msgs2.length).to.equal(1);
+
+                return client1.unsubscribeFromChannels("B");
+            }
+        }, {test: () => client1.channels.indexOf("B") == -1,
+            fn(){
+                return Promise.all([
+                    postChat(client2, "#2 hello to B", "B"),
+                    postChat(client2, "#3 hello to C", "C")
+                ]);
+            }
+        }, {test: () => msgs1.length + msgs2.length >= 5,
+            fn(){
+                chai.expect(msgs1.length).to.equal(2);
+                chai.expect(msgs2.length).to.equal(3);
+
+                chai.expect(client1.channels).to.deep.equal(["A","C"]);
+                chai.expect(client2.channels).to.deep.equal(["B","C"]);
+
+                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,C"));
+                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
+
+                return Promise.all([
+                    client1.unsubscribeFromChannels("C"),
+                    client2.unsubscribeFromChannels("C")
+                ]).then(r => 
+                    postChat(client2, "#4 hello to C", "C")
+                );
+            }
+        }, {test: () => client1.channels.indexOf("C") == -1 && client1.channels.indexOf("C") == -1,
+            fn(){
+                chai.expect(client1.channels).to.deep.equal(["A"]);
+                chai.expect(client2.channels).to.deep.equal(["B"]);
+
+                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A"));
+                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
+
+                complete(done, client1, client2);
+            }            
+        });
+    })
 
 });
