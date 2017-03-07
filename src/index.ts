@@ -101,6 +101,22 @@ export interface IOnMessageEvent {
 
 declare var EventSource: IEventSourceStatic;
 
+export interface IEventSourceOptions {
+    channels?: string,
+    handlers?: any,
+    receivers?: any,
+    triggers?: any,
+    onTick?: Function,
+    resolver?: IResolver,
+    autoStart?: boolean,
+    validate?: (op?:string, target?:string, msg?:any, json?:string) => boolean,
+    heartbeatUrl?: string,
+    unRegisterUrl?: string,
+    updateSubscriberUrl?: string,
+    heartbeatIntervalMs?: number,
+    heartbeat?: number,
+}
+
 export class ServerEventsClient {
     static UnknownChannel = "*";
     eventSourceUrl: string;
@@ -112,7 +128,7 @@ export class ServerEventsClient {
     constructor(
         baseUrl: string,
         public channels: string[],
-        public options: any = {},
+        public options: IEventSourceOptions = {},
         public eventSource: IEventSourceStatic = null) {
         if (this.channels.length === 0)
             throw "at least 1 channel is required";
