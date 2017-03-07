@@ -23,8 +23,6 @@ export class ErrorResponse {
     responseStatus: ResponseStatus;
 }
 
-export interface ISseMessage {
-    type: string;
     eventId: number;
     channel: string;
     data: string;
@@ -36,14 +34,14 @@ export interface ISseMessage {
     meta: { [index:string]: string; };
 }
 
-export interface ISseCommand extends ISseMessage {
+export interface ServerEventCommand extends ServerEventMessage {
     userId: string;
     displayName: string;
     channels: string;
     profileUrl: string;
 }
 
-export interface ISseConnect extends ISseCommand {
+export interface ServerEventConnect extends ServerEventCommand {
     id: string;
     unRegisterUrl: string;
     heartbeatUrl: string;
@@ -52,17 +50,17 @@ export interface ISseConnect extends ISseCommand {
     idleTimeoutMs: number;
 }
 
-export interface ISseHeartbeat extends ISseCommand { }
-export interface ISseJoin extends ISseCommand { }
-export interface ISseLeave extends ISseCommand { }
-export interface ISseUpdate extends ISseCommand { }
+export interface ServerEventHeartbeat extends ServerEventCommand { }
+export interface ServerEventJoin extends ServerEventCommand { }
+export interface ServerEventLeave extends ServerEventCommand { }
+export interface ServerEventUpdate extends ServerEventCommand { }
 
 const TypeMap = {
-    onConnect: "ISseCommand",
-    onHeartbeat: "ISseHeartbeat",
-    onJoin: "ISseJoin",
-    onLeave: "ISseLeave",
-    onUpdate: "ISseUpdate"
+    onConnect: "ServerEventConnect",
+    onHeartbeat: "ServerEventHeartbeat",
+    onJoin: "ServerEventJoin",
+    onLeave: "ServerEventLeave",
+    onUpdate: "ServerEventUpdate"
 };
 
 export interface IReconnectServerEventsOptions {
