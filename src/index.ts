@@ -35,12 +35,10 @@ export class NewInstanceResolver implements IResolver {
 }
 
 export class SingletonInstanceResolver implements IResolver {
-    static cache: { [index:string]: any } = {};
 
     tryResolve(ctor:ObjectConstructor): any {
-        var name = ctor.name;
-        return SingletonInstanceResolver.cache[name] 
-            || (SingletonInstanceResolver.cache[name] = new ctor());
+        return (ctor as any).instance 
+            || ((ctor as any).instance = new ctor());
     }
 }
 

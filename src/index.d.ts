@@ -32,9 +32,6 @@ export declare class NewInstanceResolver implements IResolver {
     tryResolve(ctor: ObjectConstructor): any;
 }
 export declare class SingletonInstanceResolver implements IResolver {
-    static cache: {
-        [index: string]: any;
-    };
     tryResolve(ctor: ObjectConstructor): any;
 }
 export interface ServerEventMessage {
