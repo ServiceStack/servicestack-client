@@ -23,6 +23,29 @@ export class ErrorResponse {
     responseStatus: ResponseStatus;
 }
 
+export interface IResolver
+{
+    tryResolve(Function): any;
+}
+
+export class NewInstanceResolver implements IResolver {
+    tryResolve(ctor:ObjectConstructor): any {
+        return new ctor();
+    }
+}
+
+export class SingletonInstanceResolver implements IResolver {
+    static cache: { [index:string]: any } = {};
+
+    tryResolve(ctor:ObjectConstructor): any {
+        var name = ctor.name;
+        return SingletonInstanceResolver.cache[name] 
+            || (SingletonInstanceResolver.cache[name] = new ctor());
+    }
+}
+
+export interface ServerEventMessage {
+    type: "ServerEventConnect" | "ServerEventHeartbeat" | "ServerEventJoin" | "ServerEventLeave" | "ServerEventUpdate" | "ServerEventMessage";
     eventId: number;
     channel: string;
     data: string;
@@ -119,9 +142,10 @@ export class ServerEventsClient {
     static UnknownChannel = "*";
     eventSourceUrl: string;
     updateSubscriberUrl: string;
-    connectionInfo: ISseConnect;
-    client: JsonServiceClient;
+    connectionInfo: ServerEventConnect;
+    serviceClient: JsonServiceClient;
     closed: boolean;
+    resolver: IResolver;
 
     constructor(
         baseUrl: string,
@@ -131,18 +155,17 @@ export class ServerEventsClient {
         if (this.channels.length === 0)
             throw "at least 1 channel is required";
 
+        this.resolver = this.options.resolver || new NewInstanceResolver();
+
         this.eventSourceUrl = combinePaths(baseUrl, "event-stream") + "?";
         this.updateChannels(channels);
-        this.client = new JsonServiceClient(baseUrl);
+        this.serviceClient = new JsonServiceClient(baseUrl);
 
         if (!this.options.handlers)
             this.options.handlers = {};
 
-        if (eventSource == null) {
-            this.eventSource = new EventSource(this.eventSourceUrl);
-            this.eventSource.onmessage = this.onMessage.bind(this);
-            this.eventSource.onerror = this.onError.bind(this);
-        }
+        if (this.options.autoStart !== false)
+            this.start();
     }
 
     onMessage(e: IOnMessageEvent) {
@@ -150,7 +173,9 @@ export class ServerEventsClient {
         var opt = this.options;
 
         if (typeof document == "undefined") {
-            var document:any = {}; //node
+            var document:any = { //node
+                querySelectorAll: sel => []
+            };
         }
 
         var parts = splitOnFirst(e.data, " ");
@@ -179,10 +204,14 @@ export class ServerEventsClient {
         const els = cssSelector && document.querySelectorAll(cssSelector);
         const el = els && els[0];
 
-        if (msg) {
-            var type = TypeMap[cmd] || "ISseMessage";
-            msg.eventId = (e as any).lastEventId;
-            Object.assign(msg, { type, channel, selector, json, op, target, cssSelector });
+        const eventId = (e as any).lastEventId;
+        const data = e.data;
+        const type = TypeMap[cmd] || "ServerEventMessage";
+        const request:ServerEventMessage = { eventId, data, type, 
+            channel, selector, json, op, target:tokens[0], cssSelector, meta:{} };
+
+        if (msg && typeof msg != "string") {
+            Object.assign(msg, request);
         }
 
         var headers = new Headers();
@@ -191,6 +220,11 @@ export class ServerEventsClient {
         if (op === "cmd") {
             if (cmd === "onConnect") {
                 this.connectionInfo = msg;
+                if (typeof msg.heartbeatIntervalMs == "string")
+                    this.connectionInfo.heartbeatIntervalMs = parseInt(msg.heartbeatIntervalMs);
+                if (typeof msg.idleTimeoutMs == "string")
+                    this.connectionInfo.idleTimeoutMs = parseInt(msg.idleTimeoutMs);
+
                 Object.assign(opt, msg);
 
                 var fn = opt.handlers["onConnect"];
@@ -203,7 +237,7 @@ export class ServerEventsClient {
                         clearInterval(opt.heartbeat);
                     }
                     opt.heartbeat = setInterval(() => {
-                        if (this.eventSource.readyState === 2) //CLOSED
+                        if (this.eventSource.readyState === EventSource.CLOSED)
                         {
                             clearInterval(opt.heartbeat);
                             const stopFn = opt.handlers["onStop"];
@@ -221,7 +255,7 @@ export class ServerEventsClient {
                             .catch(res => {
                                 this.reconnectServerEvents({ errorArgs: [res] });
                             });
-                    }, parseInt(this.connectionInfo.heartbeatIntervalMs || opt.heartbeatIntervalMs) || 10000);
+                    }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                 }
                 if (opt.unRegisterUrl) {
                     if (typeof window != "undefined") {
@@ -231,11 +265,17 @@ export class ServerEventsClient {
                 this.updateSubscriberUrl = opt.updateSubscriberUrl;
                 this.updateChannels((opt.channels || "").split(","));
             } else {
+                var isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
                 var fn = opt.handlers[cmd];
                 if (fn) {
                     fn.call(el || document.body, msg, e);
+                } else {
+                    if (!isCmdMsg) { //global receiver
+                        var r = opt.receivers && opt.receivers["cmd"];
+                        this.invokeReceiver(r, cmd, el, msg, request, "cmd");
+                    }
                 }            
-                if (cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate") {
+                if (isCmdMsg) {
                     fn = opt.handlers["onCommand"];
                     if (fn) {
                         fn.call(el || document.body, msg, e);
@@ -245,21 +285,17 @@ export class ServerEventsClient {
         }
         else if (op === "trigger") {
             //$(el || document).trigger(cmd, [msg, e]); //no jQuery
-            if (opt.trigger && opt.trigger[cmd] == typeof "function") {
-                opt.trigger[cmd].call(el || document, msg, e);
+            if (opt.triggers && opt.triggers[cmd] == typeof "function") {
+                opt.triggers[cmd].call(el || document, msg, e);
             }
         }
         else if (op === "css") {
             css(els || document.querySelectorAll("body"), cmd, msg);
         }
-        else {
-            var r = opt.receivers && opt.receivers[op];
-            this.invokeReceiver(r, cmd, el, msg, e, op);
-        }
 
-        if (opt.success) {
-            opt.success(selector, msg, e);
-        }
+        //Named Receiver
+        var r = opt.receivers && opt.receivers[op];
+        this.invokeReceiver(r, cmd, el, msg, request, op);
 
         if (!TypeMap[cmd])
         {
@@ -301,6 +337,14 @@ export class ServerEventsClient {
         return this.eventSource = es;
     }
 
+    start() {
+        if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
+            this.eventSource = new EventSource(this.eventSourceUrl);
+            this.eventSource.onmessage = this.onMessage.bind(this);
+            this.eventSource.onerror = this.onError.bind(this);
+        }
+    }
+
     close() {
         this.closed = true;
 
@@ -316,14 +360,41 @@ export class ServerEventsClient {
         return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }));
     }
 
-    invokeReceiver(r:any, cmd:string, el:Element, msg:string, e:any, name:string) {
+    invokeReceiver(r:any, cmd:string, el:Element, msg:any, e:ServerEventMessage, name:string) {
         if (r) {
+            if (typeof r == "function") {
+                r = this.resolver.tryResolve(r);
+            }
+            cmd = cmd.replace("-","");
+            r.client = this;
+            r.request = e;
             if (typeof (r[cmd]) == "function") {
-                r[cmd].call(el || r[cmd], msg, e);
-            } else {
+                r[cmd].call(el || r, msg, e);
+            } else if (cmd in r) {
                 r[cmd] = msg;
+            } else {
+                var cmdLower = cmd.toLowerCase();
+                for (var k in r) {
+                    if (k.toLowerCase() == cmdLower) {
+                        if (typeof r[k] == "function") {
+                            r[k].call(el || r, msg, e);
+                        } else {
+                            r[k] = msg;
+                        }
+                        return;
+                    }
+                }
+
+                var noSuchMethod = r["noSuchMethod"];
+                if (typeof noSuchMethod == "function") {
+                    noSuchMethod.call(el || r, msg.target, msg);
+                }
             }
         }
+    }
+
+    hasConnected() {
+        return this.connectionInfo != null;
     }
 
     registerHandler(name:string, fn:Function) {
@@ -331,19 +402,26 @@ export class ServerEventsClient {
             this.options.handlers = {};
 
         this.options.handlers[name] = fn;
+        return this;
     }
 
-    registerReceiver(name:string, receiver:any) {
+    registerReceiver(receiver:any){
+        return this.registerNamedReceiver("cmd", receiver);
+    }
+
+    registerNamedReceiver(name:string, receiver:any) {
         if (!this.options.receivers)
             this.options.receivers = {};
 
         this.options.receivers[name] = receiver;
+        return this;
     }
 
-    unregisterReceiver(name:string) {
+    unregisterReceiver(name:string = "cmd") {
         if (this.options.receivers) {
             delete this.options.receivers[name];
         }
+        return this;
     }
 
     updateChannels(channels:string[]) {
@@ -390,7 +468,7 @@ export class ServerEventsClient {
         if (request.id == null)
             request.id = this.getSubscriptionId();
 
-        return this.client.post(request)
+        return this.serviceClient.post(request)
             .then(x => {
                 this.updateSubscriberInfo(request.subscribeChannels, request.unsubscribeChannels);
                 return null;
@@ -402,7 +480,7 @@ export class ServerEventsClient {
         request.id = this.getSubscriptionId();
         request.subscribeChannels = channels;
 
-        return this.client.post(request)
+        return this.serviceClient.post(request)
             .then(x => {
                 this.updateChannels(channels);
             });
@@ -413,7 +491,7 @@ export class ServerEventsClient {
         request.id = this.getSubscriptionId();
         request.unsubscribeChannels = channels;
 
-        return this.client.post(request)
+        return this.serviceClient.post(request)
             .then(x => {
                 this.updateChannels(channels);
             });
@@ -423,7 +501,7 @@ export class ServerEventsClient {
         let request = new GetEventSubscribers();
         request.channels = this.channels;
 
-        return this.client.get(request)
+        return this.serviceClient.get(request)
             .then(r => r.map(x => this.toServerEventUser(x)));
     }
 
@@ -447,6 +525,17 @@ export class ServerEventsClient {
         }
         return to;
     } 
+}
+
+export interface IReceiver {
+    noSuchMethod(selector: string, message:any);
+}
+
+export class ServerEventReceiver implements IReceiver {
+    public client: ServerEventsClient;
+    public request: ServerEventMessage;
+
+    noSuchMethod(selector: string, message:any) {}
 }
 
 export class UpdateEventSubscriber implements IReturn<UpdateEventSubscriberResponse>

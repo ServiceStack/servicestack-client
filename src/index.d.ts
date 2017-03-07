@@ -25,8 +25,20 @@ export declare class ResponseError {
 export declare class ErrorResponse {
     responseStatus: ResponseStatus;
 }
-export interface ISseMessage {
-    type: string;
+export interface IResolver {
+    tryResolve(Function: any): any;
+}
+export declare class NewInstanceResolver implements IResolver {
+    tryResolve(ctor: ObjectConstructor): any;
+}
+export declare class SingletonInstanceResolver implements IResolver {
+    static cache: {
+        [index: string]: any;
+    };
+    tryResolve(ctor: ObjectConstructor): any;
+}
+export interface ServerEventMessage {
+    type: "ServerEventConnect" | "ServerEventHeartbeat" | "ServerEventJoin" | "ServerEventLeave" | "ServerEventUpdate" | "ServerEventMessage";
     eventId: number;
     channel: string;
     data: string;
@@ -39,13 +51,13 @@ export interface ISseMessage {
         [index: string]: string;
     };
 }
-export interface ISseCommand extends ISseMessage {
+export interface ServerEventCommand extends ServerEventMessage {
     userId: string;
     displayName: string;
     channels: string;
     profileUrl: string;
 }
-export interface ISseConnect extends ISseCommand {
+export interface ServerEventConnect extends ServerEventCommand {
     id: string;
     unRegisterUrl: string;
     heartbeatUrl: string;
@@ -53,13 +65,13 @@ export interface ISseConnect extends ISseCommand {
     heartbeatIntervalMs: number;
     idleTimeoutMs: number;
 }
-export interface ISseHeartbeat extends ISseCommand {
+export interface ServerEventHeartbeat extends ServerEventCommand {
 }
-export interface ISseJoin extends ISseCommand {
+export interface ServerEventJoin extends ServerEventCommand {
 }
-export interface ISseLeave extends ISseCommand {
+export interface ServerEventLeave extends ServerEventCommand {
 }
-export interface ISseUpdate extends ISseCommand {
+export interface ServerEventUpdate extends ServerEventCommand {
 }
 export interface IReconnectServerEventsOptions {
     url?: string;
@@ -94,28 +106,47 @@ export interface IEventSourceInit {
 export interface IOnMessageEvent {
     data: string;
 }
+export interface IEventSourceOptions {
+    channels?: string;
+    handlers?: any;
+    receivers?: any;
+    triggers?: any;
+    onTick?: Function;
+    resolver?: IResolver;
+    autoStart?: boolean;
+    validate?: (op?: string, target?: string, msg?: any, json?: string) => boolean;
+    heartbeatUrl?: string;
+    unRegisterUrl?: string;
+    updateSubscriberUrl?: string;
+    heartbeatIntervalMs?: number;
+    heartbeat?: number;
+}
 export declare class ServerEventsClient {
     channels: string[];
-    options: any;
+    options: IEventSourceOptions;
     eventSource: IEventSourceStatic;
     static UnknownChannel: string;
     eventSourceUrl: string;
     updateSubscriberUrl: string;
-    connectionInfo: ISseConnect;
-    client: JsonServiceClient;
+    connectionInfo: ServerEventConnect;
+    serviceClient: JsonServiceClient;
     closed: boolean;
-    constructor(baseUrl: string, channels: string[], options?: any, eventSource?: IEventSourceStatic);
+    resolver: IResolver;
+    constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage(e: IOnMessageEvent): void;
     onError(e: any): void;
     reconnectServerEvents(opt?: any): IEventSourceStatic;
+    start(): void;
     close(): Promise<Response>;
-    invokeReceiver(r: any, cmd: string, el: Element, msg: string, e: any, name: string): void;
-    registerHandler(name: string, fn: Function): void;
-    registerReceiver(name: string, receiver: any): void;
-    unregisterReceiver(name: string): void;
+    invokeReceiver(r: any, cmd: string, el: Element, msg: any, e: ServerEventMessage, name: string): void;
+    hasConnected(): boolean;
+    registerHandler(name: string, fn: Function): this;
+    registerReceiver(receiver: any): this;
+    registerNamedReceiver(name: string, receiver: any): this;
+    unregisterReceiver(name?: string): this;
     updateChannels(channels: string[]): void;
     updateSubscriberInfo(subscribe: string | string[], unsubscribe: string | string[]): void;
-    getConnectionInfo(): ISseConnect;
+    getConnectionInfo(): ServerEventConnect;
     getSubscriptionId(): string;
     updateSubscriber(request: UpdateEventSubscriber): Promise<any>;
     subscribeToChannels(channels: string[]): Promise<void>;
@@ -124,6 +155,14 @@ export declare class ServerEventsClient {
     toServerEventUser(map: {
         [id: string]: string;
     }): ServerEventUser;
+}
+export interface IReceiver {
+    noSuchMethod(selector: string, message: any): any;
+}
+export declare class ServerEventReceiver implements IReceiver {
+    client: ServerEventsClient;
+    request: ServerEventMessage;
+    noSuchMethod(selector: string, message: any): void;
 }
 export declare class UpdateEventSubscriber implements IReturn<UpdateEventSubscriberResponse> {
     id: string;

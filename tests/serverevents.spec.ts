@@ -10,13 +10,18 @@ import {
     ErrorResponse,
     appendQueryString,
     ServerEventsClient,
-    ISseConnect, ISseJoin, ISseLeave, ISseUpdate, ISseMessage, ISseHeartbeat
+    ServerEventConnect, ServerEventJoin, ServerEventLeave, ServerEventUpdate, ServerEventMessage, ServerEventHeartbeat,
+    SingletonInstanceResolver
 } from  '../src/index';
 import {
     PostChatToChannel, ChatMessage,
     PostRawToChannel,
-    PostObjectToChannel, CustomType, SetterType
+    PostObjectToChannel, CustomType, SetterType,
+    ResetServerEvents
 } from './dtos/chat.dtos';
+import {
+    TestNamedReceiver, TestGlobalReceiver, TestJavaScriptReceiver
+} from "./receivers"
 
 const run = (states:any[], debug?:Function) => {
     var i = 0;
@@ -30,7 +35,7 @@ const run = (states:any[], debug?:Function) => {
         var next = states[0];
         if (next.test()) {
             states.shift();
-            // console.log("states remaining: " + states.length);
+            console.log("states remaining: " + states.length);
             var ret = next.fn();
             if (ret && ret.then) //Promise
                 ret.then(() => fn(), () => fn());
@@ -48,7 +53,7 @@ const postChat = (sse:ServerEventsClient, message:string, channel?:string) => {
     request.channel = channel || ServerEventsClient.UnknownChannel;
     request.selector = "cmd.chat";
 
-    return sse.client.post(request);
+    return sse.serviceClient.post(request);
 }
 
 const postRaw = (sse:ServerEventsClient, selector:string, message:string, channel?:string) => {
@@ -58,23 +63,28 @@ const postRaw = (sse:ServerEventsClient, selector:string, message:string, channe
     request.channel = channel || ServerEventsClient.UnknownChannel;
     request.selector = selector;
 
-    return sse.client.post(request);
+    return sse.serviceClient.post(request);
 }
 
-const postObject = (sse:ServerEventsClient, dto:CustomType, selector:string, channel?:string) => {
+const postObject = (sse:ServerEventsClient, dto:CustomType, selector?:string, channel?:string) => {
     var request = new PostObjectToChannel();
     request.customType = dto;
     request.channel = channel || ServerEventsClient.UnknownChannel;
     request.selector = selector;
 
-    return sse.client.post(request);
+    return sse.serviceClient.post(request);
 }
 
 const postObjectSetter = (sse:ServerEventsClient, dto:SetterType) => {
     var request = new PostObjectToChannel();
     request.setterType = dto;
     request.channel = ServerEventsClient.UnknownChannel;
-    return sse.client.post(request);
+    return sse.serviceClient.post(request);
+}
+
+const complete = (done:Function, ...clients:ServerEventsClient[]) => {
+    Promise.all(clients.map(x => x.close()))
+        .then(r => done());
 }
 
 describe('ServerEventsClient Tests', () => {
@@ -84,7 +94,7 @@ describe('ServerEventsClient Tests', () => {
             handlers: {
                 onConnect: (e => {
                     console.log('onConnect: ', e);
-                    done();
+                    complete(done, client);
                 })
             }
         });
@@ -96,10 +106,11 @@ describe('ServerEventsClient Tests', () => {
                 onConnect: (e => {
                     chai.expect(e.heartbeatUrl).to.satisfy(x => x.startsWith("http://chat.servicestack.net"));
                 }),
-                onCommand: ((e:ISseJoin) => {
+                onCommand: ((e:ServerEventJoin) => {
                     console.log('onCommand: ', e);
                     chai.expect(client.getConnectionInfo().displayName).to.equal(e.displayName);
-                    done();
+
+                    complete(done, client);
                 })
             }
         });
@@ -107,27 +118,28 @@ describe('ServerEventsClient Tests', () => {
 
     it('Does fire onJoin events for multiple Channels', done => {
         var channels = ["A", "B", "C"];
-        var joinMsgs:ISseJoin[] = []; 
+        var joinMsgs:ServerEventJoin[] = []; 
 
         var client = new ServerEventsClient('http://chat.servicestack.net', channels, {
             handlers: {
-                onJoin: ((e:ISseJoin) => {
+                onJoin: ((e:ServerEventJoin) => {
                     console.log(e);
                     joinMsgs.push(e);
                     chai.expect(e.channel).to.equal(channels[joinMsgs.length-1]);
                     chai.expect(client.getConnectionInfo().displayName).to.equal(e.displayName);
 
-                    if (joinMsgs.length == channels.length)
-                        done();
+                    if (joinMsgs.length == channels.length){
+                        complete(done, client);
+                    }
                 })
             }
         });
     })
 
     it('Does fire all callbacks', done => {
-        var connectMsgs: ISseConnect[] = [];
-        var msgs: ISseMessage[] = [];
-        var commands: ISseMessage[] = [];
+        var connectMsgs: ServerEventConnect[] = [];
+        var msgs: ServerEventMessage[] = [];
+        var commands: ServerEventMessage[] = [];
         var errors = [];
 
         var states = [];
@@ -145,10 +157,10 @@ describe('ServerEventsClient Tests', () => {
         var client2;
         states.unshift(
         {   
-            test: () => connectMsgs.length == 1 && commands.filter(x => x.type == "ISseJoin").length == 1,
+            test: () => connectMsgs.length == 1 && commands.filter(x => x.type == "ServerEventJoin").length == 1,
             fn() {
                 var connectMsg = connectMsgs[0];
-                var joinMsg = commands.filter(x => x.type == "ISseJoin")[0];
+                var joinMsg = commands.filter(x => x.type == "ServerEventJoin")[0];
                 chai.expect(connectMsg).to.not.null;
                 chai.expect(joinMsg).to.not.null;
 
@@ -171,7 +183,7 @@ describe('ServerEventsClient Tests', () => {
             test: () => connectMsgs.length == 1 && commands.length == 1,
             fn() {
                 var connectMsg = connectMsgs[0];
-                var joinMsg = commands.filter(x => x.type == "ISseJoin")[0];
+                var joinMsg = commands.filter(x => x.type == "ServerEventJoin")[0];
                 chai.expect(connectMsg).to.not.null;
                 chai.expect(joinMsg).to.not.null;
 
@@ -182,21 +194,20 @@ describe('ServerEventsClient Tests', () => {
             test: () => commands.length == 2,
             fn() {
 
-                var leaveMsg = commands.filter(x => x.type == "ISseLeave")[0];
+                var leaveMsg = commands.filter(x => x.type == "ServerEventLeave")[0];
                 chai.expect(leaveMsg).to.not.null;
                 chai.expect(errors.length).to.equal(0);
 
-                client.close();
-                done();
+                complete(done, client);
             }
         });
     })
 
     it('Does receive messages', done => {
-        var connectMsgs: ISseConnect[] = [];
-        var commands: ISseMessage[] = [];
-        var msgs1: ISseMessage[] = [];
-        var msgs2: ISseMessage[] = [];
+        var connectMsgs: ServerEventConnect[] = [];
+        var commands: ServerEventMessage[] = [];
+        var msgs1: ServerEventMessage[] = [];
+        var msgs2: ServerEventMessage[] = [];
 
         var states = [];
 
@@ -210,8 +221,8 @@ describe('ServerEventsClient Tests', () => {
             onTick: run(states)
         });
 
-        var info1:ISseConnect;
-        var info2:ISseConnect;
+        var info1:ServerEventConnect;
+        var info2:ServerEventConnect;
 
         states.unshift({
             test: () => connectMsgs.length > 0 && commands.length > 0,
@@ -272,7 +283,7 @@ describe('ServerEventsClient Tests', () => {
                 chai.expect(msgs1.length).to.equal(2);
                 chai.expect(msgs2.length).to.equal(2);
 
-                done();
+                complete(done, client1, client2);
             }
         })
         
@@ -280,24 +291,333 @@ describe('ServerEventsClient Tests', () => {
 
     it('Does send multiple heartbeats', done => {
 
-        var heartbeats:ISseHeartbeat[] = [];
+        var heartbeats:ServerEventHeartbeat[] = [];
 
         var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
-                onConnect: ((e:ISseConnect) => e.heartbeatIntervalMs = 1000), //override to 1s
+                onConnect: ((e:ServerEventConnect) => e.heartbeatIntervalMs = 1000), //override to 1s
                 onHeartbeat: (e => {
                     heartbeats.push(e);
                     if (heartbeats.length >= 3) {
                         chai.expect(heartbeats.length).to.greaterThan(2);
-                        done();
+
+                        complete(done, client);
                     }
                 }),
             }
         });
     })
 
-    it.only('Does reconnect on lost connection', done => {
+    it('Does reconnect on lost connection', function(done) {
+        this.timeout(31000);
         
+        var connectMsgs: ServerEventConnect[] = [];
+        var msgs1: ServerEventMessage[] = [];
+
+        var states = [];
+
+        var client2 = null;
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                onConnect: (e => connectMsgs.push(e)),
+                onMessage: (e => msgs1.push(e))
+            },
+            onTick: run(states)
+        });
+
+        states.unshift({
+            test: () => connectMsgs.length >= 1,
+            fn(){
+                return postChat(client1, "msg1 from client1");
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn() {
+                return client1.serviceClient.post(new ResetServerEvents())
+                    .then(r => {
+                        client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                            handlers: {
+                                onConnect: (e => connectMsgs.push(e)),
+                            },
+                            onTick: run(states)
+                        });
+                    });
+            }
+        }, {test: () => connectMsgs.length >= 3,
+            fn() {
+                return postChat(client2, "msg2 from client2");
+            }
+        }, {test: () => msgs1.length >= 2,
+            fn() {
+                var msg2 = msgs1[1];
+                var chatMsg2:ChatMessage = JSON.parse(msg2.json);
+                chai.expect(chatMsg2.message).to.equal("msg2 from client2");
+
+                complete(done, client1, client2);
+            }
+        });
+    })
+
+    it('Does send message to Handler', done => {
+        var chatMsgs:ChatMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                chat: (e:ServerEventMessage) => {
+                    var chatMsg:ChatMessage = JSON.parse(e.json);
+                    chatMsgs.push(chatMsg);
+                }
+            },
+            onTick: run(states)
+        });
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                return postChat(client1, "msg1");
+            }
+        }, {test: () => chatMsgs.length >= 1,
+            fn(){
+                var chatMsg = chatMsgs[chatMsgs.length - 1];
+                chai.expect(chatMsg.message).to.equal("msg1");
+
+                return postChat(client1, "msg2");
+            }
+        }, {test: () => chatMsgs.length >= 2,
+            fn(){
+                var chatMsg = chatMsgs[chatMsgs.length - 1];
+                chai.expect(chatMsg.message).to.equal("msg2");
+
+                complete(done, client1);
+            }
+        });
+    })
+
+    it('Does send message to named receiver', done => {
+        var msgs1:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                onMessage: e => msgs1.push(e)
+            },
+            receivers: {
+                test: new TestNamedReceiver()
+            },
+            onTick: run(states)
+        });
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                var request = new CustomType();
+                request.id = 1;
+                request.name = "Foo";
+                return postObject(client1, request, "test.FooMethod");
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn(){
+                var foo = TestNamedReceiver.FooMethodReceived;
+                chai.expect(foo).to.not.undefined;
+                chai.expect(foo.id).to.equal(1);
+                chai.expect(foo.name).to.equal("Foo");
+
+                var request = new CustomType();
+                request.id = 2;
+                request.name = "Bar";
+                return postObject(client1, request, "test.BarMethod");
+            } 
+        }, {test: () => msgs1.length >= 2,
+            fn(){
+                var bar = TestNamedReceiver.BarMethodReceived;
+                chai.expect(bar).to.not.undefined;
+                chai.expect(bar.id).to.equal(2);
+                chai.expect(bar.name).to.equal("Bar");
+
+                var request = new CustomType();
+                request.id = 3;
+                request.name = "Baz";
+                return postObject(client1, request, "test.BazMethod");
+            }
+        }, {test: () => msgs1.length >= 3,
+            fn(){
+                var baz = TestNamedReceiver.NoSuchMethodReceived;
+                chai.expect(baz).to.not.undefined;
+                chai.expect(baz.id).to.equal(3);
+                chai.expect(baz.name).to.equal("Baz");
+                chai.expect(TestNamedReceiver.NoSuchMethodSelector).to.equal("BazMethod");
+
+                var request = new CustomType();
+                request.id = 4;
+                request.name = "Qux";
+                return postObject(client1, request, "test.QuxSetter");
+            }
+        }, {test: () => msgs1.length >= 4,
+            fn(){
+                var qux = TestNamedReceiver.QuxSetterReceived;
+                chai.expect(qux).to.not.undefined;
+                chai.expect(qux.id).to.equal(4);
+                chai.expect(qux.name).to.equal("Qux");
+
+                complete(done, client1);
+            }
+        });        
+    })
+
+    it('Does send message to global receiver', done => {
+        var msgs1:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                onMessage: e => msgs1.push(e)
+            },
+            onTick: run(states)
+        }).registerReceiver(new TestGlobalReceiver());
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                var request = new CustomType();
+                request.id = 1;
+                request.name = "Foo"; 
+                return postObject(client1, request);
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn(){
+                var foo = TestGlobalReceiver.CustomTypeMethodReceived;
+                chai.expect(foo).to.not.undefined;
+                chai.expect(foo.id).to.equal(1);
+                chai.expect(foo.name).to.equal("Foo");
+
+                complete(done, client1);
+            }
+        });
+    })
+
+    it('Does set properties on global receiver', done => {
+        var msgs1:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                onMessage: e => msgs1.push(e)
+            },
+            onTick: run(states)
+        }).registerReceiver(new TestGlobalReceiver());
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                var request = new SetterType();
+                request.id = 1;
+                request.name = "Foo"; 
+                return postObjectSetter(client1, request);
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn(){
+                var foo = TestGlobalReceiver.SetterTypeReceived;
+                chai.expect(foo).to.not.undefined;
+                chai.expect(foo.id).to.equal(1);
+                chai.expect(foo.name).to.equal("Foo");
+
+                complete(done, client1);
+            }
+        });
+    })
+
+    it('Does send raw string messages', done => {
+        var msgs1:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                onMessage: e => msgs1.push(e)
+            },
+            receivers: {
+                "css": new TestJavaScriptReceiver()
+            },
+            onTick: run(states)
+        })
+        .registerReceiver(new TestJavaScriptReceiver());
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                return postChat(client1, "chat msg");
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn(){
+                var chatMsg = TestJavaScriptReceiver.ChatReceived;
+                chai.expect(chatMsg).to.not.undefined;
+                chai.expect(chatMsg.message).to.equal("chat msg");
+
+                return postRaw(client1, "cmd.announce", "This is your captain speaking...");
+            }
+        }, {test: () => msgs1.length >= 2,
+            fn(){
+                var announce = TestJavaScriptReceiver.AnnounceReceived;
+                chai.expect(announce).to.equal("This is your captain speaking...");
+
+                return postRaw(client1, "cmd.toggle$#channels", null);
+            }
+        }, {test: () => msgs1.length >= 3,
+            fn(){
+                var toggle = TestJavaScriptReceiver.ToggleReceived;
+                chai.expect(toggle).to.null;
+                var toggleRequest = TestJavaScriptReceiver.ToggleRequestReceived;
+                chai.expect(toggleRequest.selector).to.equal("cmd.toggle$#channels");
+                chai.expect(toggleRequest.op).to.equal("cmd");
+                chai.expect(toggleRequest.target).to.equal("toggle");
+                chai.expect(toggleRequest.cssSelector).to.equal("#channels");
+
+                return postRaw(client1, "css.background-image$#top", "url(http://bit.ly/1yIJOBH)");
+            }
+        }, {test: () => msgs1.length >= 4,
+            fn(){
+                var bgImage = TestJavaScriptReceiver.BackgroundImageReceived;
+                chai.expect(bgImage).to.equal("url(http://bit.ly/1yIJOBH)");
+                var bgImageRequest = TestJavaScriptReceiver.BackgroundImageRequestReceived;
+                chai.expect(bgImageRequest.selector).to.equal("css.background-image$#top");
+                chai.expect(bgImageRequest.op).to.equal("css");
+                chai.expect(bgImageRequest.target).to.equal("background-image");
+                chai.expect(bgImageRequest.cssSelector).to.equal("#top");
+
+                complete(done, client1);
+            }
+        });
+
+    })
+
+    it('Can reuse same instance', done => {
+        var msgs1:ServerEventMessage[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            resolver: new SingletonInstanceResolver(),
+            handlers: {
+                onMessage: e => msgs1.push(e)
+            },
+            receivers: {
+                "css": TestJavaScriptReceiver
+            },
+            onTick: run(states)
+        })
+        .registerReceiver(TestJavaScriptReceiver);
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                return postRaw(client1, "cmd.announce", "This is your captain speaking...");
+            }
+        }, {test: () => msgs1.length >= 1,
+            fn(){
+                var instance:TestJavaScriptReceiver = client1.resolver.tryResolve(TestJavaScriptReceiver);
+                chai.expect(instance.AnnounceInstance).to.equal("This is your captain speaking...");
+
+                complete(done, client1);
+            }            
+        });
     })
 
     // it('', done => {
