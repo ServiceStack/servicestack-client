@@ -140,11 +140,11 @@ export interface IEventSourceOptions {
 
 export class ServerEventsClient {
     static UnknownChannel = "*";
-    eventSourceUrl: string;
+    eventStreamUri: string;
     updateSubscriberUrl: string;
     connectionInfo: ServerEventConnect;
     serviceClient: JsonServiceClient;
-    closed: boolean;
+    stopped: boolean;
     resolver: IResolver;
 
     constructor(
@@ -157,7 +157,7 @@ export class ServerEventsClient {
 
         this.resolver = this.options.resolver || new NewInstanceResolver();
 
-        this.eventSourceUrl = combinePaths(baseUrl, "event-stream") + "?";
+        this.eventStreamUri = combinePaths(baseUrl, "event-stream") + "?";
         this.updateChannels(channels);
         this.serviceClient = new JsonServiceClient(baseUrl);
 
@@ -169,7 +169,7 @@ export class ServerEventsClient {
     }
 
     onMessage(e: IOnMessageEvent) {
-        if (this.closed) return;
+        if (this.stopped) return;
         var opt = this.options;
 
         if (typeof document == "undefined") {
@@ -259,7 +259,7 @@ export class ServerEventsClient {
                 }
                 if (opt.unRegisterUrl) {
                     if (typeof window != "undefined") {
-                        window.onunload = () => this.close();
+                        window.onunload = () => this.stop();
                     }
                 }
                 this.updateSubscriberUrl = opt.updateSubscriberUrl;
@@ -310,7 +310,7 @@ export class ServerEventsClient {
     }
 
     onError(e:any){
-        if (this.closed) return;
+        if (this.stopped) return;
         if (!e)
             e = event;
         var fn = this.options.handlers["onException"];
@@ -322,12 +322,12 @@ export class ServerEventsClient {
     }
 
     reconnectServerEvents(opt: any = {}) {
-        if (this.closed) return;
+        if (this.stopped) return;
 
         this.onError(opt.errorArgs && opt.errorArgs[0]);
 
         const hold = this.eventSource;
-        const es = new EventSource(opt.url || this.eventSourceUrl || hold.url);
+        const es = new EventSource(opt.url || this.eventStreamUri || hold.url);
         es.onerror = opt.onerror || hold.onerror;
         es.onmessage = opt.onmessage || hold.onmessage;
         var fn = this.options.handlers["onReconnect"];
@@ -339,14 +339,14 @@ export class ServerEventsClient {
 
     start() {
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
-            this.eventSource = new EventSource(this.eventSourceUrl);
+            this.eventSource = new EventSource(this.eventStreamUri);
             this.eventSource.onmessage = this.onMessage.bind(this);
             this.eventSource.onerror = this.onError.bind(this);
         }
     }
 
-    close() {
-        this.closed = true;
+    stop() {
+        this.stopped = true;
 
         if (this.eventSource) {
             this.eventSource.close();
@@ -428,11 +428,11 @@ export class ServerEventsClient {
         this.channels = channels;
         const url = this.eventSource != null
             ? this.eventSource.url
-            : this.eventSourceUrl;
-        this.eventSourceUrl = url.substring(0, Math.min(url.indexOf("?"), url.length)) + "?channels=" + channels.join(",") + "&t=" + new Date().getTime();
+            : this.eventStreamUri;
+        this.eventStreamUri = url.substring(0, Math.min(url.indexOf("?"), url.length)) + "?channels=" + channels.join(",") + "&t=" + new Date().getTime();
     }
 
-    updateSubscriberInfo(subscribe:string|string[], unsubscribe:string|string[]) {
+    update(subscribe:string|string[], unsubscribe:string|string[]) {
         var sub = typeof subscribe == "string" ? subscribe.split(',') : subscribe;
         var unsub = typeof unsubscribe == "string" ? unsubscribe.split(',') : unsubscribe;
         var channels = [];
@@ -470,30 +470,30 @@ export class ServerEventsClient {
 
         return this.serviceClient.post(request)
             .then(x => {
-                this.updateSubscriberInfo(request.subscribeChannels, request.unsubscribeChannels);
+                this.update(request.subscribeChannels, request.unsubscribeChannels);
                 return null;
             });
     }
     
-    subscribeToChannels(channels:string[]) {
+    subscribeToChannels(...channels:string[]) {
         let request = new UpdateEventSubscriber();
         request.id = this.getSubscriptionId();
         request.subscribeChannels = channels;
 
         return this.serviceClient.post(request)
             .then(x => {
-                this.updateChannels(channels);
+                this.update(channels, null);
             });
     }
     
-    unsubscribeFromChannels(channels:string[]) {
+    unsubscribeFromChannels(...channels:string[]) {
         let request = new UpdateEventSubscriber();
         request.id = this.getSubscriptionId();
         request.unsubscribeChannels = channels;
 
         return this.serviceClient.post(request)
             .then(x => {
-                this.updateChannels(channels);
+                this.update(null, channels);
             });
     }
 

@@ -126,18 +126,18 @@ export declare class ServerEventsClient {
     options: IEventSourceOptions;
     eventSource: IEventSourceStatic;
     static UnknownChannel: string;
-    eventSourceUrl: string;
+    eventStreamUri: string;
     updateSubscriberUrl: string;
     connectionInfo: ServerEventConnect;
     serviceClient: JsonServiceClient;
-    closed: boolean;
+    stopped: boolean;
     resolver: IResolver;
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage(e: IOnMessageEvent): void;
     onError(e: any): void;
     reconnectServerEvents(opt?: any): IEventSourceStatic;
     start(): void;
-    close(): Promise<Response>;
+    stop(): Promise<Response>;
     invokeReceiver(r: any, cmd: string, el: Element, msg: any, e: ServerEventMessage, name: string): void;
     hasConnected(): boolean;
     registerHandler(name: string, fn: Function): this;
@@ -145,12 +145,12 @@ export declare class ServerEventsClient {
     registerNamedReceiver(name: string, receiver: any): this;
     unregisterReceiver(name?: string): this;
     updateChannels(channels: string[]): void;
-    updateSubscriberInfo(subscribe: string | string[], unsubscribe: string | string[]): void;
+    update(subscribe: string | string[], unsubscribe: string | string[]): void;
     getConnectionInfo(): ServerEventConnect;
     getSubscriptionId(): string;
     updateSubscriber(request: UpdateEventSubscriber): Promise<any>;
-    subscribeToChannels(channels: string[]): Promise<void>;
-    unsubscribeFromChannels(channels: string[]): Promise<void>;
+    subscribeToChannels(...channels: string[]): Promise<void>;
+    unsubscribeFromChannels(...channels: string[]): Promise<void>;
     getChannelSubscribers(): Promise<ServerEventUser[]>;
     toServerEventUser(map: {
         [id: string]: string;
