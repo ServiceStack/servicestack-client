@@ -110,7 +110,6 @@ export interface IEventSourceOptions {
     triggers?: any;
     onTick?: Function;
     resolver?: IResolver;
-    autoStart?: boolean;
     validate?: (op?: string, target?: string, msg?: any, json?: string) => boolean;
     heartbeatUrl?: string;
     unRegisterUrl?: string;
@@ -133,11 +132,12 @@ export declare class ServerEventsClient {
     onMessage(e: IOnMessageEvent): void;
     onError(e: any): void;
     reconnectServerEvents(opt?: any): IEventSourceStatic;
-    start(): void;
+    start(): this;
     stop(): Promise<Response>;
     invokeReceiver(r: any, cmd: string, el: Element, msg: any, e: ServerEventMessage, name: string): void;
     hasConnected(): boolean;
     registerHandler(name: string, fn: Function): this;
+    setResolver(resolver: IResolver): this;
     registerReceiver(receiver: any): this;
     registerNamedReceiver(name: string, receiver: any): this;
     unregisterReceiver(name?: string): this;

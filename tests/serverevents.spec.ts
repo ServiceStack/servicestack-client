@@ -2,8 +2,7 @@
 
 declare var global;
 
-var global;
-if (typeof global == "undefined") global = window; //browser
+if (typeof this.global == "undefined" && typeof window != "undefined") this.global = window; //browser
 
 declare function require(name:string);
 global.EventSource = require("eventsource");
@@ -41,7 +40,8 @@ const run = (states:any[], debug?:Function) => {
         var next = states[0];
         if (next.test()) {
             states.shift();
-            console.log("states remaining: " + states.length);
+            //uncomment to find out the last state that was run
+            //console.log("states remaining: " + states.length);
             var ret = next.fn();
             if (ret && ret.then) //Promise
                 ret.then(fn)
@@ -109,7 +109,7 @@ describe('ServerEventsClient Tests', function() {
                     complete(done, client);
                 })
             }
-        });
+        }).start();
     })
 
     it('Does fire onJoin events', done => {
@@ -125,7 +125,7 @@ describe('ServerEventsClient Tests', function() {
                     complete(done, client);
                 })
             }
-        });
+        }).start();
     })
 
     it('Does fire onJoin events for multiple Channels', done => {
@@ -145,7 +145,7 @@ describe('ServerEventsClient Tests', function() {
                     }
                 })
             }
-        });
+        }).start();
     })
 
     it('Does fire all callbacks', done => {
@@ -164,7 +164,7 @@ describe('ServerEventsClient Tests', function() {
                 onException: (e => errors.push(e))
             },
             onTick: run(states)
-        });
+        }).start();
 
         var client2:ServerEventsClient;
         states.unshift(
@@ -188,7 +188,7 @@ describe('ServerEventsClient Tests', function() {
                         onConnect: (e => connectMsgs.push(e)),
                     },
                     onTick: run(states)
-                });
+                }).start();
             }
         },
         {
@@ -231,7 +231,7 @@ describe('ServerEventsClient Tests', function() {
                 onMessage: (e => msgs1.push(e))
             },
             onTick: run(states)
-        });
+        }).start();
 
         var info1:ServerEventConnect;
         var info2:ServerEventConnect;
@@ -245,7 +245,7 @@ describe('ServerEventsClient Tests', function() {
                         onMessage: (e => msgs2.push(e))
                     },
                     onTick: run(states)
-                });
+                }).start();
             }
         }, {test: () => connectMsgs.length > 1 && commands.length > 1,
             fn() {
@@ -318,7 +318,7 @@ describe('ServerEventsClient Tests', function() {
                     }
                 }),
             }
-        });
+        }).start();
     })
 
     it('Does reconnect on lost connection', function(done) {
@@ -336,7 +336,7 @@ describe('ServerEventsClient Tests', function() {
                 onMessage: (e => msgs1.push(e))
             },
             onTick: run(states)
-        });
+        }).start();
 
         states.unshift({
             test: () => connectMsgs.length >= 1,
@@ -352,7 +352,7 @@ describe('ServerEventsClient Tests', function() {
                                 onConnect: (e => connectMsgs.push(e)),
                             },
                             onTick: run(states)
-                        });
+                        }).start();
                     });
             }
         }, {test: () => connectMsgs.length >= 3,
@@ -382,7 +382,7 @@ describe('ServerEventsClient Tests', function() {
                 }
             },
             onTick: run(states)
-        });
+        }).start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -418,7 +418,7 @@ describe('ServerEventsClient Tests', function() {
                 test: new TestNamedReceiver()
             },
             onTick: run(states)
-        });
+        }).start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -486,7 +486,9 @@ describe('ServerEventsClient Tests', function() {
                 onMessage: e => msgs1.push(e)
             },
             onTick: run(states)
-        }).registerReceiver(new TestGlobalReceiver());
+        })
+        .registerReceiver(new TestGlobalReceiver())
+        .start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -517,7 +519,9 @@ describe('ServerEventsClient Tests', function() {
                 onMessage: e => msgs1.push(e)
             },
             onTick: run(states)
-        }).registerReceiver(new TestGlobalReceiver());
+        })
+        .registerReceiver(new TestGlobalReceiver())
+        .start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -552,7 +556,8 @@ describe('ServerEventsClient Tests', function() {
             },
             onTick: run(states)
         })
-        .registerReceiver(new TestJavaScriptReceiver());
+        .registerReceiver(new TestJavaScriptReceiver())
+        .start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -616,7 +621,8 @@ describe('ServerEventsClient Tests', function() {
             },
             onTick: run(states)
         })
-        .registerReceiver(TestJavaScriptReceiver);
+        .registerReceiver(TestJavaScriptReceiver)
+        .start();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -653,6 +659,8 @@ describe('ServerEventsClient Tests', function() {
             handlers: { onMessage: e => msgsABCD.push(e) }, onTick: run(states)
         });
         var allClients = [clientA,clientAB,clientABC,clientABCD];
+
+        allClients.forEach(x => x.start());
 
         var channelAsubscribers:ServerEventUser[] = [];
         var channelABsubscribers:ServerEventUser[] = [];
@@ -717,15 +725,12 @@ describe('ServerEventsClient Tests', function() {
 
         var states = [];
         var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
-            autoStart: false,
             handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
         });
         var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
-            autoStart: false,
             handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
         });
         var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
-            autoStart: false,
             handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
         });
 
@@ -798,15 +803,12 @@ describe('ServerEventsClient Tests', function() {
 
         var states = [];
         var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
-            autoStart: false,
             handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
         });
         var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
-            autoStart: false,
             handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
         });
         var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
-            autoStart: false,
             handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
         });
 
@@ -846,11 +848,11 @@ describe('ServerEventsClient Tests', function() {
         var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
             handlers: { onMessage: e => msgs1.push(e) }, 
             onTick: run(states)
-        });
+        }).start();
         var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
             handlers: { onMessage: e => msgs2.push(e) }, 
             onTick: run(states)
-        });
+        }).start();
 
         states.unshift({
             test: () => client1.hasConnected() && client2.hasConnected(),
@@ -917,11 +919,11 @@ describe('ServerEventsClient Tests', function() {
         var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A","B","C"], {
             handlers: { onMessage: e => msgs1.push(e) }, 
             onTick: run(states)
-        });
+        }).start();
         var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B","C"], {
             handlers: { onMessage: e => msgs2.push(e) }, 
             onTick: run(states)
-        });
+        }).start();
 
         states.unshift({
             test: () => client1.hasConnected() && client2.hasConnected(),

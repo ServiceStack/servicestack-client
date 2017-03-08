@@ -127,7 +127,6 @@ export interface IEventSourceOptions {
     triggers?: any,
     onTick?: Function,
     resolver?: IResolver,
-    autoStart?: boolean,
     validate?: (op?:string, target?:string, msg?:any, json?:string) => boolean,
     heartbeatUrl?: string,
     unRegisterUrl?: string,
@@ -161,9 +160,6 @@ export class ServerEventsClient {
 
         if (!this.options.handlers)
             this.options.handlers = {};
-
-        if (this.options.autoStart !== false)
-            this.start();
     }
 
     onMessage(e: IOnMessageEvent) {
@@ -341,6 +337,7 @@ export class ServerEventsClient {
             this.eventSource.onmessage = this.onMessage.bind(this);
             this.eventSource.onerror = this.onError.bind(this);
         }
+        return this;
     }
 
     stop() {
