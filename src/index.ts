@@ -403,6 +403,11 @@ export class ServerEventsClient {
         return this;
     }
 
+    setResolver(resolver:IResolver) {
+        this.options.resolver = resolver;
+        return this;
+    }
+
     registerReceiver(receiver:any){
         return this.registerNamedReceiver("cmd", receiver);
     }
