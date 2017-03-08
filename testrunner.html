@@ -16,7 +16,8 @@
     var globalImports = {
         chai: window.chai,
         moch: window.mocha,
-        'isomorphic-fetch': window.fetch
+        'isomorphic-fetch': window.fetch,
+        eventsource: EventSource
     };
     
     //require shim
@@ -53,6 +54,7 @@
     <!-- load code you want to test here -->
 
     <script src="tests/client.spec.js"></script>
+    <script src="tests/serverevents.spec.js"></script>
 
     <!-- load your test files here -->
 
