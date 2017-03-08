@@ -1,6 +1,10 @@
 /// <reference path="../typings/index.d.ts" />
 
 declare var global;
+
+var global;
+if (typeof global == "undefined") global = window; //browser
+
 declare function require(name:string);
 global.EventSource = require("eventsource");
 
@@ -95,7 +99,7 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
-describe('ServerEventsClient Tests', () => {
+describe('ServerEventsClient Tests', function() {
 
     it('Can connect to ServerEventsStream', done => {
         var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
@@ -297,7 +301,8 @@ describe('ServerEventsClient Tests', () => {
         
     })
 
-    it('Does send multiple heartbeats', done => {
+    it('Does send multiple heartbeats', function(done) {
+        this.timeout(5000);
 
         var heartbeats:ServerEventHeartbeat[] = [];
 
@@ -957,7 +962,7 @@ describe('ServerEventsClient Tests', () => {
                     postChat(client2, "#4 hello to C", "C")
                 );
             }
-        }, {test: () => client1.channels.indexOf("C") == -1 && client1.channels.indexOf("C") == -1,
+        }, {test: () => client1.channels.indexOf("C") == -1 && client2.channels.indexOf("C") == -1,
             fn(){
                 chai.expect(client1.channels).to.deep.equal(["A"]);
                 chai.expect(client2.channels).to.deep.equal(["B"]);
