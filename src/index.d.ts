@@ -44,6 +44,7 @@ export interface ServerEventMessage {
     op: string;
     target: string;
     cssSelector: string;
+    body: any;
     meta: {
         [index: string]: string;
     };
@@ -109,7 +110,7 @@ export interface IEventSourceOptions {
     receivers?: any;
     onTick?: Function;
     resolver?: IResolver;
-    validate?: (op?: string, target?: string, msg?: any, json?: string) => boolean;
+    validate?: (request: ServerEventMessage) => boolean;
     heartbeatUrl?: string;
     unRegisterUrl?: string;
     updateSubscriberUrl?: string;
@@ -136,7 +137,7 @@ export declare class ServerEventsClient {
     reconnectServerEvents(opt?: any): IEventSourceStatic;
     start(): this;
     stop(): Promise<Response>;
-    invokeReceiver(r: any, cmd: string, el: Element, msg: any, e: ServerEventMessage, name: string): void;
+    invokeReceiver(r: any, cmd: string, el: Element, request: ServerEventMessage, name: string): void;
     hasConnected(): boolean;
     registerHandler(name: string, fn: Function): this;
     setResolver(resolver: IResolver): this;

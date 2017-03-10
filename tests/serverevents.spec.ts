@@ -115,7 +115,7 @@ describe('ServerEventsClient Tests', function() {
     it('Does fire onJoin events', done => {
         var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
-                onConnect: (e => {
+                onConnect: ((e:ServerEventConnect) => {
                     chai.expect(e.heartbeatUrl).to.satisfy(x => x.startsWith("http://chat.servicestack.net"));
                 }),
                 onCommand: ((e:ServerEventJoin) => {
@@ -376,8 +376,8 @@ describe('ServerEventsClient Tests', function() {
         var states = [];
         var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
-                chat: (e:ServerEventMessage) => {
-                    var chatMsg:ChatMessage = JSON.parse(e.json);
+                chat: (chatMsg:ChatMessage, e:ServerEventMessage) => {
+                    console.log(chatMsg);
                     chatMsgs.push(chatMsg);
                 }
             },

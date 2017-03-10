@@ -52,6 +52,7 @@ export interface ServerEventMessage {
     op: string;
     target: string;
     cssSelector: string;
+    body: any;
     meta: { [index:string]: string; };
 }
 
@@ -126,7 +127,7 @@ export interface IEventSourceOptions {
     receivers?: any,
     onTick?: Function,
     resolver?: IResolver,
-    validate?: (op?:string, target?:string, msg?:any, json?:string) => boolean,
+    validate?: (request:ServerEventMessage) => boolean,
     heartbeatUrl?: string,
     unRegisterUrl?: string,
     updateSubscriberUrl?: string,
@@ -182,7 +183,10 @@ export class ServerEventsClient {
             selector = selParts[1];
         }
         const json = parts[1];
-        var msg = json ? JSON.parse(json) : null;
+        var body = null;
+        try {
+            body = json ? JSON.parse(json) : null;
+        } catch(ignore){}
 
         parts = splitOnFirst(selector, ".");
         if (parts.length <= 1)
@@ -190,9 +194,6 @@ export class ServerEventsClient {
 
         var op = parts[0],
             target = parts[1].replace(new RegExp("%20", "g"), " ");
-
-        if (opt.validate && opt.validate(op, target, msg, json) === false)
-            return;
 
         const tokens = splitOnFirst(target, "$");
         const [cmd, cssSelector] = tokens;
@@ -202,29 +203,32 @@ export class ServerEventsClient {
         const eventId = (e as any).lastEventId;
         const data = e.data;
         const type = TypeMap[cmd] || "ServerEventMessage";
-        const request:ServerEventMessage = { eventId, data, type, 
-            channel, selector, json, op, target:tokens[0], cssSelector, meta:{} };
+        const request:ServerEventMessage = { eventId, data, type,
+            channel, selector, json, body, op, target:tokens[0], cssSelector, meta:{} };
 
-        if (msg && typeof msg != "string") {
-            Object.assign(msg, request);
-        }
+        const mergedBody = typeof body == "object" 
+            ? Object.assign({}, request, body)
+            : request;
+
+        if (opt.validate && opt.validate(request) === false)
+            return;
 
         var headers = new Headers();
         headers.set("Content-Type", "text/plain");
 
         if (op === "cmd") {
             if (cmd === "onConnect") {
-                this.connectionInfo = msg;
-                if (typeof msg.heartbeatIntervalMs == "string")
-                    this.connectionInfo.heartbeatIntervalMs = parseInt(msg.heartbeatIntervalMs);
-                if (typeof msg.idleTimeoutMs == "string")
-                    this.connectionInfo.idleTimeoutMs = parseInt(msg.idleTimeoutMs);
+                this.connectionInfo = body;
+                if (typeof body.heartbeatIntervalMs == "string")
+                    this.connectionInfo.heartbeatIntervalMs = parseInt(body.heartbeatIntervalMs);
+                if (typeof body.idleTimeoutMs == "string")
+                    this.connectionInfo.idleTimeoutMs = parseInt(body.idleTimeoutMs);
 
-                Object.assign(opt, msg);
+                Object.assign(opt, body);
 
                 var fn = opt.handlers["onConnect"];
                 if (fn){
-                    fn.call(el || document.body, this.connectionInfo, e);
+                    fn.call(el || document.body, this.connectionInfo, request);
                 }
 
                 if (opt.heartbeatUrl) {
@@ -263,17 +267,21 @@ export class ServerEventsClient {
                 var isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
                 var fn = opt.handlers[cmd];
                 if (fn) {
-                    fn.call(el || document.body, msg, e);
+                    if (isCmdMsg) {
+                        fn.call(el || document.body, mergedBody);
+                    } else {
+                        fn.call(el || document.body, body, request);
+                    }
                 } else {
                     if (!isCmdMsg) { //global receiver
                         var r = opt.receivers && opt.receivers["cmd"];
-                        this.invokeReceiver(r, cmd, el, msg, request, "cmd");
+                        this.invokeReceiver(r, cmd, el, request, "cmd");
                     }
                 }            
                 if (isCmdMsg) {
                     fn = opt.handlers["onCommand"];
                     if (fn) {
-                        fn.call(el || document.body, msg, e);
+                        fn.call(el || document.body, mergedBody);
                     }
                 }
             }
@@ -282,18 +290,18 @@ export class ServerEventsClient {
             this.raiseEvent(target, request);
         }
         else if (op === "css") {
-            css(els || document.querySelectorAll("body"), cmd, msg);
+            css(els || document.querySelectorAll("body"), cmd, body);
         }
 
         //Named Receiver
         var r = opt.receivers && opt.receivers[op];
-        this.invokeReceiver(r, cmd, el, msg, request, op);
+        this.invokeReceiver(r, cmd, el, request, op);
 
         if (!TypeMap[cmd])
         {
             var fn = opt.handlers["onMessage"];
             if (fn) {
-                fn.call(el || document.body, msg, e);
+                fn.call(el || document.body, mergedBody);
             }
         }
 
@@ -353,26 +361,26 @@ export class ServerEventsClient {
         return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }));
     }
 
-    invokeReceiver(r:any, cmd:string, el:Element, msg:any, e:ServerEventMessage, name:string) {
+    invokeReceiver(r:any, cmd:string, el:Element, request:ServerEventMessage, name:string) {
         if (r) {
             if (typeof r == "function") {
                 r = this.resolver.tryResolve(r);
             }
             cmd = cmd.replace("-","");
             r.client = this;
-            r.request = e;
+            r.request = request;
             if (typeof (r[cmd]) == "function") {
-                r[cmd].call(el || r, msg, e);
+                r[cmd].call(el || r, request.body);
             } else if (cmd in r) {
-                r[cmd] = msg;
+                r[cmd] = request.body;
             } else {
                 var cmdLower = cmd.toLowerCase();
                 for (var k in r) {
                     if (k.toLowerCase() == cmdLower) {
                         if (typeof r[k] == "function") {
-                            r[k].call(el || r, msg, e);
+                            r[k].call(el || r, request.body);
                         } else {
-                            r[k] = msg;
+                            r[k] = request.body;
                         }
                         return;
                     }
@@ -380,7 +388,7 @@ export class ServerEventsClient {
 
                 var noSuchMethod = r["noSuchMethod"];
                 if (typeof noSuchMethod == "function") {
-                    noSuchMethod.call(el || r, msg.target, msg);
+                    noSuchMethod.call(el || r, request.target, request);
                 }
             }
         }
