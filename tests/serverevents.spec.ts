@@ -405,6 +405,42 @@ describe('ServerEventsClient Tests', function() {
             }
         });
     })
+    
+    it('Does send string to Handler', done => {
+        var announceMsgs:string[] = [];
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            handlers: {
+                announce: (msg:string, e:ServerEventMessage) => {
+                    console.log(msg, e);
+                    announceMsgs.push(msg);
+                }
+            },
+            onTick: run(states)
+        }).start();
+        
+        states.unshift({
+            test: () => client1.hasConnected(),
+            fn(){
+                return postRaw(client1, "cmd.announce", "msg1");
+            }
+        }, {test: () => announceMsgs.length >= 1,
+            fn(){
+                var announceMsg = announceMsgs[announceMsgs.length - 1];
+                chai.expect(announceMsg).to.equal("msg1");
+
+                return postRaw(client1, "cmd.announce", "msg2");
+            }
+        }, {test: () => announceMsgs.length >= 2,
+            fn(){
+                var announceMsg = announceMsgs[announceMsgs.length - 1];
+                chai.expect(announceMsg).to.equal("msg2");
+
+                complete(done, client1);
+            }
+        });
+    })
 
     it('Does send message to named receiver', done => {
         var msgs1:ServerEventMessage[] = [];

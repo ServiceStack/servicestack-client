@@ -370,7 +370,7 @@ export class ServerEventsClient {
             r.client = this;
             r.request = request;
             if (typeof (r[cmd]) == "function") {
-                r[cmd].call(el || r, request.body);
+                r[cmd].call(el || r, request.body, request);
             } else if (cmd in r) {
                 r[cmd] = request.body;
             } else {
@@ -378,7 +378,7 @@ export class ServerEventsClient {
                 for (var k in r) {
                     if (k.toLowerCase() == cmdLower) {
                         if (typeof r[k] == "function") {
-                            r[k].call(el || r, request.body);
+                            r[k].call(el || r, request.body, request);
                         } else {
                             r[k] = request.body;
                         }
