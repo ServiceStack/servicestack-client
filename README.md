@@ -130,17 +130,19 @@ const client = new ServerEventsClient("/", channels, {
         onLeave: (msg:ServerEventLeave) => {      // User has left subscribed channel
             console.log(user.displayName + " has left the building");
         },
-        onUpdate: (msg:ServerEventUpdate) => {    // User's subscribed channels have changed
+        onUpdate: (msg:ServerEventUpdate) => {    // User channel subscription was changed
             console.log(user.displayName + " channels subscription were updated");
         },        
         onMessage: (msg:ServerEventMessage) => {} // Invoked for each other message
         //... Register custom handlers
-        CustomMessage: (msg:CustomMessage) = {}   // Handle CustomMessage Request DTO
+        announce: (s:string) => {}                // Handle messages with simple argument
+        chat: (chatMsg:ChatMessage) => {}         // Handle messages with complex type argument
+        CustomMessage: (msg:CustomMessage) => {}  // Handle complex types with default selector
     },
     receivers: { 
         //... Register any receivers
         tv: {
-            watch: function (id) {                 // Handle 'tv.watch {url}' messages 
+            watch: function (id) {                // Handle 'tv.watch {url}' messages 
                 var el = document.querySelector("#tv");
                 if (id.indexOf('youtu.be') >= 0) {
                     var v = splitOnLast(id, '/')[1];
@@ -150,16 +152,17 @@ const client = new ServerEventsClient("/", channels, {
                 }
                 el.style.display = 'block'; 
             },
-            off: function () {                     // Hanndle 'tv.off' messages
+            off: function () {                    // Handle 'tv.off' messages
                 var el = document.querySelector("#tv");
                 el.style.display = 'none';
                 el.innerHTML = '';
             }
         }
     }
-}).start();
+})
+.addListener("theEvent",(e:ServerEventMessage) => {}) // Add listener for pub/sub event trigger
+.start();
 ```
 
-When publishing a DTO Type for your Server Events message, your clients will be able to benefit from 
-the generated DTOs in [TypeScript ServiceStack References](http://docs.servicestack.net/typescript-add-servicestack-reference).
+When publishing a DTO Type for your Server Events message, your clients will be able to benefit from the generated DTOs in [TypeScript ServiceStack References](http://docs.servicestack.net/typescript-add-servicestack-reference).
 
