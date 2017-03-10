@@ -124,7 +124,6 @@ export interface IEventSourceOptions {
     channels?: string,
     handlers?: any,
     receivers?: any,
-    triggers?: any,
     onTick?: Function,
     resolver?: IResolver,
     validate?: (op?:string, target?:string, msg?:any, json?:string) => boolean,
@@ -143,6 +142,7 @@ export class ServerEventsClient {
     serviceClient: JsonServiceClient;
     stopped: boolean;
     resolver: IResolver;
+    listeners: { [index:string]: ((e:ServerEventMessage) => void)[] };
 
     constructor(
         baseUrl: string,
@@ -157,6 +157,7 @@ export class ServerEventsClient {
         this.eventStreamUri = combinePaths(baseUrl, "event-stream") + "?";
         this.updateChannels(channels);
         this.serviceClient = new JsonServiceClient(baseUrl);
+        this.listeners = {};
 
         if (!this.options.handlers)
             this.options.handlers = {};
@@ -278,10 +279,7 @@ export class ServerEventsClient {
             }
         }
         else if (op === "trigger") {
-            //$(el || document).trigger(cmd, [msg, e]); //no jQuery
-            if (opt.triggers && opt.triggers[cmd] == typeof "function") {
-                opt.triggers[cmd].call(el || document, msg, e);
-            }
+            this.raiseEvent(target, request);
         }
         else if (op === "css") {
             css(els || document.querySelectorAll("body"), cmd, msg);
@@ -451,6 +449,34 @@ export class ServerEventsClient {
             }
         }
         this.updateChannels(channels);
+    }
+
+    addListener(eventName:string, handler:((e:ServerEventMessage) => void)) {
+        var handlers = this.listeners[eventName] || (this.listeners[eventName] = []);
+        handlers.push(handler);
+        return this;
+    }
+
+    removeListener(eventName:string, handler:((e:ServerEventMessage) => void)) {
+        var handlers = this.listeners[eventName];
+        if (handlers) {
+            var pos = handlers.indexOf(handler);
+            if (pos >= 0) {
+                handlers.splice(pos, 1);
+            }
+        }
+        return this;
+    }
+
+    raiseEvent(eventName:string, msg:ServerEventMessage) {
+        var handlers = this.listeners[eventName];
+        if (handlers) {
+            handlers.forEach(x => {
+                try {
+                    x(msg);
+                } catch (e) {}
+            });
+        }        
     }
 
     getConnectionInfo(){

@@ -977,4 +977,52 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
+    it('Does fire multiple listeners for custom trigger', done => {
+        var msgs1:ServerEventMessage[] = [];
+        var msgs2:ServerEventMessage[] = [];
+
+        const handler = (e:ServerEventMessage) => {
+            msgs1.push(e);
+        };
+
+        var states = [];
+        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            onTick: run(states)
+        })
+        .addListener("customEvent", handler)
+        .addListener("customEvent", e => msgs2.push(e))
+        .start();
+
+        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            onTick: run(states)
+        }).start();
+
+        states.unshift({
+            test: () => client1.hasConnected() && client2.hasConnected(),
+            fn(){
+                postRaw(client2, "trigger.customEvent", "arg");
+            }
+        }, {test: () => msgs1.length >= 1 && msgs2.length >= 1,
+            fn(){
+                chai.expect(msgs1.length).to.equal(1);
+                chai.expect(msgs2.length).to.equal(1);
+
+                client1.removeListener("customEvent", handler);
+
+                postRaw(client2, "trigger.customEvent", "arg");
+            }
+        }, {test: () => msgs2.length >= 2, 
+            fn(){
+                chai.expect(msgs1.length).to.equal(1);
+                chai.expect(msgs2.length).to.equal(2);
+
+                chai.expect(
+                    [...msgs1, ...msgs2].every(x => JSON.parse(x.json) == "arg")
+                ).to.be.true;
+
+                complete(done, client1, client2);
+            }
+        })
+    });
+
 });

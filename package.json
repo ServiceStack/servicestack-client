@@ -17,8 +17,8 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/tsc",
-    "test2": "mocha -t 5000 ./tests/*.js",
-    "test": "mocha -t 5000 ./tests/serverevents.spec.js"
+    "test": "mocha -t 5000 ./tests/*.js",
+    "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
   "files": [
     "src/index.js",

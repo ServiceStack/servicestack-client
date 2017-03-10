@@ -107,7 +107,6 @@ export interface IEventSourceOptions {
     channels?: string;
     handlers?: any;
     receivers?: any;
-    triggers?: any;
     onTick?: Function;
     resolver?: IResolver;
     validate?: (op?: string, target?: string, msg?: any, json?: string) => boolean;
@@ -128,6 +127,9 @@ export declare class ServerEventsClient {
     serviceClient: JsonServiceClient;
     stopped: boolean;
     resolver: IResolver;
+    listeners: {
+        [index: string]: ((e: ServerEventMessage) => void)[];
+    };
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage(e: IOnMessageEvent): void;
     onError(e: any): void;
@@ -143,6 +145,9 @@ export declare class ServerEventsClient {
     unregisterReceiver(name?: string): this;
     updateChannels(channels: string[]): void;
     update(subscribe: string | string[], unsubscribe: string | string[]): void;
+    addListener(eventName: string, handler: ((e: ServerEventMessage) => void)): this;
+    removeListener(eventName: string, handler: ((e: ServerEventMessage) => void)): this;
+    raiseEvent(eventName: string, msg: ServerEventMessage): void;
     getConnectionInfo(): ServerEventConnect;
     getSubscriptionId(): string;
     updateSubscriber(request: UpdateEventSubscriber): Promise<any>;
