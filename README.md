@@ -158,7 +158,9 @@ const client = new ServerEventsClient("/", channels, {
                 el.innerHTML = '';
             }
         }
-    }
+    },
+    onException: (e:Error) => {},                 // Invoked on each Error
+    onReconnect: (e:Error) => {}                  // Invoked after each auto-reconnect
 })
 .addListener("theEvent",(e:ServerEventMessage) => {}) // Add listener for pub/sub event trigger
 .start();                                             // Start listening for Server Events!
