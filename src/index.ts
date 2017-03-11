@@ -220,8 +220,7 @@ export class ServerEventsClient {
 
         if (op === "cmd") {
             if (cmd === "onConnect") {
-                body.type = "ServerEventConnect";
-                this.connectionInfo = body;
+                this.connectionInfo = mergedBody;
                 if (typeof body.heartbeatIntervalMs == "string")
                     this.connectionInfo.heartbeatIntervalMs = parseInt(body.heartbeatIntervalMs);
                 if (typeof body.idleTimeoutMs == "string")
