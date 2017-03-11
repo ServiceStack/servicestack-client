@@ -40,8 +40,8 @@ const run = (states:any[], debug?:Function) => {
         var next = states[0];
         if (next.test()) {
             states.shift();
-            //uncomment to find out the last state that was run
-            //console.log("states remaining: " + states.length);
+            // uncomment to find out the last state that was run
+            // console.log("states remaining: " + states.length);
             var ret = next.fn();
             if (ret && ret.then) //Promise
                 ret.then(fn)
@@ -1060,5 +1060,52 @@ describe('ServerEventsClient Tests', function() {
             }
         })
     });
+
+    it("Does raise Error Messages", done => {
+        this.timeout(5000);
+
+        var errors = [];
+        var states = [];
+
+        var client1 = new ServerEventsClient('http://chat.servicestack.invalid', ["*"], {
+            onException: (e) => {
+                chai.expect(e).to.exist;
+                errors.push(e);
+            },
+            onTick: run(states)
+        }).start();
+
+        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+            onTick: run(states)
+        }).start();
+
+        states.unshift({ 
+            test: () => errors.length >= 1,
+            fn(){
+                client1.stop();
+                client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                    handlers: {
+                        onConnect: (e:ServerEventConnect) => {
+                            e.heartbeatIntervalMs = 1000;
+                        },
+                    },
+                    onException: function(e) {
+                        chai.expect(e).to.exist;
+                        errors.push(e);
+                    },
+                    onTick: run(states)
+                }).start();
+            }
+        }, {test: () => client1.hasConnected() && client2.hasConnected(),
+            fn(){
+                return client2.serviceClient.post(new ResetServerEvents());
+            } 
+        }, {test: () => errors.length >= 2,
+            fn(){
+                errors.forEach(e => console.log(e.message));
+                complete(done, client1, client2);
+            }
+        });
+    })
 
 });

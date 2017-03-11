@@ -89,7 +89,7 @@ export interface IReconnectServerEventsOptions {
     url?: string;
     onerror?: (...args: any[]) => void;
     onmessage?: (...args: any[]) => void;
-    errorArgs?: any[];
+    error?: Error;
 }
 
 /**
@@ -244,18 +244,13 @@ export class ServerEventsClient {
                             const stopFn = opt.handlers["onStop"];
                             if (stopFn != null)
                                 stopFn.apply(this.eventSource);
-                            this.reconnectServerEvents({ errorArgs: { error: "CLOSED" } });
+                            this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
                             return;
                         }
 
                         fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers }))
-                            .then(res => {
-                                if (!res.ok)
-                                    throw res;
-                            })
-                            .catch(res => {
-                                this.reconnectServerEvents({ errorArgs: [res] });
-                            });
+                            .then(res => { if (!res.ok) throw new Error(`${res.status} - ${res.statusText}`); })
+                            .catch(error => this.reconnectServerEvents({ error }));
                     }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                 }
                 if (opt.unRegisterUrl) {
@@ -311,22 +306,23 @@ export class ServerEventsClient {
             opt.onTick();
     }
 
-    onError(e:any){
+    onError = (error?:any) => {
         if (this.stopped) return;
-        if (!e)
-            e = event;
-        var fn = this.options.handlers["onException"];
+        if (!error)
+            error = event;
+        var fn = this.options.onException;
         if (fn != null)
-            fn.apply(this.eventSource, e);                        
+            fn.call(this.eventSource, error);                        
 
         if (this.options.onTick) 
             this.options.onTick();
     }
 
-    reconnectServerEvents(opt: any = {}) {
+    reconnectServerEvents(opt:IReconnectServerEventsOptions = {}) {
         if (this.stopped) return;
 
-        this.onError(opt.errorArgs && opt.errorArgs[0]);
+        if (opt.error)
+            this.onError(opt.error);
 
         const hold = this.eventSource;
         const es = new EventSource(opt.url || this.eventStreamUri || hold.url);
@@ -334,7 +330,7 @@ export class ServerEventsClient {
         es.onmessage = opt.onmessage || hold.onmessage;
         var fn = this.options.onReconnect;
         if (fn != null)
-            fn.apply(es, opt.errorArgs);
+            fn.call(es, opt.error);
         hold.close();
         return this.eventSource = es;
     }
@@ -343,12 +339,12 @@ export class ServerEventsClient {
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
             this.eventSource = new EventSource(this.eventStreamUri);
             this.eventSource.onmessage = this.onMessage.bind(this);
-            this.eventSource.onerror = this.onError.bind(this);
+            this.eventSource.onerror = (e) => this.onError(e);
         }
         return this;
     }
 
-    stop() {
+    stop() : Promise<void> {
         this.stopped = true;
 
         if (this.eventSource) {
@@ -357,10 +353,12 @@ export class ServerEventsClient {
 
         var hold = this.connectionInfo;
         if (hold == null || hold.unRegisterUrl == null)
-            return new Promise((resolve, reject) => resolve());
+            return new Promise<void>((resolve, reject) => resolve());
 
         this.connectionInfo = null;
-        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }));
+        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }))
+            .then(res => { if (!res.ok) throw new Error(`${res.status} - ${res.statusText}`); })
+            .catch(this.onError);
     }
 
     invokeReceiver(r:any, cmd:string, el:Element, request:ServerEventMessage, name:string) {
@@ -484,7 +482,9 @@ export class ServerEventsClient {
             handlers.forEach(x => {
                 try {
                     x(msg);
-                } catch (e) {}
+                } catch (e) {
+                    this.onError(e);
+                }
             });
         }        
     }
@@ -508,7 +508,7 @@ export class ServerEventsClient {
             .then(x => {
                 this.update(request.subscribeChannels, request.unsubscribeChannels);
                 return null;
-            });
+            }).catch(this.onError);
     }
     
     subscribeToChannels(...channels:string[]) {
@@ -519,7 +519,7 @@ export class ServerEventsClient {
         return this.serviceClient.post(request)
             .then(x => {
                 this.update(channels, null);
-            });
+            }).catch(this.onError);
     }
     
     unsubscribeFromChannels(...channels:string[]) {
@@ -530,7 +530,7 @@ export class ServerEventsClient {
         return this.serviceClient.post(request)
             .then(x => {
                 this.update(null, channels);
-            });
+            }).catch(this.onError);
     }
 
     getChannelSubscribers(): Promise<ServerEventUser[]> {
@@ -538,7 +538,8 @@ export class ServerEventsClient {
         request.channels = this.channels;
 
         return this.serviceClient.get(request)
-            .then(r => r.map(x => this.toServerEventUser(x)));
+            .then(r => r.map(x => this.toServerEventUser(x)))
+            .catch(this.onError);
     }
 
     toServerEventUser(map: { [id: string] : string; }): ServerEventUser {

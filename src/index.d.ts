@@ -75,7 +75,7 @@ export interface IReconnectServerEventsOptions {
     url?: string;
     onerror?: (...args: any[]) => void;
     onmessage?: (...args: any[]) => void;
-    errorArgs?: any[];
+    error?: Error;
 }
 /**
  * EventSource
@@ -135,10 +135,10 @@ export declare class ServerEventsClient {
     };
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage(e: IOnMessageEvent): void;
-    onError(e: any): void;
-    reconnectServerEvents(opt?: any): IEventSourceStatic;
+    onError: (error?: any) => void;
+    reconnectServerEvents(opt?: IReconnectServerEventsOptions): IEventSourceStatic;
     start(): this;
-    stop(): Promise<Response>;
+    stop(): Promise<void>;
     invokeReceiver(r: any, cmd: string, el: Element, request: ServerEventMessage, name: string): void;
     hasConnected(): boolean;
     registerHandler(name: string, fn: Function): this;
