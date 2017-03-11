@@ -108,6 +108,8 @@ export interface IEventSourceOptions {
     channels?: string;
     handlers?: any;
     receivers?: any;
+    onException?: Function;
+    onReconnect?: Function;
     onTick?: Function;
     resolver?: IResolver;
     validate?: (request: ServerEventMessage) => boolean;

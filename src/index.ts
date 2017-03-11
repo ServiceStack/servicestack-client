@@ -125,6 +125,8 @@ export interface IEventSourceOptions {
     channels?: string,
     handlers?: any,
     receivers?: any,
+    onException?: Function,
+    onReconnect?: Function,
     onTick?: Function,
     resolver?: IResolver,
     validate?: (request:ServerEventMessage) => boolean,
@@ -330,7 +332,7 @@ export class ServerEventsClient {
         const es = new EventSource(opt.url || this.eventStreamUri || hold.url);
         es.onerror = opt.onerror || hold.onerror;
         es.onmessage = opt.onmessage || hold.onmessage;
-        var fn = this.options.handlers["onReconnect"];
+        var fn = this.options.onReconnect;
         if (fn != null)
             fn.apply(es, opt.errorArgs);
         hold.close();
