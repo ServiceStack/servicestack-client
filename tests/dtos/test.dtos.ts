@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-03-01 17:55:09
+Date: 2017-03-12 07:06:22
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -116,6 +116,34 @@ export class EchoTypes implements IReturn<EchoTypes>
     getTypeName() { return "EchoTypes"; }
 }
 
+// @DataContract
+export class AuthenticateResponse
+{
+    // @DataMember(Order=1)
+    userId: string;
+
+    // @DataMember(Order=2)
+    sessionId: string;
+
+    // @DataMember(Order=3)
+    userName: string;
+
+    // @DataMember(Order=4)
+    displayName: string;
+
+    // @DataMember(Order=5)
+    referrerUrl: string;
+
+    // @DataMember(Order=6)
+    bearerToken: string;
+
+    // @DataMember(Order=7)
+    responseStatus: ResponseStatus;
+
+    // @DataMember(Order=8)
+    meta: { [index:string]: string; };
+}
+
 // @Route("/throwvalidation")
 export class ThrowValidation implements IReturn<ThrowValidationResponse>
 {
@@ -174,4 +202,68 @@ export class TestAuth implements IReturn<TestAuthResponse>
 {
     createResponse() { return new TestAuthResponse(); }
     getTypeName() { return "TestAuth"; }
+}
+
+// @Route("/auth")
+// @Route("/auth/{provider}")
+// @Route("/authenticate")
+// @Route("/authenticate/{provider}")
+// @DataContract
+export class Authenticate implements IReturn<AuthenticateResponse>
+{
+    // @DataMember(Order=1)
+    provider: string;
+
+    // @DataMember(Order=2)
+    state: string;
+
+    // @DataMember(Order=3)
+    oauth_token: string;
+
+    // @DataMember(Order=4)
+    oauth_verifier: string;
+
+    // @DataMember(Order=5)
+    userName: string;
+
+    // @DataMember(Order=6)
+    password: string;
+
+    // @DataMember(Order=7)
+    rememberMe: boolean;
+
+    // @DataMember(Order=8)
+    continue: string;
+
+    // @DataMember(Order=9)
+    nonce: string;
+
+    // @DataMember(Order=10)
+    uri: string;
+
+    // @DataMember(Order=11)
+    response: string;
+
+    // @DataMember(Order=12)
+    qop: string;
+
+    // @DataMember(Order=13)
+    nc: string;
+
+    // @DataMember(Order=14)
+    cnonce: string;
+
+    // @DataMember(Order=15)
+    useTokenCookie: boolean;
+
+    // @DataMember(Order=16)
+    accessToken: string;
+
+    // @DataMember(Order=17)
+    accessTokenSecret: string;
+
+    // @DataMember(Order=18)
+    meta: { [index:string]: string; };
+    createResponse() { return new AuthenticateResponse(); }
+    getTypeName() { return "Authenticate"; }
 }

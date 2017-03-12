@@ -64,6 +64,18 @@ export declare class EchoTypes implements IReturn<EchoTypes> {
     createResponse(): EchoTypes;
     getTypeName(): string;
 }
+export declare class AuthenticateResponse {
+    userId: string;
+    sessionId: string;
+    userName: string;
+    displayName: string;
+    referrerUrl: string;
+    bearerToken: string;
+    responseStatus: ResponseStatus;
+    meta: {
+        [index: string]: string;
+    };
+}
 export declare class ThrowValidation implements IReturn<ThrowValidationResponse> {
     age: number;
     required: string;
@@ -99,5 +111,29 @@ export declare class ReturnStream implements IReturn<Blob> {
 }
 export declare class TestAuth implements IReturn<TestAuthResponse> {
     createResponse(): TestAuthResponse;
+    getTypeName(): string;
+}
+export declare class Authenticate implements IReturn<AuthenticateResponse> {
+    provider: string;
+    state: string;
+    oauth_token: string;
+    oauth_verifier: string;
+    userName: string;
+    password: string;
+    rememberMe: boolean;
+    continue: string;
+    nonce: string;
+    uri: string;
+    response: string;
+    qop: string;
+    nc: string;
+    cnonce: string;
+    useTokenCookie: boolean;
+    accessToken: string;
+    accessTokenSecret: string;
+    meta: {
+        [index: string]: string;
+    };
+    createResponse(): AuthenticateResponse;
     getTypeName(): string;
 }
