@@ -49,17 +49,5 @@
     "mocha": "^2.5.3",
     "typescript": "^2.0.10"
   },
-  "jspm": {
-    "registry": "npm",
-    "directories": {},
-    "dependencies": {
-      "es6-shim": ">=0.35.0",
-      "isomorphic-fetch": ">=2.2.1"
-    },
-    "devDependencies": {
-      "typescript": "^2.0.10",
-      "chai": "^3.5.0",
-      "mocha": "^2.5.3"
-    }
   }
 }
