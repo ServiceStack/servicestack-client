@@ -656,6 +656,10 @@ export class JsonServiceClient {
         this.password = password;
     }
 
+    setBearerToken(token:string): void {
+        this.headers.set("Authorization", "Bearer " + token);
+    }
+
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Get, request, args);
     }

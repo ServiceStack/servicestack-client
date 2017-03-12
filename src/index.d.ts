@@ -221,6 +221,7 @@ export declare class JsonServiceClient {
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
+    setBearerToken(token: string): void;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T> | string, args?: any): Promise<T>;
