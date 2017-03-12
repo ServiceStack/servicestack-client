@@ -4,6 +4,7 @@
 import * as dtos from "./dtos/techstacks.dtos";
 import { 
     ResponseStatus, ResponseError,
+    Authenticate,AuthenticateResponse,
     Hello, HelloResponse,
     HelloTypes,
     ReturnString, ReturnBytes, ReturnStream,
@@ -94,8 +95,8 @@ describe('JsonServiceClient Tests', () => {
 
         testPromise.then((res: ErrorResponse) => {
             try {
-                chai.expect(res.responseStatus.errorCode).to.be.equal(401);
-                chai.expect(res.responseStatus.message).to.be.equal('Unauthorized');
+                chai.expect(res.responseStatus.errorCode).to.equal("401");
+                chai.expect(res.responseStatus.message).to.equal('Unauthorized');
                 done();
             } catch(error) {
                 done(error);
@@ -128,7 +129,7 @@ describe('JsonServiceClient Tests', () => {
     // it ('Should return raw bytes', done => {
     //     var request = new ReturnBytes();
     //     request.data = new Uint8Array([0x01]);
-    //     test.get(request)
+    //     testClient.get(request)
     //         .then(r => {
     //             console.log('r',r);
     //             chai.expect(r[0]).to.equal(0x01);
@@ -374,5 +375,41 @@ describe('JsonServiceClient Tests', () => {
                 done();
             }, done);
     })
+
+    it ('Can authenticate with BearerToken', async () => {
+        var request = new Authenticate();
+        request.provider = "credentials";
+        request.userName = "test";
+        request.password = "test";
+        var authResponse = await testClient.post(request);
+        var jwtToken = authResponse.bearerToken;
+        chai.expect(jwtToken).not.empty;
+
+        var logout = new Authenticate();
+        logout.provider = "logout";
+        await testClient.post(logout);
+
+        var newClient = new JsonServiceClient("http://test.servicestack.net");
+
+        try {
+            //New Client without BearerToken should fail
+            await newClient.post(new Authenticate());
+            chai.assert.fail(0,1, "Should not be allowed to authenticate");
+        } catch (e) {
+            if (e instanceof chai.AssertionError)
+                throw e;
+
+            const status = (e as ErrorResponse).responseStatus;
+            chai.expect(status.errorCode).to.equal("401");
+            chai.expect(status.message).to.equal("Unauthorized");
+
+            //New Client with BearerToken
+            newClient.setBearerToken(jwtToken);
+            var success = await newClient.post(new Authenticate());
+            chai.expect(success.userId).not.empty;
+            chai.expect(success.sessionId).not.empty;
+        }
+    })
+
 });
 
