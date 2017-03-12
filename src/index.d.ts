@@ -1,4 +1,4 @@
-import 'isomorphic-fetch';
+import 'fetch-everywhere';
 export interface IReturnVoid {
     createResponse(): any;
 }

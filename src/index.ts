@@ -1,4 +1,4 @@
-﻿import 'isomorphic-fetch'
+﻿import 'fetch-everywhere';
 
 export interface IReturnVoid {
     createResponse();
@@ -800,10 +800,10 @@ export class JsonServiceClient {
     }
 }
 
-const createErrorResponse = (errorCode: string, message: string) => {
+const createErrorResponse = (errorCode: string|number, message: string) => {
     const error = new ErrorResponse();
     error.responseStatus = new ResponseStatus();
-    error.responseStatus.errorCode = errorCode;
+    error.responseStatus.errorCode = errorCode && errorCode.toString();
     error.responseStatus.message = message;
     return error;
 };
