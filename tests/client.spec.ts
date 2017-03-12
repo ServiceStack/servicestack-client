@@ -137,10 +137,11 @@ describe('JsonServiceClient Tests', () => {
     //         }, done);
     // })
 
-    it ('Should allow HTTP Basic Auth requests', done => {
+    it ('Can authenticate with HTTP Basic Auth', done => {
         testClient.userName = "test";
         testClient.password = "test";
 
+        //authenticated request
         testClient.get(new TestAuth())
             .then(r => {
                 chai.expect(r.userName).to.equal("test");
@@ -148,6 +149,60 @@ describe('JsonServiceClient Tests', () => {
             }, done);
     })
 
+    it ('Can authenticate with Credentials', () => {
+        var request = new Authenticate();
+        request.provider = "credentials";
+        request.userName = "test";
+        request.password = "test";
+        request.rememberMe = true;
+        return testClient.post(request)
+            .then(r => {
+                chai.expect(r.userId).not.empty;
+                chai.expect(r.sessionId).not.empty;
+
+                //authenticated request
+                return testClient.get(new TestAuth())
+                    .then(r => {
+                        chai.expect(r.userName).to.equal("test");
+                    });
+            });
+    })
+
+    it ('Can authenticate with BearerToken', async () => {
+        var request = new Authenticate();
+        request.provider = "credentials";
+        request.userName = "test";
+        request.password = "test";
+        var authResponse = await testClient.post(request);
+        var jwtToken = authResponse.bearerToken;
+        chai.expect(jwtToken).not.empty;
+
+        //Clear existing User Session
+        var logout = new Authenticate();
+        logout.provider = "logout";
+        await testClient.post(logout);
+
+        var newClient = new JsonServiceClient("http://test.servicestack.net");
+
+        try {
+            //New Client without BearerToken should fail
+            await newClient.post(new Authenticate());
+            chai.assert.fail(0,1, "Should not be allowed to authenticate");
+        } catch (e) {
+            if (e instanceof chai.AssertionError)
+                throw e;
+
+            const status = (e as ErrorResponse).responseStatus;
+            chai.expect(status.errorCode).to.equal("401");
+            chai.expect(status.message).to.equal("Unauthorized");
+
+            //New Client with BearerToken
+            newClient.setBearerToken(jwtToken);
+            var success = await newClient.post(new Authenticate());
+            chai.expect(success.userId).not.empty;
+            chai.expect(success.sessionId).not.empty;
+        }
+    })
     it ('Should return 401 for failed HTTP Basic Auth requests', done => {
         testClient.userName = "test";
         testClient.password = "wrong";
@@ -376,40 +431,6 @@ describe('JsonServiceClient Tests', () => {
             }, done);
     })
 
-    it ('Can authenticate with BearerToken', async () => {
-        var request = new Authenticate();
-        request.provider = "credentials";
-        request.userName = "test";
-        request.password = "test";
-        var authResponse = await testClient.post(request);
-        var jwtToken = authResponse.bearerToken;
-        chai.expect(jwtToken).not.empty;
-
-        var logout = new Authenticate();
-        logout.provider = "logout";
-        await testClient.post(logout);
-
-        var newClient = new JsonServiceClient("http://test.servicestack.net");
-
-        try {
-            //New Client without BearerToken should fail
-            await newClient.post(new Authenticate());
-            chai.assert.fail(0,1, "Should not be allowed to authenticate");
-        } catch (e) {
-            if (e instanceof chai.AssertionError)
-                throw e;
-
-            const status = (e as ErrorResponse).responseStatus;
-            chai.expect(status.errorCode).to.equal("401");
-            chai.expect(status.message).to.equal("Unauthorized");
-
-            //New Client with BearerToken
-            newClient.setBearerToken(jwtToken);
-            var success = await newClient.post(new Authenticate());
-            chai.expect(success.userId).not.empty;
-            chai.expect(success.sessionId).not.empty;
-        }
-    })
 
 });
 
