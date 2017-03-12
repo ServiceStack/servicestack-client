@@ -206,6 +206,16 @@ export declare class HttpMethods {
 export interface IRequestFilterOptions {
     url: string;
 }
+export interface Cookie {
+    name: string;
+    value: string;
+    path: string;
+    domain?: string;
+    expires?: Date;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: string;
+}
 export declare class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -218,6 +228,10 @@ export declare class JsonServiceClient {
     requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
     responseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
+    manageCookies: boolean;
+    cookies: {
+        [index: string]: Cookie;
+    };
     static toBase64: (rawString: string) => string;
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
@@ -245,6 +259,9 @@ export declare const createPath: (route: string, args: any) => string;
 export declare const createUrl: (route: string, args: any) => string;
 export declare const appendQueryString: (url: string, args: any) => string;
 export declare const bytesToBase64: (aBytes: Uint8Array) => string;
+export declare const stripQuotes: (s: string) => string;
+export declare const tryDecode: (s: string) => string;
+export declare const parseCookie: (setCookie: string) => Cookie;
 export declare const toDate: (s: string) => Date;
 export declare const toDateFmt: (s: string) => string;
 export declare const padInt: (n: number) => string | number;

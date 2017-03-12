@@ -622,6 +622,17 @@ export interface IRequestFilterOptions {
     url:string
 }
 
+export interface Cookie {
+    name: string;
+    value: string;
+    path: string;
+    domain?: string;
+    expires?: Date;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: string;
+}
+
 export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -634,6 +645,8 @@ export class JsonServiceClient {
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
+    manageCookies: boolean;
+    cookies:{ [index:string]: Cookie };
 
     static toBase64: (rawString:string) => string;
 
@@ -649,6 +662,8 @@ export class JsonServiceClient {
         this.credentials = 'include';
         this.headers = new Headers();
         this.headers.set("Content-Type", "application/json");
+        this.manageCookies = typeof document == "undefined"; //because node-fetch doesn't
+        this.cookies = {};
     }
 
     setCredentials(userName:string, password:string): void {
@@ -711,6 +726,22 @@ export class JsonServiceClient {
             this.headers.set('Authorization', 'Basic '+ JsonServiceClient.toBase64(`${this.userName}:${this.password}`));
         }
 
+        if (this.manageCookies) {
+            var cookies = Object.keys(this.cookies)
+                .map(x => {
+                    var c = this.cookies[x];
+                    return c.expires && c.expires < new Date()
+                        ? null
+                        : `${c.name}=${encodeURIComponent(c.value)}`               
+                })
+                .filter(x => !!x);
+
+            if (cookies.length > 0)
+                this.headers.set("Cookie", cookies.join("; "));
+            else
+                this.headers.delete("Cookie");
+        }
+
         // Set `compress` false due to common error
         // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
         var reqOptions = {
@@ -736,6 +767,19 @@ export class JsonServiceClient {
                 holdRes = res;
                 if (!res.ok)
                     throw res;
+
+                if (this.manageCookies) {
+                    var setCookies = [];
+                    res.headers.forEach((v,k) => {
+                        if ("set-cookie" == k.toLowerCase())
+                            setCookies.push(v);
+                    });
+                    setCookies.forEach(x => {
+                        var cookie = parseCookie(x);
+                        if (cookie)
+                            this.cookies[cookie.name] = cookie;
+                    });
+                }
 
                 if (this.responseFilter != null)
                     this.responseFilter(res);
@@ -1019,6 +1063,45 @@ JsonServiceClient.toBase64 = (str:string) =>
     _btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match:any, p1:string) =>
         String.fromCharCode(new Number('0x' + p1).valueOf())
     ));
+
+export const stripQuotes = (s:string) => 
+    s && s[0] == '"' && s[s.length] == '"' ? s.slice(1,-1) : s;
+
+export const tryDecode = (s:string) => {
+    try {
+        return decodeURIComponent(s);
+    } catch(e) {
+        return s;
+    }
+};
+
+export const parseCookie = (setCookie:string): Cookie => {
+    if (!setCookie)
+        return null;
+    var to:Cookie = null;
+    var pairs = setCookie.split(/; */);
+    for (var i=0; i<pairs.length; i++) {
+        var pair = pairs[i];
+        var parts = splitOnFirst(pair, '=');
+        var name = parts[0].trim();
+        var value = parts.length > 1 ? tryDecode(stripQuotes(parts[1].trim())) : null;
+        if (i == 0) {
+            to = { name, value, path: "/" };
+        } else {
+            var lower = name.toLowerCase();
+            if (lower == "httponly") {
+                to.httpOnly = true;
+            } else if (lower == "secure") {
+                to.secure = true;
+            } else if (lower == "expires") {
+                to.expires = new Date(value);
+            } else {
+                to[name] = value;
+            }
+        }
+    }
+    return to; 
+}
 
 export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
