@@ -133,6 +133,7 @@ export declare class ServerEventsClient {
     listeners: {
         [index: string]: ((e: ServerEventMessage) => void)[];
     };
+    EventSource: IEventSourceStatic;
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage: (e: IOnMessageEvent) => void;
     onError: (error?: any) => void;

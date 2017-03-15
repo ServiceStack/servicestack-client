@@ -325,9 +325,11 @@ export class ServerEventsClient {
             this.onError(opt.error);
 
         const hold = this.eventSource;
-        const es = new EventSource(opt.url || this.eventStreamUri || hold.url);
         es.onerror = opt.onerror || hold.onerror;
         es.onmessage = opt.onmessage || hold.onmessage;
+        const es = this.EventSource
+            ? new this.EventSource(opt.url || this.eventStreamUri || hold.url)
+            : new EventSource(opt.url || this.eventStreamUri || hold.url);
         var fn = this.options.onReconnect;
         if (fn != null)
             fn.call(es, opt.error);
@@ -337,9 +339,11 @@ export class ServerEventsClient {
 
     start() {
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
-            this.eventSource = new EventSource(this.eventStreamUri);
             this.eventSource.onmessage = this.onMessage.bind(this);
             this.eventSource.onerror = (e) => this.onError(e);
+            this.eventSource = this.EventSource
+                ? new this.EventSource(this.eventStreamUri)
+                : new EventSource(this.eventStreamUri);
         }
         return this;
     }
