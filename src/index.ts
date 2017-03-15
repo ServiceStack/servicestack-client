@@ -146,6 +146,7 @@ export class ServerEventsClient {
     stopped: boolean;
     resolver: IResolver;
     listeners: { [index:string]: ((e:ServerEventMessage) => void)[] };
+    EventSource: IEventSourceStatic;
 
     constructor(
         baseUrl: string,
@@ -325,11 +326,12 @@ export class ServerEventsClient {
             this.onError(opt.error);
 
         const hold = this.eventSource;
-        es.onerror = opt.onerror || hold.onerror;
-        es.onmessage = opt.onmessage || hold.onmessage;
         const es = this.EventSource
             ? new this.EventSource(opt.url || this.eventStreamUri || hold.url)
             : new EventSource(opt.url || this.eventStreamUri || hold.url);
+        es.addEventListener('error', e => opt.onerror || hold.onerror || this.onError);
+        es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
+
         var fn = this.options.onReconnect;
         if (fn != null)
             fn.call(es, opt.error);
@@ -339,11 +341,11 @@ export class ServerEventsClient {
 
     start() {
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
-            this.eventSource.onmessage = this.onMessage.bind(this);
-            this.eventSource.onerror = (e) => this.onError(e);
             this.eventSource = this.EventSource
                 ? new this.EventSource(this.eventStreamUri)
                 : new EventSource(this.eventStreamUri);
+            this.eventSource.addEventListener('error', this.onError);
+            this.eventSource.addEventListener('message', e => this.onMessage(e as any));
         }
         return this;
     }
