@@ -166,7 +166,7 @@ export class ServerEventsClient {
             this.options.handlers = {};
     }
 
-    onMessage(e: IOnMessageEvent) {
+    onMessage = (e: IOnMessageEvent) => {
         if (this.stopped) return;
         var opt = this.options;
 

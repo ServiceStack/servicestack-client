@@ -134,7 +134,7 @@ export declare class ServerEventsClient {
         [index: string]: ((e: ServerEventMessage) => void)[];
     };
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
-    onMessage(e: IOnMessageEvent): void;
+    onMessage: (e: IOnMessageEvent) => void;
     onError: (error?: any) => void;
     reconnectServerEvents(opt?: IReconnectServerEventsOptions): IEventSourceStatic;
     start(): this;
