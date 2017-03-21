@@ -128,10 +128,10 @@ const client = new ServerEventsClient("/", channels, {
             console.log("Welcome, " + msg.displayName);
         },
         onLeave: (msg:ServerEventLeave) => {      // User has left subscribed channel
-            console.log(user.displayName + " has left the building");
+            console.log(msg.displayName + " has left the building");
         },
         onUpdate: (msg:ServerEventUpdate) => {    // User channel subscription was changed
-            console.log(user.displayName + " channels subscription were updated");
+            console.log(msg.displayName + " channels subscription were updated");
         },        
         onMessage: (msg:ServerEventMessage) => {} // Invoked for each other message
         //... Register custom handlers
