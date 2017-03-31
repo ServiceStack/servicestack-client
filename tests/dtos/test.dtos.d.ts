@@ -21,10 +21,72 @@ export declare class ResponseStatus {
         [index: string]: string;
     };
 }
+export interface IAuthTokens {
+    provider?: string;
+    userId?: string;
+    accessToken?: string;
+    accessTokenSecret?: string;
+    refreshToken?: string;
+    refreshTokenExpiry?: string;
+    requestToken?: string;
+    requestTokenSecret?: string;
+    items?: {
+        [index: string]: string;
+    };
+}
+export declare class AuthUserSession {
+    referrerUrl: string;
+    id: string;
+    userAuthId: string;
+    userAuthName: string;
+    userName: string;
+    twitterUserId: string;
+    twitterScreenName: string;
+    facebookUserId: string;
+    facebookUserName: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    company: string;
+    email: string;
+    primaryEmail: string;
+    phoneNumber: string;
+    birthDate: string;
+    birthDateRaw: string;
+    address: string;
+    address2: string;
+    city: string;
+    state: string;
+    country: string;
+    culture: string;
+    fullName: string;
+    gender: string;
+    language: string;
+    mailAddress: string;
+    nickname: string;
+    postalCode: string;
+    timeZone: string;
+    requestTokenSecret: string;
+    createdAt: string;
+    lastModified: string;
+    roles: string[];
+    permissions: string[];
+    isAuthenticated: boolean;
+    fromToken: boolean;
+    profileUrl: string;
+    sequence: string;
+    tag: number;
+    authProvider: string;
+    providerOAuthAccess: IAuthTokens[];
+}
 export declare class ThrowValidationResponse {
     age: number;
     required: string;
     email: string;
+    responseStatus: ResponseStatus;
+}
+export declare class CreateJwtResponse {
+    token: string;
     responseStatus: ResponseStatus;
 }
 export declare class HelloResponse {
@@ -71,6 +133,7 @@ export declare class AuthenticateResponse {
     displayName: string;
     referrerUrl: string;
     bearerToken: string;
+    refreshToken: string;
     responseStatus: ResponseStatus;
     meta: {
         [index: string]: string;
@@ -81,6 +144,11 @@ export declare class ThrowValidation implements IReturn<ThrowValidationResponse>
     required: string;
     email: string;
     createResponse(): ThrowValidationResponse;
+    getTypeName(): string;
+}
+export declare class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse> {
+    jwtExpiry: string;
+    createResponse(): CreateJwtResponse;
     getTypeName(): string;
 }
 export declare class Hello implements IReturn<HelloResponse> {

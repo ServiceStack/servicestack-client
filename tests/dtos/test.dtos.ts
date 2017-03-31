@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-03-12 07:06:22
+Date: 2017-03-31 10:04:39
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,AuthUserSession,IAuthTokens
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -61,11 +61,163 @@ export class ResponseStatus
     meta: { [index:string]: string; };
 }
 
+export interface IAuthTokens
+{
+    provider?: string;
+    userId?: string;
+    accessToken?: string;
+    accessTokenSecret?: string;
+    refreshToken?: string;
+    refreshTokenExpiry?: string;
+    requestToken?: string;
+    requestTokenSecret?: string;
+    items?: { [index:string]: string; };
+}
+
+// @DataContract
+export class AuthUserSession
+{
+    // @DataMember(Order=1)
+    referrerUrl: string;
+
+    // @DataMember(Order=2)
+    id: string;
+
+    // @DataMember(Order=3)
+    userAuthId: string;
+
+    // @DataMember(Order=4)
+    userAuthName: string;
+
+    // @DataMember(Order=5)
+    userName: string;
+
+    // @DataMember(Order=6)
+    twitterUserId: string;
+
+    // @DataMember(Order=7)
+    twitterScreenName: string;
+
+    // @DataMember(Order=8)
+    facebookUserId: string;
+
+    // @DataMember(Order=9)
+    facebookUserName: string;
+
+    // @DataMember(Order=10)
+    firstName: string;
+
+    // @DataMember(Order=11)
+    lastName: string;
+
+    // @DataMember(Order=12)
+    displayName: string;
+
+    // @DataMember(Order=13)
+    company: string;
+
+    // @DataMember(Order=14)
+    email: string;
+
+    // @DataMember(Order=15)
+    primaryEmail: string;
+
+    // @DataMember(Order=16)
+    phoneNumber: string;
+
+    // @DataMember(Order=17)
+    birthDate: string;
+
+    // @DataMember(Order=18)
+    birthDateRaw: string;
+
+    // @DataMember(Order=19)
+    address: string;
+
+    // @DataMember(Order=20)
+    address2: string;
+
+    // @DataMember(Order=21)
+    city: string;
+
+    // @DataMember(Order=22)
+    state: string;
+
+    // @DataMember(Order=23)
+    country: string;
+
+    // @DataMember(Order=24)
+    culture: string;
+
+    // @DataMember(Order=25)
+    fullName: string;
+
+    // @DataMember(Order=26)
+    gender: string;
+
+    // @DataMember(Order=27)
+    language: string;
+
+    // @DataMember(Order=28)
+    mailAddress: string;
+
+    // @DataMember(Order=29)
+    nickname: string;
+
+    // @DataMember(Order=30)
+    postalCode: string;
+
+    // @DataMember(Order=31)
+    timeZone: string;
+
+    // @DataMember(Order=32)
+    requestTokenSecret: string;
+
+    // @DataMember(Order=33)
+    createdAt: string;
+
+    // @DataMember(Order=34)
+    lastModified: string;
+
+    // @DataMember(Order=35)
+    roles: string[];
+
+    // @DataMember(Order=36)
+    permissions: string[];
+
+    // @DataMember(Order=37)
+    isAuthenticated: boolean;
+
+    // @DataMember(Order=38)
+    fromToken: boolean;
+
+    // @DataMember(Order=39)
+    profileUrl: string;
+
+    // @DataMember(Order=40)
+    sequence: string;
+
+    // @DataMember(Order=41)
+    tag: number;
+
+    // @DataMember(Order=42)
+    authProvider: string;
+
+    // @DataMember(Order=43)
+    providerOAuthAccess: IAuthTokens[];
+}
+
 export class ThrowValidationResponse
 {
     age: number;
     required: string;
     email: string;
+    responseStatus: ResponseStatus;
+}
+
+export class CreateJwtResponse
+{
+    token: string;
     responseStatus: ResponseStatus;
 }
 
@@ -138,9 +290,12 @@ export class AuthenticateResponse
     bearerToken: string;
 
     // @DataMember(Order=7)
-    responseStatus: ResponseStatus;
+    refreshToken: string;
 
     // @DataMember(Order=8)
+    responseStatus: ResponseStatus;
+
+    // @DataMember(Order=9)
     meta: { [index:string]: string; };
 }
 
@@ -152,6 +307,14 @@ export class ThrowValidation implements IReturn<ThrowValidationResponse>
     email: string;
     createResponse() { return new ThrowValidationResponse(); }
     getTypeName() { return "ThrowValidation"; }
+}
+
+// @Route("/jwt")
+export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>
+{
+    jwtExpiry: string;
+    createResponse() { return new CreateJwtResponse(); }
+    getTypeName() { return "CreateJwt"; }
 }
 
 // @Route("/hello")
