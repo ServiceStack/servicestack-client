@@ -8,24 +8,25 @@ in native TypeScript. It provides integration with many ServiceStack features
 including [TypeScript Add ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
 and [Server Events](http://docs.servicestack.net/server-events).
 
-### Isomorphic Fetch
+### Web, Node.js and React Native
 
 It contains a clean "jQuery-free" implementation based on JavaScript's new 
 [Fetch API standard](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), 
-utilizing the [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) implementation
-so it can be used in both JavaScript client web apps as well as node.js server projects.
+utilizing the [fetch-everywhere](https://www.npmjs.com/package/isomorphic-fetch) implementation
+so it can be used in both JavaScript Web apps, Node.js server and test projects as well as 
+React Native iOS and Android Mobile Apps as seen in [TypeScript Server Event Examples](https://github.com/ServiceStackApps/typescript-server-events).
 
 ## Install
 
 This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Templates](https://github.com/ServiceStack/ServiceStackVS)
 
-Other TypeScript or ES6 projects can install `servicestack-client` with:
-
-    jspm install servicestack-client
-
-node server projects can instead install it with:
+Node.js projects can install it with:
 
     npm install servicestack-client --save
+
+Or if using jspm:
+
+    jspm install servicestack-client
 
 The Type Definitions are contained in the above `servicestack-client` npm package, if using jspm it 
 can be installed with:
@@ -114,8 +115,8 @@ The [TypeScript ServerEventClient](http://docs.servicestack.net/typescript-serve
 is an idiomatic port of ServiceStack's 
 [C# Server Events Client](http://docs.servicestack.net/csharp-server-events-client) 
 in native TypeScript providing a productive client to consume ServiceStack's 
-[real-time Server Events](http://docs.servicestack.net/server-events) that can be used in both 
-TypeScript Web and node.js server applications.
+[real-time Server Events](http://docs.servicestack.net/server-events) that can be used in TypeScript 
+[Web, Node.js Server and React Native iOS and Android Mobile Apps](https://github.com/ServiceStackApps/typescript-server-events).
 
 ```ts
 const channels = ["home"];
