@@ -244,6 +244,9 @@ export declare class JsonServiceClient {
     patch<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(method: string, relativeOrAbsoluteUrl: string): string;
+    private createRequest(method, request, args?);
+    private createResponse<T>(res, request);
+    private handleError(holdRes, res);
     send<T>(method: string, request: any | string, args?: any): Promise<T>;
     raiseError(res: Response, error: any): any;
 }

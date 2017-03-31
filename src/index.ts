@@ -654,6 +654,7 @@ export class JsonServiceClient {
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
+    onAuthenticationRequired: () => Promise<any>;
     manageCookies: boolean;
     cookies:{ [index:string]: Cookie };
 
@@ -721,7 +722,7 @@ export class JsonServiceClient {
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
     }
 
-    send<T>(method: string, request: any|string, args?:any): Promise<T> {
+    private createRequest(method: string, request: any|string, args?:any) : [Request,IRequestFilterOptions] {
 
         let url = typeof request != "string"
             ? this.createUrlFromDto(method, request)
@@ -765,87 +766,103 @@ export class JsonServiceClient {
         if (HttpMethods.hasRequestBody(method))
             (req as any).body = JSON.stringify(request);
 
-        var opt:IRequestFilterOptions = { url: req.url };
+        var opt:IRequestFilterOptions = { url };
         if (this.requestFilter != null)
             this.requestFilter(req, opt);
 
+        return [req, opt];
+    }
+
+    private createResponse<T>(res:Response, request: any|string) {
+        if (!res.ok)
+            throw res;
+
+        if (this.manageCookies) {
+            var setCookies = [];
+            res.headers.forEach((v,k) => {
+                if ("set-cookie" == k.toLowerCase())
+                    setCookies.push(v);
+            });
+            setCookies.forEach(x => {
+                var cookie = parseCookie(x);
+                if (cookie)
+                    this.cookies[cookie.name] = cookie;
+            });
+        }
+
+        if (this.responseFilter != null)
+            this.responseFilter(res);
+
+        var x = typeof request != "string" && typeof request.createResponse == 'function'
+            ? request.createResponse()
+            : null;
+
+        if (typeof x === 'string')
+            return res.text().then(o => o as Object as T);
+
+        var contentType = res.headers.get("content-type");
+        var isJson = contentType && contentType.indexOf("application/json") !== -1;
+        if (isJson) {
+            return res.json().then(o => o as Object as T);
+        }
+
+        if (x instanceof Uint8Array) {
+            if (typeof res.arrayBuffer != 'function')
+                throw new Error("This fetch polyfill does not implement 'arrayBuffer'");
+
+            return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
+
+        } else if (typeof Blob == "function" && x instanceof Blob) {
+            if (typeof res.blob != 'function')
+                throw new Error("This fetch polyfill does not implement 'blob'");
+
+            return res.blob().then(o => o as Object as T);
+        }
+
+        let contentLength = res.headers.get("content-length");
+        if (contentLength === "0" || (contentLength == null && !isJson)) {
+            return x;
+        }
+
+        return res.json().then(o => o as Object as T); //fallback
+    }
+
+    private handleError(holdRes:Response, res) {
+
+        if (res instanceof Error)
+            throw this.raiseError(holdRes, res);
+
+        // res.json can only be called once.
+        if (res.bodyUsed)
+            throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
+
+        return res.json().then(o => {
+            var errorDto = sanitize(o);
+            if (!errorDto.responseStatus)
+                throw createErrorResponse(res.status, res.statusText);
+            throw errorDto;
+        }).catch(error => {
+            // No responseStatus body, set from `res` Body object
+            if (error instanceof Error)
+                throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
+            throw this.raiseError(res, error);
+        });
+    }
+
+    send<T>(method: string, request: any|string, args?:any): Promise<T> {
+
         var holdRes:Response  = null;
+
+        const [req, opt] = this.createRequest(method, request, args);
 
         return fetch(opt.url || req.url, req)
             .then(res => {
                 holdRes = res;
-                if (!res.ok)
-                    throw res;
-
-                if (this.manageCookies) {
-                    var setCookies = [];
-                    res.headers.forEach((v,k) => {
-                        if ("set-cookie" == k.toLowerCase())
-                            setCookies.push(v);
-                    });
-                    setCookies.forEach(x => {
-                        var cookie = parseCookie(x);
-                        if (cookie)
-                            this.cookies[cookie.name] = cookie;
-                    });
-                }
-
-                if (this.responseFilter != null)
-                    this.responseFilter(res);
-
-                var x = typeof request != "string" && typeof request.createResponse == 'function'
-                    ? request.createResponse()
-                    : null;
-
-                if (typeof x === 'string')
-                    return res.text().then(o => o as Object as T);
-
-                var contentType = res.headers.get("content-type");
-                var isJson = contentType && contentType.indexOf("application/json") !== -1;
-                if (isJson) {
-                    return res.json().then(o => o as Object as T);
-                }
-
-                if (x instanceof Uint8Array) {
-                    if (typeof res.arrayBuffer != 'function')
-                        throw new Error("This fetch polyfill does not implement 'arrayBuffer'");
-
-                    return res.arrayBuffer().then(o => new Uint8Array(o) as Object as T);
-
-                } else if (typeof Blob == "function" && x instanceof Blob) {
-                    if (typeof res.blob != 'function')
-                        throw new Error("This fetch polyfill does not implement 'blob'");
-
-                    return res.blob().then(o => o as Object as T);
-                }
-
-                let contentLength = res.headers.get("content-length");
-                if (contentLength === "0" || (contentLength == null && !isJson)) {
-                    return x;
-                }
-
-                return res.json().then(o => o as Object as T); //fallback
+                const response = this.createResponse(res, request);
+                return response;
             })
             .catch(res => {
-
-                if (res instanceof Error)
-                    throw this.raiseError(holdRes, res);
-
-                // res.json can only be called once.
-                if (res.bodyUsed)
-                    throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
-
-                return res.json().then(o => {
-                    var errorDto = sanitize(o);
-                    if (!errorDto.responseStatus)
-                        throw createErrorResponse(res.status, res.statusText);
-                    throw errorDto;
-                }).catch(error => {
-                    // No responseStatus body, set from `res` Body object
-                    if (error instanceof Error)
-                        throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
-                    throw this.raiseError(res, error);
-                });
+                return this.handleError(holdRes, res);
             });
     }
 
