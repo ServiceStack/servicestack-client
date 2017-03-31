@@ -217,6 +217,10 @@ export interface Cookie {
     secure?: boolean;
     sameSite?: string;
 }
+export declare class GetAccessTokenResponse {
+    accessToken: string;
+    responseStatus: ResponseStatus;
+}
 export declare class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -226,9 +230,12 @@ export declare class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    refreshToken: string;
+    refreshTokenUri: string;
     requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
     responseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
+    onAuthenticationRequired: () => Promise<any>;
     manageCookies: boolean;
     cookies: {
         [index: string]: Cookie;
@@ -237,6 +244,7 @@ export declare class JsonServiceClient {
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
     setBearerToken(token: string): void;
+    getBearerToken(): string;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T> | string, args?: any): Promise<T>;

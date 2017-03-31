@@ -88,6 +88,52 @@ client.get(new SecureRequest())
 
 Or use `client.setCredentials()` to have them set both together.
 
+### Transparently handle 401 Unauthorized Responses
+
+If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the 
+configured Bearer Token or API Key used had expired or was invalidated, you can use `onAuthenticationRequired`
+callback to re-configure the client before automatically retrying the original request, e.g:
+
+```ts
+client.onAuthenticationRequired = async () => {
+    const authClient = new JsonServiceClient(authBaseUrl);
+    authClient.userName = userName;
+    authClient.password = password;
+    const response = await authClient.get(new Authenticate());
+    client.setBearerToken(response.bearerToken);
+};
+
+//Automatically retries requests returning 401 Responses with new bearerToken
+var response = await client.get(new Secured());
+```
+
+### Automatically refresh Access Tokens
+
+With the [Refresh Token support in JWT](http://docs.servicestack.net/jwt-authprovider#refresh-tokens) 
+you can use the `refreshToken` property to instruct the Service Client to automatically fetch new 
+JWT Tokens behind the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:
+
+```ts
+//Authenticate to get new Refresh Token
+const authClient = new JsonServiceClient(authBaseUrl);
+authClient.userName = userName;
+authClient.password = password;
+const authResponse = await authClient.get(new Authenticate());
+
+//Configure client with RefreshToken
+client.refreshToken = authResponse.RefreshToken;
+
+//Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
+var response = await client.get(new Secured());
+```
+
+Use the `refreshTokenUri` property when refresh tokens need to be sent to a different ServiceStack Server, e.g:
+
+```ts
+client.refreshToken = refreshToken;
+client.refreshTokenUri = authBaseUrl + "/access-token";
+```
+
 ### Raw Data Responses
 
 The `JsonServiceClient` also supports Raw Data responses like `string` and `byte[]` which also get a Typed API 

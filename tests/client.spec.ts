@@ -164,6 +164,10 @@ describe('JsonServiceClient Tests', () => {
                 return testClient.get(new TestAuth())
                     .then(r => {
                         chai.expect(r.userName).to.equal("test");
+
+                        var logout = new Authenticate();
+                        logout.provider = "logout";
+                        return testClient.post(logout);
                     });
             });
     })
@@ -203,6 +207,7 @@ describe('JsonServiceClient Tests', () => {
             chai.expect(success.sessionId).not.empty;
         }
     })
+    
     it ('Should return 401 for failed HTTP Basic Auth requests', done => {
         testClient.userName = "test";
         testClient.password = "wrong";

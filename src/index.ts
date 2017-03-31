@@ -642,6 +642,16 @@ export interface Cookie {
     sameSite?: string;
 }
 
+class GetAccessToken implements IReturn<GetAccessTokenResponse> {
+    refreshToken: string;
+    createResponse() { return new GetAccessTokenResponse(); }
+    getTypeName() { return "GetAccessToken"; }
+}
+export class GetAccessTokenResponse {
+    accessToken: string;
+    responseStatus: ResponseStatus;
+}
+
 export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -651,6 +661,8 @@ export class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    refreshToken: string;
+    refreshTokenUri: string;
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
@@ -683,6 +695,13 @@ export class JsonServiceClient {
 
     setBearerToken(token:string): void {
         this.headers.set("Authorization", "Bearer " + token);
+    }
+
+    getBearerToken() {
+        var auth = this.headers.get("Authorization");
+        return auth == null || !auth.startsWith("Bearer ")
+            ? null
+            : splitOnFirst(auth, " ")[1];
     }
 
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
@@ -862,6 +881,33 @@ export class JsonServiceClient {
                 return response;
             })
             .catch(res => {
+
+                if (res.status === 401) {
+                    if (this.refreshToken) {
+                        const jwtReq = new GetAccessToken();
+                        jwtReq.refreshToken = this.refreshToken;
+                        var url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
+                        return this.post<GetAccessTokenResponse>(url, jwtReq)
+                            .then(r => {
+                                this.setBearerToken(r.accessToken);
+                                const [req, opt] = this.createRequest(method, request, args);
+                                return fetch(opt.url || req.url, req)
+                                    .then(res => this.createResponse(res, request))
+                                    .catch(res => this.handleError(holdRes, res));
+                            })
+                            .catch(res => this.handleError(holdRes, res));
+                    }
+
+                    if (this.onAuthenticationRequired) {
+                        return this.onAuthenticationRequired().then(() => {
+                            const [req, opt] = this.createRequest(method, request, args);
+                            return fetch(opt.url || req.url, req)
+                                .then(res => this.createResponse(res, request))
+                                .catch(res => this.handleError(holdRes, res));
+                        });
+                    }
+                }
+
                 return this.handleError(holdRes, res);
             });
     }
