@@ -700,23 +700,39 @@ export class JsonServiceClient {
     }
 
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Get, request, args);
+        return typeof request != "string" 
+            ? this.send<T>(HttpMethods.Get, request, args)
+            : this.send<T>(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
     }
 
     delete<T>(request: IReturn<T>|string, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Delete, request, args);
+        return typeof request != "string" 
+            ? this.send<T>(HttpMethods.Delete, request, args)
+            : this.send<T>(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
     }
 
-    post<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+    post<T>(request: IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Post, request, args);
     }
 
-    put<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+    postToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
+    }
+
+    put<T>(request: IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Put, request, args);
     }
 
-    patch<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+    putToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
+    }
+
+    patch<T>(request: IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Patch, request, args);
+    }
+
+    patchToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
+        return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     }
 
     createUrlFromDto<T>(method:string, request: IReturn<T>) : string {
@@ -729,22 +745,18 @@ export class JsonServiceClient {
         return url;
     }
 
-    toAbsoluteUrl(method:string, relativeOrAbsoluteUrl:string) : string {
+    toAbsoluteUrl(relativeOrAbsoluteUrl:string) : string {
         return relativeOrAbsoluteUrl.startsWith("http://") ||
                relativeOrAbsoluteUrl.startsWith("https://")
             ? relativeOrAbsoluteUrl
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
     }
 
-    private createRequest(method: string, request: any|string, args?:any) : [Request,IRequestFilterOptions] {
-
-        let url = typeof request != "string"
-            ? this.createUrlFromDto(method, request)
-            : this.toAbsoluteUrl(method, request);
-
-        if (args) {
+    private createRequest(method:string, request:any|null, args?:any, url?:string) : [Request,IRequestFilterOptions] {
+        if (!url)
+            url = this.createUrlFromDto(method, request);
+        if (args)
             url = appendQueryString(url, args);
-        }
 
         if (this.bearerToken != null) {
             this.headers.set("Authorization", "Bearer " + this.bearerToken);
@@ -790,7 +802,7 @@ export class JsonServiceClient {
         return [req, opt];
     }
 
-    private createResponse<T>(res:Response, request: any|string) {
+    private createResponse<T>(res:Response, request:any|null) {
         if (!res.ok)
             throw res;
 
@@ -810,7 +822,7 @@ export class JsonServiceClient {
         if (this.responseFilter != null)
             this.responseFilter(res);
 
-        var x = typeof request != "string" && typeof request.createResponse == 'function'
+        var x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
             : null;
 
@@ -866,11 +878,11 @@ export class JsonServiceClient {
         });
     }
 
-    send<T>(method: string, request: any|string, args?:any): Promise<T> {
+    send<T>(method: string, request:any|null, args?:any, url?:string): Promise<T> {
 
         var holdRes:Response  = null;
 
-        const [req, opt] = this.createRequest(method, request, args);
+        const [req, opt] = this.createRequest(method, request, args, url);
 
         return fetch(opt.url || req.url, req)
             .then(res => {
@@ -885,7 +897,7 @@ export class JsonServiceClient {
                         const jwtReq = new GetAccessToken();
                         jwtReq.refreshToken = this.refreshToken;
                         var url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
-                        return this.post<GetAccessTokenResponse>(url, jwtReq)
+                        return this.postToUrl<GetAccessTokenResponse>(url, jwtReq)
                             .then(r => {
                                 this.bearerToken = r.accessToken;
                                 const [req, opt] = this.createRequest(method, request, args);
@@ -979,6 +991,11 @@ export const nameOf = (o: any) => {
 };
 
 /* utils */
+
+function log<T>(o:T, prefix:string="LOG") {
+    console.log(prefix, o);
+    return o;
+}
 
 export const css = (selector: string | NodeListOf<Element>, name: string, value: string) => {
     const els = typeof selector == "string"

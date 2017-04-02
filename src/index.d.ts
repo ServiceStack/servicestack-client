@@ -245,18 +245,20 @@ export declare class JsonServiceClient {
     constructor(baseUrl: string);
     setCredentials(userName: string, password: string): void;
     setBearerToken(token: string): void;
-    getBearerToken(): string;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
-    post<T>(request: IReturn<T> | string, args?: any): Promise<T>;
-    put<T>(request: IReturn<T> | string, args?: any): Promise<T>;
-    patch<T>(request: IReturn<T> | string, args?: any): Promise<T>;
+    post<T>(request: IReturn<T>, args?: any): Promise<T>;
+    postToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
+    put<T>(request: IReturn<T>, args?: any): Promise<T>;
+    putToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
+    patch<T>(request: IReturn<T>, args?: any): Promise<T>;
+    patchToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
-    toAbsoluteUrl(method: string, relativeOrAbsoluteUrl: string): string;
-    private createRequest(method, request, args?);
+    toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
+    private createRequest(method, request, args?, url?);
     private createResponse<T>(res, request);
     private handleError(holdRes, res);
-    send<T>(method: string, request: any | string, args?: any): Promise<T>;
+    send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
 export declare const toCamelCase: (key: string) => string;
