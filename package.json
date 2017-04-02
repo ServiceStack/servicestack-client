@@ -1,7 +1,7 @@
 {
   "name": "servicestack-client",
   "title": "ServiceStack JavaScript Utils",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "ServiceStack's TypeScript library providing convenience utilities in developing web apps. Integrates with ServiceStack's Server features including ServiceClient, Server Events, Error Handling and Validation",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
   "bugs": "https://github.com/ServiceStack/Issues",
