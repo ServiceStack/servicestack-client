@@ -72,7 +72,7 @@ client.post(request)
 
 Where the `r` param in the returned `then()` Promise callback is typed to `StoreGistResponse` DTO Type.
 
-### Support for Basic Auth
+### Authenticating using Basic Auth
 
 Basic Auth support is implemented in `JsonServiceClient` and follows the same API made available in the C# 
 Service Clients where the `userName/password` properties can be set individually, e.g:
@@ -88,6 +88,48 @@ client.get(new SecureRequest())
 
 Or use `client.setCredentials()` to have them set both together.
 
+### Authenticating using Credentials
+
+Alternatively you can authenticate using userName/password credentials by 
+[adding a TypeScript Reference](http://docs.servicestack.net/typescript-add-servicestack-reference#add-typescript-reference) 
+to your remote ServiceStack Instance and sending a populated `Authenticate` Request DTO, e.g:
+
+```ts
+let request = new Authenticate();
+request.provider = "credentials";
+request.userName = userName;
+request.password = password;
+request.rememberMe = true;
+
+var response = client.post(request);
+```
+
+This will populate the `JsonServiceClient` with 
+[Session Cookies](http://docs.servicestack.net/sessions#cookie-session-ids) 
+which will transparently be sent on subsequent requests to make authenticated requests.
+
+### Authenticating using JWT
+
+Use the `bearerToken` property to Authenticate with a [ServiceStack JWT Provider](http://docs.servicestack.net/jwt-authprovider) using a JWT Token:
+
+```ts
+client.bearerToken = jwtToken;
+```
+
+Alternatively you can use a [Refresh Token](http://docs.servicestack.net/jwt-authprovider#refresh-tokens) instead:
+
+```ts
+client.refreshToken = refreshToken;
+```
+
+### Authenticating using an API Key
+
+Use the `bearerToken` property to Authenticate with an [API Key](http://docs.servicestack.net/api-key-authprovider):
+
+```ts
+client.bearerToken = apiKey;
+```
+
 ### Transparently handle 401 Unauthorized Responses
 
 If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the 
@@ -100,7 +142,7 @@ client.onAuthenticationRequired = async () => {
     authClient.userName = userName;
     authClient.password = password;
     const response = await authClient.get(new Authenticate());
-    client.setBearerToken(response.bearerToken);
+    client.bearerToken = response.bearerToken;
 };
 
 //Automatically retries requests returning 401 Responses with new bearerToken
