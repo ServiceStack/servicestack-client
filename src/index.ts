@@ -661,6 +661,7 @@ export class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
@@ -693,15 +694,9 @@ export class JsonServiceClient {
         this.password = password;
     }
 
+    // @deprecated use bearerToken property
     setBearerToken(token:string): void {
-        this.headers.set("Authorization", "Bearer " + token);
-    }
-
-    getBearerToken() {
-        var auth = this.headers.get("Authorization");
-        return auth == null || !auth.startsWith("Bearer ")
-            ? null
-            : splitOnFirst(auth, " ")[1];
+        this.bearerToken = token;
     }
 
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
@@ -751,7 +746,10 @@ export class JsonServiceClient {
             url = appendQueryString(url, args);
         }
 
-        if (this.userName != null && this.password != null) {
+        if (this.bearerToken != null) {
+            this.headers.set("Authorization", "Bearer " + this.bearerToken);
+        }
+        else if (this.userName != null) {
             this.headers.set('Authorization', 'Basic '+ JsonServiceClient.toBase64(`${this.userName}:${this.password}`));
         }
 
@@ -889,7 +887,7 @@ export class JsonServiceClient {
                         var url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
                         return this.post<GetAccessTokenResponse>(url, jwtReq)
                             .then(r => {
-                                this.setBearerToken(r.accessToken);
+                                this.bearerToken = r.accessToken;
                                 const [req, opt] = this.createRequest(method, request, args);
                                 return fetch(opt.url || req.url, req)
                                     .then(res => this.createResponse(res, request))

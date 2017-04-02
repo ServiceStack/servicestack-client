@@ -230,6 +230,7 @@ export declare class JsonServiceClient {
     headers: Headers;
     userName: string;
     password: string;
+    bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
     requestFilter: (req: Request, options?: IRequestFilterOptions) => void;

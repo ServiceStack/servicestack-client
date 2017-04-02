@@ -201,7 +201,7 @@ describe('JsonServiceClient Tests', () => {
             chai.expect(status.message).to.equal("Unauthorized");
 
             //New Client with BearerToken
-            newClient.setBearerToken(jwtToken);
+            newClient.bearerToken = jwtToken;
             var success = await newClient.post(new Authenticate());
             chai.expect(success.userId).not.empty;
             chai.expect(success.sessionId).not.empty;

@@ -45,7 +45,7 @@ describe ('JsonServiceClient Auth Tests', () => {
         const request = createJwt();
         let response = await client.post(request);
 
-        client.setBearerToken(response.token);
+        client.bearerToken = response.token;
 
         let testAuth = await client.get(new TestAuth());
         expect(testAuth.userId).eq("1");
@@ -96,7 +96,7 @@ describe ('JsonServiceClient Auth Tests', () => {
             authClient.userName = "test";
             authClient.password = "test";
             const response = await authClient.get(new Authenticate());
-            client.setBearerToken(response.bearerToken);
+            client.bearerToken = response.bearerToken;
         };
 
         var response = await client.get(new TestAuth());
@@ -110,14 +110,14 @@ describe ('JsonServiceClient Auth Tests', () => {
             count++;
             let createFreshJwt = createJwt();
             const freshJwt = await client.post(createFreshJwt);
-            client.setBearerToken(freshJwt.token);
+            client.bearerToken = freshJwt.token;
         };
 
         let createExpiredJwt = createJwt();
         createExpiredJwt.jwtExpiry = "2000-01-01";
         const expiredJwt = await client.post(createExpiredJwt);
 
-        client.setBearerToken(expiredJwt.token);
+        client.bearerToken = expiredJwt.token;
         var response = await client.get(new TestAuth());
         expect(count).eq(1);
     })
@@ -131,15 +131,16 @@ describe ('JsonServiceClient Auth Tests', () => {
         var authResponse = await client.post(new Authenticate());
 
         client.refreshToken = authResponse.refreshToken;
+        client.setCredentials(null,null);
 
         let createExpiredJwt = createJwt();
         createExpiredJwt.jwtExpiry = "2000-01-01";
         const expiredJwt = await client.post(createExpiredJwt);
 
-        client.setBearerToken(expiredJwt.token);
+        client.bearerToken = expiredJwt.token;
         var response = await client.get(new TestAuth());
 
-        expect(client.getBearerToken()).not.eq(expiredJwt.token);
+        expect(client.bearerToken).not.eq(expiredJwt.token);
     })
 
 });
