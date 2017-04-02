@@ -215,3 +215,22 @@ const client = new ServerEventsClient("/", channels, {
 
 When publishing a DTO Type for your Server Events message, your clients will be able to benefit from the generated DTOs in [TypeScript ServiceStack References](http://docs.servicestack.net/typescript-add-servicestack-reference).
 
+## Troubleshooting
+
+If you're getting missing Type Definitions for `Headers`, `Response`, `Request`, etc. You'll need to import
+the Type Definitions for W3C's `fetch` API, preferably by using the latest version of TypeScript and
+referencing the core **es2016** lib in TypeScript's `tsconfig.json`, e.g:
+
+```json
+{
+  "compilerOptions": {
+    "lib": [
+      "es2016"
+    ]
+  }
+}
+```
+
+Alternatively you can import the [whatwg-fetch](https://www.npmjs.com/package/@types/whatwg-fetch) Type Definitions with:
+
+    npm install @types/whatwg-fetch --save-dev
