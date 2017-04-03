@@ -20,6 +20,9 @@ import {
     appendQueryString,
 } from  '../src/index';
 
+const expect = chai.expect; 
+const assert = chai.assert; 
+
 describe('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
     var testClient : JsonServiceClient;
@@ -113,16 +116,13 @@ describe('JsonServiceClient Tests', () => {
         chai.expect(requestUrl).to.equal("http://test.servicestack.net?bool=false&int=0");
     })
 
-    it ('Should return raw text', done => {
+    it ('Should return raw text', async () => {
 
-        var request = new ReturnString();
+        let request = new ReturnString();
         request.data = "0x10";
 
-        testClient.get(request)
-            .then(s => {
-                chai.expect(s).to.equal("0x10");
-                done();
-            }, done);
+        const str = await testClient.get(request);
+        expect(str).eq("0x10");
     })
 
     // node-fetch v2 will implement arrayBuffer: https://github.com/bitinn/node-fetch/issues/51#issuecomment-253998195

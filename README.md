@@ -60,17 +60,72 @@ file.filename = "main.cs";
 file.content = 'var greeting = "Hi, from TypeScript!";';
 request.files = { [file.filename]: file };
 
-client.post(request)
-    .then(r => { // r:StoreGistResponse
-        console.log(`New C# Gist was created with id: ${r.gist}`);
-        location.href = `http://gistlyn.com?gist=${r.gist}`;
-    })
-    .catch(e => {
-        console.log("Failed to create Gist: ", e.responseStatus);
-    });
+try {
+    const response = client.post(request); //response:StoreGistResponse
+
+    console.log(`New C# Gist was created with id: ${r.gist}`);
+    location.href = `http://gistlyn.com?gist=${r.gist}`;
+} catch(e) {
+    console.log("Failed to create Gist: ", e.responseStatus);
+}
 ```
 
-Where the `r` param in the returned `then()` Promise callback is typed to `StoreGistResponse` DTO Type.
+Where the `response` param is typed to `StoreGistResponse` DTO Type.
+
+### Sending additional arguments with Typed API Requests
+
+Many AutoQuery Services utilize 
+[implicit conventions](http://docs.servicestack.net/autoquery-rdbms#implicit-conventions) 
+to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can now be queried by specifying additional arguments with the typed Request DTO, e.g:
+
+```ts
+const request = new FindTechStacks();
+
+//typed to QueryResponse<TechnologyStack> 
+const response = await client.get(request, { VendorName: "ServiceStack" });
+```
+
+Which will [return TechStacks](http://techstacks.io/ss_admin/autoquery/FindTechStacks) developed by ServiceStack.
+
+### Calling APIs with Custom URLs
+
+You can call Services using relative or absolute urls, e.g:
+
+```ts
+client.get<GetTechnologyResponse>("/technology/ServiceStack")
+
+client.get<GetTechnologyResponse>("http://techstacks.io/technology/ServiceStack")
+
+// GET http://techstacks.io/technology?Slug=ServiceStack
+client.get<GetTechnologyResponse>("/technology", { Slug: "ServiceStack" }) 
+```
+
+as well as POST Request DTOs to custom urls:
+
+```ts
+client.postToUrl("/custom-path", request, { Slug: "ServiceStack" });
+
+client.putToUrl("http://example.org/custom-path", request);
+```
+
+### Raw Data Responses
+
+The `JsonServiceClient` also supports Raw Data responses like `string` and `byte[]` which also get a Typed API 
+once declared on Request DTOs using the `IReturn<T>` marker:
+
+```csharp
+public class ReturnString : IReturn<string> {}
+public class ReturnBytes : IReturn<byte[]> {}
+```
+
+Which can then be accessed as normal, with their Response typed to a JavaScript `string` or `Uint8Array` for 
+raw `byte[]` responses:
+
+```ts
+let str:string = await client.get(new ReturnString());
+
+let data:Uint8Array = await client.get(new ReturnBytes());
+```
 
 ### Authenticating using Basic Auth
 
@@ -82,8 +137,7 @@ var client = new JsonServiceClient(baseUrl);
 client.userName = user;
 client.password = pass;
 
-client.get(new SecureRequest())
-    .then(r => ...);
+const response = await client.get(new SecureRequest());
 ```
 
 Or use `client.setCredentials()` to have them set both together.
@@ -101,7 +155,7 @@ request.userName = userName;
 request.password = password;
 request.rememberMe = true;
 
-var response = client.post(request);
+const response = await client.post(request);
 ```
 
 This will populate the `JsonServiceClient` with 
@@ -166,7 +220,7 @@ const authResponse = await authClient.get(new Authenticate());
 client.refreshToken = authResponse.RefreshToken;
 
 //Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
-var response = await client.get(new Secured());
+const response = await client.get(new Secured());
 ```
 
 Use the `refreshTokenUri` property when refresh tokens need to be sent to a different ServiceStack Server, e.g:
@@ -174,27 +228,6 @@ Use the `refreshTokenUri` property when refresh tokens need to be sent to a diff
 ```ts
 client.refreshToken = refreshToken;
 client.refreshTokenUri = authBaseUrl + "/access-token";
-```
-
-### Raw Data Responses
-
-The `JsonServiceClient` also supports Raw Data responses like `string` and `byte[]` which also get a Typed API 
-once declared on Request DTOs using the `IReturn<T>` marker:
-
-```csharp
-public class ReturnString : IReturn<string> {}
-public class ReturnBytes : IReturn<byte[]> {}
-```
-
-Which can then be accessed as normal, with their Response typed to a JavaScript `string` or `Uint8Array` for 
-raw `byte[]` responses:
-
-```ts
-client.get(new ReturnString())
-    .then(str => ...);  //= str:string
-
-client.get(new ReturnBytes())
-    .then(data => ...); //= data:Uint8Array
 ```
 
 ### [ServerEvents Client](http://docs.servicestack.net/typescript-server-events-client)
