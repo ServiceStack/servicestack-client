@@ -837,7 +837,7 @@ export class JsonServiceClient {
             return res.json().then(o => o as Object as T);
         }
 
-        if (x instanceof Uint8Array) {
+        if (typeof Uint8Array != "undefined" && x instanceof Uint8Array) {
             if (typeof res.arrayBuffer != 'function')
                 throw new Error("This fetch polyfill does not implement 'arrayBuffer'");
 
@@ -1104,7 +1104,7 @@ export const appendQueryString = (url: string, args: any): string => {
 const qsValue = (arg: any) => {
     if (arg == null)
         return "";
-    if (arg instanceof Uint8Array)
+    if (typeof Uint8Array != "undefined" && arg instanceof Uint8Array)
         return bytesToBase64(arg as Uint8Array);
     return encodeURIComponent(arg) || "";
 }
