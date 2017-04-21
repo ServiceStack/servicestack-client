@@ -336,8 +336,10 @@ export class ServerEventsClient {
         if (fn != null)
             fn.call(es, opt.error);
         
-        hold.removeEventListener('error', this.onError);
-        hold.removeEventListener('message', this.onMessage as any);
+        if (hold.removeEventListener) {
+            hold.removeEventListener('error', this.onError);
+            hold.removeEventListener('message', this.onMessage as any);
+        }
         hold.close();
         return this.eventSource = es;
     }

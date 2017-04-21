@@ -105,7 +105,7 @@ describe('ServerEventsClient Tests', function() {
         var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
                 onConnect: (e => {
-                    console.log('onConnect: ', e);
+                    // console.log('onConnect: ', e);
                     complete(done, client);
                 })
             }
@@ -119,7 +119,7 @@ describe('ServerEventsClient Tests', function() {
                     chai.expect(e.heartbeatUrl).to.satisfy(x => x.startsWith("http://chat.servicestack.net"));
                 }),
                 onCommand: ((e:ServerEventJoin) => {
-                    console.log('onCommand: ', e);
+                    // console.log('onCommand: ', e);
                     chai.expect(client.getConnectionInfo().displayName).to.equal(e.displayName);
 
                     complete(done, client);
@@ -135,7 +135,7 @@ describe('ServerEventsClient Tests', function() {
         var client = new ServerEventsClient('http://chat.servicestack.net', channels, {
             handlers: {
                 onJoin: ((e:ServerEventJoin) => {
-                    console.log(e);
+                    // console.log(e);
                     joinMsgs.push(e);
                     chai.expect(e.channel).to.equal(channels[joinMsgs.length-1]);
                     chai.expect(client.getConnectionInfo().displayName).to.equal(e.displayName);
@@ -377,7 +377,7 @@ describe('ServerEventsClient Tests', function() {
         var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
                 chat: (chatMsg:ChatMessage, e:ServerEventMessage) => {
-                    console.log(chatMsg);
+                    // console.log(chatMsg);
                     chatMsgs.push(chatMsg);
                 }
             },
@@ -413,7 +413,7 @@ describe('ServerEventsClient Tests', function() {
         var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
             handlers: {
                 announce: (msg:string, e:ServerEventMessage) => {
-                    console.log(msg, e);
+                    // console.log(msg, e);
                     announceMsgs.push(msg);
                 }
             },
@@ -713,7 +713,7 @@ describe('ServerEventsClient Tests', function() {
                     chai.expect(channelAsubscribers.length).to.equal(4);
                     chai.expect(channelABsubscribers.length).to.equal(4);
 
-                    console.log("Publishing Msg Batch #1 ...");
+                    // console.log("Publishing Msg Batch #1 ...");
 
                     return Promise.all([
                         postChat(clientA, "#1 hello to A", "A"),
@@ -730,7 +730,7 @@ describe('ServerEventsClient Tests', function() {
                 chai.expect(msgsABC.length).to.equal(3);
                 chai.expect(msgsABCD.length).to.equal(4);
 
-                console.log("Publishing Msg Batch #2 ...");
+                // console.log("Publishing Msg Batch #2 ...");
                 return Promise.all([
                     postChat(clientA, "#5 hello to A", "A"),
                     postChat(clientA, "#6 hello to B", "B"),
@@ -1102,7 +1102,7 @@ describe('ServerEventsClient Tests', function() {
             } 
         }, {test: () => errors.length >= 2,
             fn(){
-                errors.forEach(e => console.log(e.message));
+                // errors.forEach(e => console.log(e.message));
                 complete(done, client1, client2);
             }
         });
