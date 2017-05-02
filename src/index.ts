@@ -147,6 +147,7 @@ export class ServerEventsClient {
     resolver: IResolver;
     listeners: { [index:string]: ((e:ServerEventMessage) => void)[] };
     EventSource: IEventSourceStatic;
+    withCredentials: boolean;
 
     constructor(
         baseUrl: string,
@@ -162,6 +163,7 @@ export class ServerEventsClient {
         this.updateChannels(channels);
         this.serviceClient = new JsonServiceClient(baseUrl);
         this.listeners = {};
+        this.withCredentials = true;
 
         if (!this.options.handlers)
             this.options.handlers = {};
@@ -319,6 +321,10 @@ export class ServerEventsClient {
             this.options.onTick();
     }
 
+    getEventSourceOptions() {
+        return { withCredentials: this.withCredentials };
+    }
+
     reconnectServerEvents(opt:IReconnectServerEventsOptions = {}) {
         if (this.stopped) return;
 
@@ -327,8 +333,8 @@ export class ServerEventsClient {
 
         const hold = this.eventSource;
         const es = this.EventSource
-            ? new this.EventSource(opt.url || this.eventStreamUri || hold.url)
-            : new EventSource(opt.url || this.eventStreamUri || hold.url);
+            ? new this.EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions())
+            : new EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions());
         es.addEventListener('error', e => opt.onerror || hold.onerror || this.onError);
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
 
@@ -347,8 +353,8 @@ export class ServerEventsClient {
     start() {
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
             this.eventSource = this.EventSource
-                ? new this.EventSource(this.eventStreamUri)
-                : new EventSource(this.eventStreamUri);
+                ? new this.EventSource(this.eventStreamUri, this.getEventSourceOptions())
+                : new EventSource(this.eventStreamUri, this.getEventSourceOptions());
             this.eventSource.addEventListener('error', this.onError);
             this.eventSource.addEventListener('message', e => this.onMessage(e as any));
         }

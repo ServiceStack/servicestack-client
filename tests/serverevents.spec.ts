@@ -1108,4 +1108,31 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
+    it ('Does create EventSource instance withCredentials', () => {
+        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {})
+            .start();
+
+        chai.expect(client.getEventSourceOptions().withCredentials).eq(true);
+
+        if (typeof window != "undefined")
+        {
+            chai.expect(client.eventSource.withCredentials).eq(true);
+        }
+
+        client.stop();
+
+        client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {});
+        client.withCredentials = false;
+        client.start();
+
+        chai.expect(client.getEventSourceOptions().withCredentials).eq(false);
+
+        if (typeof window != "undefined")
+        {
+            chai.expect(client.eventSource.withCredentials).eq(false);
+        }
+
+        client.stop();
+    })
+
 });
