@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 declare var global;
 
 if (typeof this.global == "undefined" && typeof window != "undefined") this.global = window; //browser

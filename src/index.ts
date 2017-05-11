@@ -664,8 +664,8 @@ export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
     oneWayBaseUrl: string;
-    mode: string;
-    credentials: string;
+    mode: RequestMode;
+    credentials: RequestCredentials;
     headers: Headers;
     userName: string;
     password: string;
