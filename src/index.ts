@@ -873,6 +873,12 @@ export class JsonServiceClient {
         if (res.bodyUsed)
             throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
 
+        if (typeof res.json == "undefined" && res.responseStatus) {
+            return new Promise((resolve,reject) => 
+                reject(this.raiseError(null, res))
+            );
+        }
+
         return res.json().then(o => {
             var errorDto = sanitize(o);
             if (!errorDto.responseStatus)

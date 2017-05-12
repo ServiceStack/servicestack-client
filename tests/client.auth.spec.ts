@@ -142,4 +142,40 @@ describe ('JsonServiceClient Auth Tests', () => {
         expect(client.bearerToken).not.eq(expiredJwt.token);
     })
 
+    it ("Can reauthenticate after an auto refresh access token", async () => {
+
+        var client = new JsonServiceClient(TEST_URL);
+        var auth = new Authenticate();
+        auth.provider = "credentials";
+        auth.userName = "test";
+        auth.password = "test";
+        var authResponse = await client.post(auth);
+
+        var refreshToken = authResponse.refreshToken;
+
+        let createExpiredJwt = createJwt();
+        createExpiredJwt.jwtExpiry = "2000-01-01";
+        const expiredJwt = await client.post(createExpiredJwt);
+        var bearerToken = expiredJwt.token;
+
+        //Clear existing User Session
+        var logout = new Authenticate();
+        logout.provider = "logout";
+        await client.post(logout);
+
+        client = new JsonServiceClient(TEST_URL);
+        client.bearerToken = bearerToken;
+        client.refreshToken = refreshToken;
+
+        auth.password = "notvalid";
+        try {
+            await client.post(auth);
+            assert.fail("should throw");
+        } catch(e){
+            var status = (e as ErrorResponse).responseStatus;
+            expect(status.errorCode).eq("Unauthorized");
+            expect(status.message).eq("Invalid UserName or Password");
+        }
+    })
+
 });
