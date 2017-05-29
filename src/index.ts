@@ -351,6 +351,7 @@ export class ServerEventsClient {
     }
 
     start() {
+        this.stopped = false;
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
             this.eventSource = this.EventSource
                 ? new this.EventSource(this.eventStreamUri, this.getEventSourceOptions())
