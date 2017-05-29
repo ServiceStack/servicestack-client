@@ -294,14 +294,14 @@ When publishing a DTO Type for your Server Events message, your clients will be 
 
 If you're getting missing Type Definitions for `Headers`, `Response`, `Request`, etc. You'll need to import
 the Type Definitions for W3C's `fetch` API, preferably by using the latest version of TypeScript and
-referencing the core **es2016** lib in TypeScript's `tsconfig.json`, e.g:
+referencing the core **es2016** and **dom** libs in TypeScript's `tsconfig.json`, e.g:
 
 ```json
 {
   "compilerOptions": {
-    "lib": [
-      "es2016"
-    ]
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [ "es2015", "dom" ]
   }
 }
 ```
