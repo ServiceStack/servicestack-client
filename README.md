@@ -22,16 +22,14 @@ This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Template
 
 Node.js projects can install it with:
 
-    npm install servicestack-client --save
+    npm install --save servicestack-client
 
-Or if using jspm:
+or if using jspm:
 
     jspm install servicestack-client
+    npm install --save-dev servicestack-client
 
-The Type Definitions are contained in the above `servicestack-client` npm package, if using jspm it 
-can be installed with:
-
-    npm install servicestack-client --save-dev
+Where you'll also need to install the Type Definitions contained in the `servicestack-client` npm package separately.
 
 ### Ideal Typed Message-based API
 
