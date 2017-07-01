@@ -664,6 +664,16 @@ export class GetAccessTokenResponse {
     responseStatus: ResponseStatus;
 }
 
+export interface ISendRequest
+{
+    method:string; 
+    request:any|null; 
+    body?:any|null;
+    args?:any; 
+    url?:string; 
+    returns?: { createResponse: () => any };
+}
+
 export class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -731,6 +741,10 @@ export class JsonServiceClient {
         return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
     }
 
+    postBody<T>(request:IReturn<T>, body:string|any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body);
+    }
+
     put<T>(request: IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Put, request, args);
     }
@@ -739,12 +753,20 @@ export class JsonServiceClient {
         return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     }
 
+    putBody<T>(request:IReturn<T>, body:string|any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body);
+    }
+
     patch<T>(request: IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Patch, request, args);
     }
 
     patchToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
         return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
+    }
+
+    patchBody<T>(request:IReturn<T>, body:string|any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body);
     }
 
     createUrlFromDto<T>(method:string, request: IReturn<T>) : string {
@@ -764,7 +786,8 @@ export class JsonServiceClient {
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
     }
 
-    private createRequest(method:string, request:any|null, args?:any, url?:string) : [Request,IRequestFilterOptions] {
+    private createRequest({ method, request, args, url, body } : ISendRequest) : [Request,IRequestFilterOptions] {
+
         if (!url)
             url = this.createUrlFromDto(method, request);
         if (args)
@@ -805,7 +828,7 @@ export class JsonServiceClient {
         const req = new Request(url, reqOptions);
 
         if (HttpMethods.hasRequestBody(method))
-            (req as any).body = JSON.stringify(request);
+            (req as any).body = body || JSON.stringify(request);
 
         var opt:IRequestFilterOptions = { url };
         if (this.requestFilter != null)
@@ -896,16 +919,32 @@ export class JsonServiceClient {
         });
     }
 
-    send<T>(method: string, request:any|null, args?:any, url?:string): Promise<T> {
+    send<T>(method:string, request:any|null, args?:any, url?:string): Promise<T> {
+        return this.sendRequest<T>({ method, request, args, url });
+    }
 
-        var holdRes:Response  = null;
+    private sendBody<T>(method:string, request:IReturn<T>, body:string|any) {
+        let url = combinePaths(this.replyBaseUrl, nameOf(request));
+        return this.sendRequest<T>({
+            method,
+            request: body, 
+            body: typeof body == "string" ? body : JSON.stringify(body),
+            url: appendQueryString(url, request), 
+            returns: request 
+        });
+    }
 
-        const [req, opt] = this.createRequest(method, request, args, url);
+    sendRequest<T>(info:ISendRequest): Promise<T> {
 
+        const [req, opt] = this.createRequest(info);
+
+        const returns = info.returns || info.request;
+
+        let holdRes:Response  = null;        
         return fetch(opt.url || req.url, req)
             .then(res => {
                 holdRes = res;
-                const response = this.createResponse(res, request);
+                const response = this.createResponse(res, returns);
                 return response;
             })
             .catch(res => {
@@ -914,13 +953,13 @@ export class JsonServiceClient {
                     if (this.refreshToken) {
                         const jwtReq = new GetAccessToken();
                         jwtReq.refreshToken = this.refreshToken;
-                        var url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
+                        let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
                         return this.postToUrl<GetAccessTokenResponse>(url, jwtReq)
                             .then(r => {
                                 this.bearerToken = r.accessToken;
-                                const [req, opt] = this.createRequest(method, request, args);
+                                const [req, opt] = this.createRequest(info);
                                 return fetch(opt.url || req.url, req)
-                                    .then(res => this.createResponse(res, request))
+                                    .then(res => this.createResponse(res, returns))
                                     .catch(res => this.handleError(holdRes, res));
                             })
                             .catch(res => this.handleError(holdRes, res));
@@ -928,9 +967,9 @@ export class JsonServiceClient {
 
                     if (this.onAuthenticationRequired) {
                         return this.onAuthenticationRequired().then(() => {
-                            const [req, opt] = this.createRequest(method, request, args);
+                            const [req, opt] = this.createRequest(info);
                             return fetch(opt.url || req.url, req)
-                                .then(res => this.createResponse(res, request))
+                                .then(res => this.createResponse(res, returns))
                                 .catch(res => this.handleError(holdRes, res));
                         });
                     }

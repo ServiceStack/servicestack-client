@@ -225,6 +225,16 @@ export declare class GetAccessTokenResponse {
     accessToken: string;
     responseStatus: ResponseStatus;
 }
+export interface ISendRequest {
+    method: string;
+    request: any | null;
+    body?: any | null;
+    args?: any;
+    url?: string;
+    returns?: {
+        createResponse: () => any;
+    };
+}
 export declare class JsonServiceClient {
     baseUrl: string;
     replyBaseUrl: string;
@@ -253,16 +263,21 @@ export declare class JsonServiceClient {
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T>, args?: any): Promise<T>;
     postToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
+    postBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
     put<T>(request: IReturn<T>, args?: any): Promise<T>;
     putToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
+    putBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
     patch<T>(request: IReturn<T>, args?: any): Promise<T>;
     patchToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
+    patchBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
-    private createRequest(method, request, args?, url?);
+    private createRequest({method, request, args, url, body});
     private createResponse<T>(res, request);
     private handleError(holdRes, res);
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
+    private sendBody<T>(method, request, body);
+    sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
 export declare const toCamelCase: (key: string) => string;
@@ -281,6 +296,10 @@ export declare const bytesToBase64: (aBytes: Uint8Array) => string;
 export declare const stripQuotes: (s: string) => string;
 export declare const tryDecode: (s: string) => string;
 export declare const parseCookie: (setCookie: string) => Cookie;
+export declare const normalizeKey: (key: string) => string;
+export declare const normalize: (dto: any, deep?: boolean) => any;
+export declare const getField: (o: any, name: string) => any;
+export declare const parseResponseStatus: (json: string, defaultMsg?: any) => any;
 export declare const toDate: (s: string) => Date;
 export declare const toDateFmt: (s: string) => string;
 export declare const padInt: (n: number) => string | number;
