@@ -309,7 +309,7 @@ export class ServerEventsClient {
             opt.onTick();
     }
 
-    onError = (error?:any) => {
+    onError = (error?:any):void => {
         if (this.stopped) return;
         if (!error)
             error = event;
@@ -557,7 +557,10 @@ export class ServerEventsClient {
 
         return this.serviceClient.get(request)
             .then(r => r.map(x => this.toServerEventUser(x)))
-            .catch(this.onError);
+            .catch(e => {
+                this.onError(e);
+                return [];
+            });
     }
 
     toServerEventUser(map: { [id: string] : string; }): ServerEventUser {
