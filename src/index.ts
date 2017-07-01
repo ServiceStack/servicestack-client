@@ -518,14 +518,13 @@ export class ServerEventsClient {
         return this.getConnectionInfo().id;
     }
 
-    updateSubscriber(request:UpdateEventSubscriber): Promise<UpdateEventSubscriberResponse> {
+    updateSubscriber(request:UpdateEventSubscriber): Promise<void> {
         if (request.id == null)
             request.id = this.getSubscriptionId();
 
         return this.serviceClient.post(request)
             .then(x => {
                 this.update(request.subscribeChannels, request.unsubscribeChannels);
-                return null;
             }).catch(this.onError);
     }
     
