@@ -10,7 +10,8 @@ import {
     TestAuth, TestAuthResponse,
     HelloReturnVoid,
     ThrowValidation, ThrowValidationResponse,
-    EchoTypes
+    EchoTypes,
+    SendJson, SendText, SendRaw,
 } from "./dtos/test.dtos";
 import * as chai from "chai";
 import { 
@@ -435,6 +436,52 @@ describe('JsonServiceClient Tests', () => {
             }, done);
     })
 
+    it ('Can send raw JSON as object', async () => {
+        let body = { foo: "bar" };
 
+        let request = new SendJson();
+        request.id = 1;
+        request.name = "name";
+
+        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        if (typeof document == "undefined") //fetch in browser ignores custom headers
+            testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
+
+        var json = await testClient.postBody(request, body);
+        var obj = JSON.parse(json);
+        chai.expect(obj["foo"]).to.eq("bar");
+    }) 
+
+    it ('Can send raw JSON as string', async () => {
+        let body = { foo: "bar" };
+
+        let request = new SendJson();
+        request.id = 1;
+        request.name = "name";
+
+        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        if (typeof document == "undefined") //fetch in browser ignores custom headers
+            testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
+
+        var json = await testClient.postBody(request, JSON.stringify(body));
+        var obj = JSON.parse(json);
+        chai.expect(obj["foo"]).to.eq("bar");
+    }) 
+
+    it ('Can send raw string', async () => {
+        let body = { foo: "bar" };
+
+        let request = new SendText();
+        request.id = 1;
+        request.name = "name";
+        request.contentType = "text/plain";
+
+        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        if (typeof document == "undefined") //fetch in browser ignores custom headers
+            testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
+
+        var str = await testClient.postBody(request, "foo");
+        chai.expect(str).to.eq("foo");
+    });
 });
 

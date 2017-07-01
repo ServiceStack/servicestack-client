@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-03-31 10:04:39
+Date: 2017-07-01 08:18:57
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,AuthUserSession,IAuthTokens
+IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -358,6 +358,35 @@ export class ReturnStream implements IReturn<Blob>
     data: Uint8Array;
     createResponse() { return new Blob(); }
     getTypeName() { return "ReturnStream"; }
+}
+
+// @Route("/sendjson")
+export class SendJson implements IReturn<string>
+{
+    id: number;
+    name: string;
+    createResponse() { return ""; }
+    getTypeName() { return "SendJson"; }
+}
+
+// @Route("/sendtext")
+export class SendText implements IReturn<string>
+{
+    id: number;
+    name: string;
+    contentType: string;
+    createResponse() { return ""; }
+    getTypeName() { return "SendText"; }
+}
+
+// @Route("/sendraw")
+export class SendRaw implements IReturn<Uint8Array>
+{
+    id: number;
+    name: string;
+    contentType: string;
+    createResponse() { return new Uint8Array(0); }
+    getTypeName() { return "SendRaw"; }
 }
 
 // @Route("/testauth")

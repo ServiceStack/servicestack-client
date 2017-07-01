@@ -177,6 +177,26 @@ export declare class ReturnStream implements IReturn<Blob> {
     createResponse(): Blob;
     getTypeName(): string;
 }
+export declare class SendJson implements IReturn<string> {
+    id: number;
+    name: string;
+    createResponse(): string;
+    getTypeName(): string;
+}
+export declare class SendText implements IReturn<string> {
+    id: number;
+    name: string;
+    contentType: string;
+    createResponse(): string;
+    getTypeName(): string;
+}
+export declare class SendRaw implements IReturn<Uint8Array> {
+    id: number;
+    name: string;
+    contentType: string;
+    createResponse(): Uint8Array;
+    getTypeName(): string;
+}
 export declare class TestAuth implements IReturn<TestAuthResponse> {
     createResponse(): TestAuthResponse;
     getTypeName(): string;
