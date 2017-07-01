@@ -1,11 +1,10 @@
 /* Options:
-Date: 2016-07-14 06:16:57
-Version: 4.061
+Date: 2017-07-01 08:18:56
+Version: 4.512
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://techstacks.io
 
 //GlobalNamespace: 
-//ExportAsTypes: True
 //MakePropertiesOptional: True
 //AddServiceStackTypes: True
 //AddResponseStatus: False
@@ -19,54 +18,15 @@ BaseUrl: http://techstacks.io
 
 export interface IReturnVoid
 {
+    createResponse() : void;
 }
 
 export interface IReturn<T>
 {
+    createResponse() : T;
 }
 
-export class TechnologyStackBase
-{
-    Id: number;
-    Name: string;
-    VendorName: string;
-    Description: string;
-    AppUrl: string;
-    ScreenshotUrl: string;
-    Created: string;
-    CreatedBy: string;
-    LastModified: string;
-    LastModifiedBy: string;
-    IsLocked: boolean;
-    OwnerId: string;
-    Slug: string;
-    Details: string;
-    LastStatusUpdate: string;
-}
-
-export class QueryBase
-{
-    // @DataMember(Order=1)
-    Skip: number;
-
-    // @DataMember(Order=2)
-    Take: number;
-
-    // @DataMember(Order=3)
-    OrderBy: string;
-
-    // @DataMember(Order=4)
-    OrderByDesc: string;
-
-    // @DataMember(Order=5)
-    Include: string;
-
-    // @DataMember(Order=6)
-    Fields: string;
-
-    // @DataMember(Order=7)
-    Meta: { [index:string]: string; };
-}
+export type TechnologyTier = "ProgrammingLanguage" | "Client" | "Http" | "Server" | "Data" | "SoftwareInfrastructure" | "OperatingSystem" | "HardwareInfrastructure" | "ThirdPartyServices";
 
 export class TechnologyBase
 {
@@ -93,7 +53,21 @@ export class Technology extends TechnologyBase
 {
 }
 
-export type TechnologyTier = "ProgrammingLanguage" | "Client" | "Http" | "Server" | "Data" | "SoftwareInfrastructure" | "OperatingSystem" | "HardwareInfrastructure" | "ThirdPartyServices";
+// @DataContract
+export class ResponseError
+{
+    // @DataMember(Order=1, EmitDefaultValue=false)
+    ErrorCode: string;
+
+    // @DataMember(Order=2, EmitDefaultValue=false)
+    FieldName: string;
+
+    // @DataMember(Order=3, EmitDefaultValue=false)
+    Message: string;
+
+    // @DataMember(Order=4, EmitDefaultValue=false)
+    Meta: { [index:string]: string; };
+}
 
 // @DataContract
 export class ResponseStatus
@@ -114,6 +88,32 @@ export class ResponseStatus
     Meta: { [index:string]: string; };
 }
 
+export class TechnologyStackBase
+{
+    Id: number;
+    Name: string;
+    VendorName: string;
+    Description: string;
+    AppUrl: string;
+    ScreenshotUrl: string;
+    Created: string;
+    CreatedBy: string;
+    LastModified: string;
+    LastModifiedBy: string;
+    IsLocked: boolean;
+    OwnerId: string;
+    Slug: string;
+    Details: string;
+    LastStatusUpdate: string;
+}
+
+export class TechnologyInStack extends TechnologyBase
+{
+    TechnologyId: number;
+    TechnologyStackId: number;
+    Justification: string;
+}
+
 export class TechStackDetails extends TechnologyStackBase
 {
     DetailsHtml: string;
@@ -124,6 +124,30 @@ export class TechnologyHistory extends TechnologyBase
 {
     TechnologyId: number;
     Operation: string;
+}
+
+export class QueryBase
+{
+    // @DataMember(Order=1)
+    Skip: number;
+
+    // @DataMember(Order=2)
+    Take: number;
+
+    // @DataMember(Order=3)
+    OrderBy: string;
+
+    // @DataMember(Order=4)
+    OrderByDesc: string;
+
+    // @DataMember(Order=5)
+    Include: string;
+
+    // @DataMember(Order=6)
+    Fields: string;
+
+    // @DataMember(Order=7)
+    Meta: { [index:string]: string; };
 }
 
 export class QueryDb<T> extends QueryBase
@@ -168,39 +192,6 @@ export class Option
 
     // @DataMember(Name="value")
     Value: TechnologyTier;
-}
-
-// @DataContract
-export class ResponseError
-{
-    // @DataMember(Order=1, EmitDefaultValue=false)
-    ErrorCode: string;
-
-    // @DataMember(Order=2, EmitDefaultValue=false)
-    FieldName: string;
-
-    // @DataMember(Order=3, EmitDefaultValue=false)
-    Message: string;
-
-    // @DataMember(Order=4, EmitDefaultValue=false)
-    Meta: { [index:string]: string; };
-}
-
-export class TechnologyInStack extends TechnologyBase
-{
-    TechnologyId: number;
-    TechnologyStackId: number;
-    Justification: string;
-}
-
-
-export class LogoUrlApprovalResponse
-{
-    Result: Technology;
-}
-
-export class LockStackResponse
-{
 }
 
 export class CreateTechnologyResponse
@@ -372,6 +363,15 @@ export class GetUserInfoResponse
     FavoriteTechnologies: Technology[];
 }
 
+export class LogoUrlApprovalResponse
+{
+    Result: Technology;
+}
+
+export class LockStackResponse
+{
+}
+
 // @DataContract
 export class AuthenticateResponse
 {
@@ -394,9 +394,12 @@ export class AuthenticateResponse
     BearerToken: string;
 
     // @DataMember(Order=7)
-    ResponseStatus: ResponseStatus;
+    RefreshToken: string;
 
     // @DataMember(Order=8)
+    ResponseStatus: ResponseStatus;
+
+    // @DataMember(Order=9)
     Meta: { [index:string]: string; };
 }
 
@@ -426,31 +429,24 @@ export class UnAssignRolesResponse
     ResponseStatus: ResponseStatus;
 }
 
-// @Route("/admin/technology/{TechnologyId}/logo")
-export class LogoUrlApproval implements IReturn<LogoUrlApprovalResponse>
+// @DataContract
+export class ConvertSessionToTokenResponse
 {
-    TechnologyId: number;
-    Approved: boolean;
-    createResponse() { return new LogoUrlApprovalResponse(); }
-    getTypeName() { return "LogoUrlApproval"; }
+    // @DataMember(Order=1)
+    Meta: { [index:string]: string; };
+
+    // @DataMember(Order=2)
+    ResponseStatus: ResponseStatus;
 }
 
-// @Route("/admin/techstacks/{TechnologyStackId}/lock")
-export class LockTechStack implements IReturn<LockStackResponse>
+// @DataContract
+export class GetAccessTokenResponse
 {
-    TechnologyStackId: number;
-    IsLocked: boolean;
-    createResponse() { return new LockStackResponse(); }
-    getTypeName() { return "LockTechStack"; }
-}
+    // @DataMember(Order=1)
+    AccessToken: string;
 
-// @Route("/admin/technology/{TechnologyId}/lock")
-export class LockTech implements IReturn<LockStackResponse>
-{
-    TechnologyId: number;
-    IsLocked: boolean;
-    createResponse() { return new LockStackResponse(); }
-    getTypeName() { return "LockTech"; }
+    // @DataMember(Order=2)
+    ResponseStatus: ResponseStatus;
 }
 
 // @Route("/ping")
@@ -585,7 +581,7 @@ export class GetAllTechnologies implements IReturn<GetAllTechnologiesResponse>
 }
 
 // @Route("/technology/search")
-// @AutoQueryViewer(Title="Find Technologies", Description="Explore different Technologies", IconUrl="octicon:database", DefaultSearchField="Tier", DefaultSearchType="=", DefaultSearchText="Data")
+// @AutoQueryViewer(DefaultSearchField="Tier", DefaultSearchText="Data", DefaultSearchType="=", Description="Explore different Technologies", IconUrl="octicon:database", Title="Find Technologies")
 export class FindTechnologies extends QueryDb<Technology> implements IReturn<QueryResponse<Technology>>
 {
     Name: string;
@@ -628,7 +624,7 @@ export class GetPageStats implements IReturn<GetPageStatsResponse>
 }
 
 // @Route("/techstacks/search")
-// @AutoQueryViewer(Title="Find Technology Stacks", Description="Explore different Technology Stacks", IconUrl="material-icons:cloud", DefaultSearchField="Description", DefaultSearchType="Contains", DefaultSearchText="ServiceStack")
+// @AutoQueryViewer(DefaultSearchField="Description", DefaultSearchText="ServiceStack", DefaultSearchType="Contains", Description="Explore different Technology Stacks", IconUrl="material-icons:cloud", Title="Find Technology Stacks")
 export class FindTechStacks extends QueryDb<TechnologyStack> implements IReturn<QueryResponse<TechnologyStack>>
 {
     NameContains: string;
@@ -745,6 +741,33 @@ export class GetUserInfo implements IReturn<GetUserInfoResponse>
     getTypeName() { return "GetUserInfo"; }
 }
 
+// @Route("/admin/technology/{TechnologyId}/logo")
+export class LogoUrlApproval implements IReturn<LogoUrlApprovalResponse>
+{
+    TechnologyId: number;
+    Approved: boolean;
+    createResponse() { return new LogoUrlApprovalResponse(); }
+    getTypeName() { return "LogoUrlApproval"; }
+}
+
+// @Route("/admin/techstacks/{TechnologyStackId}/lock")
+export class LockTechStack implements IReturn<LockStackResponse>
+{
+    TechnologyStackId: number;
+    IsLocked: boolean;
+    createResponse() { return new LockStackResponse(); }
+    getTypeName() { return "LockTechStack"; }
+}
+
+// @Route("/admin/technology/{TechnologyId}/lock")
+export class LockTech implements IReturn<LockStackResponse>
+{
+    TechnologyId: number;
+    IsLocked: boolean;
+    createResponse() { return new LockStackResponse(); }
+    getTypeName() { return "LockTech"; }
+}
+
 // @Route("/auth")
 // @Route("/auth/{provider}")
 // @Route("/authenticate")
@@ -798,6 +821,12 @@ export class Authenticate implements IReturn<AuthenticateResponse>
     UseTokenCookie: boolean;
 
     // @DataMember(Order=16)
+    AccessToken: string;
+
+    // @DataMember(Order=17)
+    AccessTokenSecret: string;
+
+    // @DataMember(Order=18)
     Meta: { [index:string]: string; };
     createResponse() { return new AuthenticateResponse(); }
     getTypeName() { return "Authenticate"; }
@@ -835,8 +864,28 @@ export class UnAssignRoles implements IReturn<UnAssignRolesResponse>
     getTypeName() { return "UnAssignRoles"; }
 }
 
+// @Route("/session-to-token")
+// @DataContract
+export class ConvertSessionToToken implements IReturn<ConvertSessionToTokenResponse>
+{
+    // @DataMember(Order=1)
+    PreserveSession: boolean;
+    createResponse() { return new ConvertSessionToTokenResponse(); }
+    getTypeName() { return "ConvertSessionToToken"; }
+}
+
+// @Route("/access-token")
+// @DataContract
+export class GetAccessToken implements IReturn<GetAccessTokenResponse>
+{
+    // @DataMember(Order=1)
+    RefreshToken: string;
+    createResponse() { return new GetAccessTokenResponse(); }
+    getTypeName() { return "GetAccessToken"; }
+}
+
 // @Route("/admin/technology/search")
-// @AutoQueryViewer(Title="Find Technologies Admin", Description="Explore different Technologies", IconUrl="octicon:database", DefaultSearchField="Tier", DefaultSearchType="=", DefaultSearchText="Data")
+// @AutoQueryViewer(DefaultSearchField="Tier", DefaultSearchText="Data", DefaultSearchType="=", Description="Explore different Technologies", IconUrl="octicon:database", Title="Find Technologies Admin")
 export class FindTechnologiesAdmin extends QueryDb<Technology> implements IReturn<QueryResponse<Technology>>
 {
     Name: string;

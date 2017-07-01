@@ -97,10 +97,13 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
+const SERVER_EVENTS_URL = 'http://chat.servicestack.net';
+//const SERVER_EVENTS_URL = 'http://localhost:1337';
+
 describe('ServerEventsClient Tests', function() {
 
     it('Can connect to ServerEventsStream', done => {
-        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: (e => {
                     // console.log('onConnect: ', e);
@@ -111,10 +114,10 @@ describe('ServerEventsClient Tests', function() {
     })
 
     it('Does fire onJoin events', done => {
-        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: ((e:ServerEventConnect) => {
-                    chai.expect(e.heartbeatUrl).to.satisfy(x => x.startsWith("http://chat.servicestack.net"));
+                    chai.expect(e.heartbeatUrl).to.satisfy(x => x.startsWith(SERVER_EVENTS_URL));
                 }),
                 onCommand: ((e:ServerEventJoin) => {
                     // console.log('onCommand: ', e);
@@ -130,7 +133,7 @@ describe('ServerEventsClient Tests', function() {
         var channels = ["A", "B", "C"];
         var joinMsgs:ServerEventJoin[] = []; 
 
-        var client = new ServerEventsClient('http://chat.servicestack.net', channels, {
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, channels, {
             handlers: {
                 onJoin: ((e:ServerEventJoin) => {
                     // console.log(e);
@@ -154,7 +157,7 @@ describe('ServerEventsClient Tests', function() {
 
         var states = [];
 
-        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: (e => connectMsgs.push(e)),
                 onCommand: (e => commands.push(e)),
@@ -181,7 +184,7 @@ describe('ServerEventsClient Tests', function() {
                 connectMsgs = [];
                 commands = [];
 
-                client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
                     handlers: {
                         onConnect: (e => connectMsgs.push(e)),
                     },
@@ -222,7 +225,7 @@ describe('ServerEventsClient Tests', function() {
         var states = [];
 
         var client2 = null;
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: (e => connectMsgs.push(e)),
                 onCommand: (e => commands.push(e)),
@@ -237,7 +240,7 @@ describe('ServerEventsClient Tests', function() {
         states.unshift({
             test: () => connectMsgs.length > 0 && commands.length > 0,
             fn() {
-                client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
                     handlers: {
                         onConnect: (e => connectMsgs.push(e)),
                         onMessage: (e => msgs2.push(e))
@@ -304,7 +307,7 @@ describe('ServerEventsClient Tests', function() {
 
         var heartbeats:ServerEventHeartbeat[] = [];
 
-        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: ((e:ServerEventConnect) => e.heartbeatIntervalMs = 1000), //override to 1s
                 onHeartbeat: (e => {
@@ -328,7 +331,7 @@ describe('ServerEventsClient Tests', function() {
         var states = [];
 
         var client2 = null;
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: (e => connectMsgs.push(e)),
                 onMessage: (e => msgs1.push(e))
@@ -345,7 +348,7 @@ describe('ServerEventsClient Tests', function() {
             fn() {
                 return client1.serviceClient.post(new ResetServerEvents())
                     .then(r => {
-                        client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                        client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
                             handlers: {
                                 onConnect: (e => connectMsgs.push(e)),
                             },
@@ -372,7 +375,7 @@ describe('ServerEventsClient Tests', function() {
         var chatMsgs:ChatMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 chat: (chatMsg:ChatMessage, e:ServerEventMessage) => {
                     // console.log(chatMsg);
@@ -408,7 +411,7 @@ describe('ServerEventsClient Tests', function() {
         var announceMsgs:string[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 announce: (msg:string, e:ServerEventMessage) => {
                     // console.log(msg, e);
@@ -444,7 +447,7 @@ describe('ServerEventsClient Tests', function() {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onMessage: e => msgs1.push(e)
             },
@@ -515,7 +518,7 @@ describe('ServerEventsClient Tests', function() {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onMessage: e => msgs1.push(e)
             },
@@ -548,7 +551,7 @@ describe('ServerEventsClient Tests', function() {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onMessage: e => msgs1.push(e)
             },
@@ -581,7 +584,7 @@ describe('ServerEventsClient Tests', function() {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onMessage: e => msgs1.push(e)
             },
@@ -645,7 +648,7 @@ describe('ServerEventsClient Tests', function() {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             resolver: new SingletonInstanceResolver(),
             handlers: {
                 onMessage: e => msgs1.push(e)
@@ -673,23 +676,23 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does receive messages on to clients subscribed on multiple channels', done => {
+    it ('Does receive messages on to clients subscribed on multiple channels', done => {
         var msgsA:ServerEventMessage[] = [];
         var msgsAB:ServerEventMessage[] = [];
         var msgsABC:ServerEventMessage[] = [];
         var msgsABCD:ServerEventMessage[] = [];
 
         var states = [];
-        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+        var clientA = new ServerEventsClient(SERVER_EVENTS_URL, ["A"], {
             handlers: { onMessage: e => msgsA.push(e) }, onTick: run(states)
         });
-        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+        var clientAB = new ServerEventsClient(SERVER_EVENTS_URL, ["A", "B"], {
             handlers: { onMessage: e => msgsAB.push(e) }, onTick: run(states)
         });
-        var clientABC = new ServerEventsClient('http://chat.servicestack.net', ["A", "B", "C"], {
+        var clientABC = new ServerEventsClient(SERVER_EVENTS_URL, ["A", "B", "C"], {
             handlers: { onMessage: e => msgsABC.push(e) }, onTick: run(states)
         });
-        var clientABCD = new ServerEventsClient('http://chat.servicestack.net', ["A", "B", "C", "D"], {
+        var clientABCD = new ServerEventsClient(SERVER_EVENTS_URL, ["A", "B", "C", "D"], {
             handlers: { onMessage: e => msgsABCD.push(e) }, onTick: run(states)
         });
         var allClients = [clientA,clientAB,clientABC,clientABCD];
@@ -758,13 +761,13 @@ describe('ServerEventsClient Tests', function() {
         var leaveAB:ServerEventJoin[] = [];
 
         var states = [];
-        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+        var clientA = new ServerEventsClient(SERVER_EVENTS_URL, ["A"], {
             handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
         });
-        var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+        var clientB = new ServerEventsClient(SERVER_EVENTS_URL, ["B"], {
             handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
         });
-        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+        var clientAB = new ServerEventsClient(SERVER_EVENTS_URL, ["A", "B"], {
             handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
         });
 
@@ -836,13 +839,13 @@ describe('ServerEventsClient Tests', function() {
         var leaveAB:ServerEventJoin[] = [];
 
         var states = [];
-        var clientA = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+        var clientA = new ServerEventsClient(SERVER_EVENTS_URL, ["A"], {
             handlers: { onJoin: e => joinA.push(e), onLeave: e => leaveA.push(e) }, onTick: run(states)
         });
-        var clientB = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+        var clientB = new ServerEventsClient(SERVER_EVENTS_URL, ["B"], {
             handlers: { onJoin: e => joinB.push(e), onLeave: e => leaveB.push(e) }, onTick: run(states)
         });
-        var clientAB = new ServerEventsClient('http://chat.servicestack.net', ["A", "B"], {
+        var clientAB = new ServerEventsClient(SERVER_EVENTS_URL, ["A", "B"], {
             handlers: { onJoin: e => joinAB.push(e), onLeave: e => leaveAB.push(e) }, onTick: run(states)
         });
 
@@ -879,11 +882,11 @@ describe('ServerEventsClient Tests', function() {
         var msgs2:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["A"], {
             handlers: { onMessage: e => msgs1.push(e) }, 
             onTick: run(states)
         }).start();
-        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B"], {
+        var client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["B"], {
             handlers: { onMessage: e => msgs2.push(e) }, 
             onTick: run(states)
         }).start();
@@ -950,11 +953,11 @@ describe('ServerEventsClient Tests', function() {
         var msgs2:ServerEventMessage[] = [];
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["A","B","C"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["A","B","C"], {
             handlers: { onMessage: e => msgs1.push(e) }, 
             onTick: run(states)
         }).start();
-        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["B","C"], {
+        var client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["B","C"], {
             handlers: { onMessage: e => msgs2.push(e) }, 
             onTick: run(states)
         }).start();
@@ -1020,14 +1023,14 @@ describe('ServerEventsClient Tests', function() {
         };
 
         var states = [];
-        var client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             onTick: run(states)
         })
         .addListener("customEvent", handler)
         .addListener("customEvent", e => msgs2.push(e))
         .start();
 
-        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             onTick: run(states)
         }).start();
 
@@ -1073,7 +1076,7 @@ describe('ServerEventsClient Tests', function() {
             onTick: run(states)
         }).start();
 
-        var client2 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+        var client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             onTick: run(states)
         }).start();
 
@@ -1081,7 +1084,7 @@ describe('ServerEventsClient Tests', function() {
             test: () => errors.length >= 1,
             fn(){
                 client1.stop();
-                client1 = new ServerEventsClient('http://chat.servicestack.net', ["*"], {
+                client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
                     handlers: {
                         onConnect: (e:ServerEventConnect) => {
                             e.heartbeatIntervalMs = 1000;
@@ -1107,7 +1110,7 @@ describe('ServerEventsClient Tests', function() {
     })
 
     it ('Does create EventSource instance withCredentials', () => {
-        var client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {})
+        var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {})
             .start();
 
         chai.expect(client.getEventSourceOptions().withCredentials).eq(true);
@@ -1119,7 +1122,7 @@ describe('ServerEventsClient Tests', function() {
 
         client.stop();
 
-        client = new ServerEventsClient('http://chat.servicestack.net', ["*"], {});
+        client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {});
         client.withCredentials = false;
         client.start();
 

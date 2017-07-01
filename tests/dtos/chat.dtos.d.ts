@@ -76,6 +76,7 @@ export declare class AuthenticateResponse {
     displayName: string;
     referrerUrl: string;
     bearerToken: string;
+    refreshToken: string;
     responseStatus: ResponseStatus;
     meta: {
         [index: string]: string;

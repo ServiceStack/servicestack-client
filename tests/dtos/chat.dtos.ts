@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-03-06 07:49:22
+Date: 2017-07-01 08:18:56
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://chat.servicestack.net
@@ -141,9 +141,12 @@ export class AuthenticateResponse
     bearerToken: string;
 
     // @DataMember(Order=7)
-    responseStatus: ResponseStatus;
+    refreshToken: string;
 
     // @DataMember(Order=8)
+    responseStatus: ResponseStatus;
+
+    // @DataMember(Order=9)
     meta: { [index:string]: string; };
 }
 
