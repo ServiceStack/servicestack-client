@@ -518,7 +518,7 @@ export class ServerEventsClient {
         return this.getConnectionInfo().id;
     }
 
-    updateSubscriber(request:UpdateEventSubscriber) {
+    updateSubscriber(request:UpdateEventSubscriber): Promise<UpdateEventSubscriberResponse> {
         if (request.id == null)
             request.id = this.getSubscriptionId();
 
@@ -529,7 +529,7 @@ export class ServerEventsClient {
             }).catch(this.onError);
     }
     
-    subscribeToChannels(...channels:string[]) {
+    subscribeToChannels(...channels:string[]): Promise<void> {
         let request = new UpdateEventSubscriber();
         request.id = this.getSubscriptionId();
         request.subscribeChannels = channels;
@@ -540,7 +540,7 @@ export class ServerEventsClient {
             }).catch(this.onError);
     }
     
-    unsubscribeFromChannels(...channels:string[]) {
+    unsubscribeFromChannels(...channels:string[]): Promise<void> {
         let request = new UpdateEventSubscriber();
         request.id = this.getSubscriptionId();
         request.unsubscribeChannels = channels;

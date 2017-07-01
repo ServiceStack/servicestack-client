@@ -158,7 +158,7 @@ export declare class ServerEventsClient {
     raiseEvent(eventName: string, msg: ServerEventMessage): void;
     getConnectionInfo(): ServerEventConnect;
     getSubscriptionId(): string;
-    updateSubscriber(request: UpdateEventSubscriber): Promise<any>;
+    updateSubscriber(request: UpdateEventSubscriber): Promise<UpdateEventSubscriberResponse>;
     subscribeToChannels(...channels: string[]): Promise<void>;
     unsubscribeFromChannels(...channels: string[]): Promise<void>;
     getChannelSubscribers(): Promise<ServerEventUser[]>;
