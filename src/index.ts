@@ -1208,6 +1208,44 @@ export const parseCookie = (setCookie:string): Cookie => {
     return to; 
 }
 
+export const normalizeKey = (key: string) => key.toLowerCase().replace(/_/g, '');
+
+const isArray = (o: any) => Object.prototype.toString.call(o) === '[object Array]';
+
+export const normalize = (dto: any, deep?: boolean) => {
+    if (isArray(dto)) {
+        if (!deep) return dto;
+        const to = [];
+        for (let i = 0; i < dto.length; i++) {
+            to[i] = normalize(dto[i], deep);
+        }
+        return to;
+    }
+    if (typeof dto != "object") return dto;
+    var o = {};
+    for (let k in dto) {
+        o[normalizeKey(k)] = deep ? normalize(dto[k], deep) : dto[k];
+    }
+    return o;
+}
+
+export const getField = (o: any, name: string) =>
+    o == null || name == null ? null :
+        o[name] ||
+        o[Object.keys(o).filter(k => normalizeKey(k) === normalizeKey(name))[0] || ''];
+
+export const parseResponseStatus = (json:string, defaultMsg=null) => {
+    try {
+        var err = JSON.parse(json);
+        return sanitize(err.ResponseStatus || err.responseStatus);
+    } catch (e) {
+        return {
+            message: defaultMsg || e.message || e,
+            __error: { error: e, json: json }
+        };
+    }
+};
+
 export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
 export const padInt = (n: number) => n < 10 ? '0' + n : n;
