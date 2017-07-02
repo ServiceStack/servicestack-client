@@ -263,20 +263,20 @@ export declare class JsonServiceClient {
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T>, args?: any): Promise<T>;
     postToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    postBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
+    postBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
     put<T>(request: IReturn<T>, args?: any): Promise<T>;
     putToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    putBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
+    putBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
     patch<T>(request: IReturn<T>, args?: any): Promise<T>;
     patchToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    patchBody<T>(request: IReturn<T>, body: string | any): Promise<T>;
+    patchBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
-    private createRequest({method, request, args, url, body});
+    private createRequest({method, request, url, args, body});
     private createResponse<T>(res, request);
     private handleError(holdRes, res);
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody<T>(method, request, body);
+    private sendBody<T>(method, request, body, args?);
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }

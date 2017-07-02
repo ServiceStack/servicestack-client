@@ -559,8 +559,8 @@ var JsonServiceClient = (function () {
     JsonServiceClient.prototype.postToUrl = function (url, request, args) {
         return this.send(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
     };
-    JsonServiceClient.prototype.postBody = function (request, body) {
-        return this.sendBody(HttpMethods.Post, request, body);
+    JsonServiceClient.prototype.postBody = function (request, body, args) {
+        return this.sendBody(HttpMethods.Post, request, body, args);
     };
     JsonServiceClient.prototype.put = function (request, args) {
         return this.send(HttpMethods.Put, request, args);
@@ -568,8 +568,8 @@ var JsonServiceClient = (function () {
     JsonServiceClient.prototype.putToUrl = function (url, request, args) {
         return this.send(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     };
-    JsonServiceClient.prototype.putBody = function (request, body) {
-        return this.sendBody(HttpMethods.Post, request, body);
+    JsonServiceClient.prototype.putBody = function (request, body, args) {
+        return this.sendBody(HttpMethods.Post, request, body, args);
     };
     JsonServiceClient.prototype.patch = function (request, args) {
         return this.send(HttpMethods.Patch, request, args);
@@ -577,8 +577,8 @@ var JsonServiceClient = (function () {
     JsonServiceClient.prototype.patchToUrl = function (url, request, args) {
         return this.send(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     };
-    JsonServiceClient.prototype.patchBody = function (request, body) {
-        return this.sendBody(HttpMethods.Post, request, body);
+    JsonServiceClient.prototype.patchBody = function (request, body, args) {
+        return this.sendBody(HttpMethods.Post, request, body, args);
     };
     JsonServiceClient.prototype.createUrlFromDto = function (method, request) {
         var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
@@ -595,7 +595,7 @@ var JsonServiceClient = (function () {
     };
     JsonServiceClient.prototype.createRequest = function (_a) {
         var _this = this;
-        var method = _a.method, request = _a.request, args = _a.args, url = _a.url, body = _a.body;
+        var method = _a.method, request = _a.request, url = _a.url, args = _a.args, body = _a.body;
         if (!url)
             url = this.createUrlFromDto(method, request);
         if (args)
@@ -708,13 +708,14 @@ var JsonServiceClient = (function () {
     JsonServiceClient.prototype.send = function (method, request, args, url) {
         return this.sendRequest({ method: method, request: request, args: args, url: url });
     };
-    JsonServiceClient.prototype.sendBody = function (method, request, body) {
+    JsonServiceClient.prototype.sendBody = function (method, request, body, args) {
         var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
         return this.sendRequest({
             method: method,
             request: body,
             body: typeof body == "string" ? body : JSON.stringify(body),
             url: exports.appendQueryString(url, request),
+            args: args,
             returns: request
         });
     };

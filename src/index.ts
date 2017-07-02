@@ -740,8 +740,8 @@ export class JsonServiceClient {
         return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
     }
 
-    postBody<T>(request:IReturn<T>, body:string|any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body);
+    postBody<T>(request:IReturn<T>, body:string|any, args?:any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body, args);
     }
 
     put<T>(request: IReturn<T>, args?:any): Promise<T> {
@@ -752,8 +752,8 @@ export class JsonServiceClient {
         return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     }
 
-    putBody<T>(request:IReturn<T>, body:string|any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body);
+    putBody<T>(request:IReturn<T>, body:string|any, args?:any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body, args);
     }
 
     patch<T>(request: IReturn<T>, args?:any): Promise<T> {
@@ -764,8 +764,8 @@ export class JsonServiceClient {
         return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     }
 
-    patchBody<T>(request:IReturn<T>, body:string|any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body);
+    patchBody<T>(request:IReturn<T>, body:string|any, args?:any) {
+        return this.sendBody<T>(HttpMethods.Post, request, body, args);
     }
 
     createUrlFromDto<T>(method:string, request: IReturn<T>) : string {
@@ -785,7 +785,7 @@ export class JsonServiceClient {
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
     }
 
-    private createRequest({ method, request, args, url, body } : ISendRequest) : [Request,IRequestFilterOptions] {
+    private createRequest({ method, request, url, args, body } : ISendRequest) : [Request,IRequestFilterOptions] {
 
         if (!url)
             url = this.createUrlFromDto(method, request);
@@ -922,13 +922,14 @@ export class JsonServiceClient {
         return this.sendRequest<T>({ method, request, args, url });
     }
 
-    private sendBody<T>(method:string, request:IReturn<T>, body:string|any) {
+    private sendBody<T>(method:string, request:IReturn<T>, body:string|any, args?:any) {
         let url = combinePaths(this.replyBaseUrl, nameOf(request));
         return this.sendRequest<T>({
             method,
             request: body, 
             body: typeof body == "string" ? body : JSON.stringify(body),
             url: appendQueryString(url, request), 
+            args,
             returns: request 
         });
     }
