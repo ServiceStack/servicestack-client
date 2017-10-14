@@ -100,9 +100,9 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
 const SERVER_EVENTS_URL = 'http://chat.servicestack.net';
 //const SERVER_EVENTS_URL = 'http://localhost:1337';
 
-describe('ServerEventsClient Tests', function() {
+describe ('ServerEventsClient Tests', () => {
 
-    it('Can connect to ServerEventsStream', done => {
+    it ('Can connect to ServerEventsStream', done => {
         var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: (e => {
@@ -113,7 +113,7 @@ describe('ServerEventsClient Tests', function() {
         }).start();
     })
 
-    it('Does fire onJoin events', done => {
+    it ('Does fire onJoin events', done => {
         var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
                 onConnect: ((e:ServerEventConnect) => {
@@ -129,7 +129,7 @@ describe('ServerEventsClient Tests', function() {
         }).start();
     })
 
-    it('Does fire onJoin events for multiple Channels', done => {
+    it ('Does fire onJoin events for multiple Channels', done => {
         var channels = ["A", "B", "C"];
         var joinMsgs:ServerEventJoin[] = []; 
 
@@ -149,7 +149,7 @@ describe('ServerEventsClient Tests', function() {
         }).start();
     })
 
-    it('Does fire all callbacks', done => {
+    it ('Does fire all callbacks', done => {
         var connectMsgs: ServerEventConnect[] = [];
         var msgs: ServerEventMessage[] = [];
         var commands: ServerEventMessage[] = [];
@@ -216,7 +216,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does receive messages', done => {
+    it ('Does receive messages', done => {
         var connectMsgs: ServerEventConnect[] = [];
         var commands: ServerEventMessage[] = [];
         var msgs1: ServerEventMessage[] = [];
@@ -302,8 +302,7 @@ describe('ServerEventsClient Tests', function() {
         
     })
 
-    it('Does send multiple heartbeats', function(done) {
-        this.timeout(5000);
+    it ('Does send multiple heartbeats', done => {
 
         var heartbeats:ServerEventHeartbeat[] = [];
 
@@ -322,7 +321,7 @@ describe('ServerEventsClient Tests', function() {
         }).start();
     })
 
-    it('Does reconnect on lost connection', function(done) {
+    it ('Does reconnect on lost connection', function(done) {
         this.timeout(31000);
         
         var connectMsgs: ServerEventConnect[] = [];
@@ -371,7 +370,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does send message to Handler', done => {
+    it ('Does send message to Handler', done => {
         var chatMsgs:ChatMessage[] = [];
 
         var states = [];
@@ -407,7 +406,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
     
-    it('Does send string to Handler', done => {
+    it ('Does send string to Handler', done => {
         var announceMsgs:string[] = [];
 
         var states = [];
@@ -443,7 +442,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does send message to named receiver', done => {
+    it ('Does send message to named receiver', done => {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -514,7 +513,7 @@ describe('ServerEventsClient Tests', function() {
         });        
     })
 
-    it('Does send message to global receiver', done => {
+    it ('Does send message to global receiver', done => {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -547,7 +546,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does set properties on global receiver', done => {
+    it ('Does set properties on global receiver', done => {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -580,7 +579,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does send raw string messages', done => {
+    it ('Does send raw string messages', done => {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -644,7 +643,7 @@ describe('ServerEventsClient Tests', function() {
 
     })
 
-    it('Can reuse same instance', done => {
+    it ('Can reuse same instance', done => {
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -751,7 +750,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Does receive all join and leave messages', done => {
+    it ('Does receive all join and leave messages', done => {
         var joinA:ServerEventJoin[] = [];
         var joinB:ServerEventJoin[] = [];
         var joinAB:ServerEventJoin[] = [];
@@ -829,7 +828,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('MultiChannel Does receive all join and leave messages', done => {
+    it ('MultiChannel Does receive all join and leave messages', done => {
         var joinA:ServerEventJoin[] = [];
         var joinB:ServerEventJoin[] = [];
         var joinAB:ServerEventJoin[] = [];
@@ -877,7 +876,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Can subscribe to channels whilst connected', done => {
+    it ('Can subscribe to channels whilst connected', done => {
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];
 
@@ -910,8 +909,8 @@ describe('ServerEventsClient Tests', function() {
                 chai.expect(client1.channels).to.deep.equal(["A","B"]);
                 chai.expect(client2.channels).to.deep.equal(["B"]);
 
-                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B"));
-                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
+                chai.expect(client1.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B"));
+                chai.expect(client2.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
 
                 return Promise.all([
                     postChat(client2, "#2 hello to B", "B"),
@@ -937,8 +936,8 @@ describe('ServerEventsClient Tests', function() {
                 chai.expect(client1.channels).to.deep.equal(["A","B","C"]);
                 chai.expect(client2.channels).to.deep.equal(["B","C"]);
 
-                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B,C"));
-                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
+                chai.expect(client1.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=A,B,C"));
+                chai.expect(client2.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
 
                 chai.expect(msgs1.length).to.equal(2);
                 chai.expect(msgs2.length).to.equal(3);
@@ -948,7 +947,7 @@ describe('ServerEventsClient Tests', function() {
         });
     })
 
-    it('Can unsubscribe from channels whilst connected', done => {
+    it ('Can unsubscribe from channels whilst connected', done => {
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];
 
@@ -991,8 +990,8 @@ describe('ServerEventsClient Tests', function() {
                 chai.expect(client1.channels).to.deep.equal(["A","C"]);
                 chai.expect(client2.channels).to.deep.equal(["B","C"]);
 
-                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A,C"));
-                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
+                chai.expect(client1.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=A,C"));
+                chai.expect(client2.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=B,C"));
 
                 return Promise.all([
                     client1.unsubscribeFromChannels("C"),
@@ -1006,15 +1005,15 @@ describe('ServerEventsClient Tests', function() {
                 chai.expect(client1.channels).to.deep.equal(["A"]);
                 chai.expect(client2.channels).to.deep.equal(["B"]);
 
-                chai.expect(client1.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=A"));
-                chai.expect(client2.eventStreamUri.split('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
+                chai.expect(client1.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=A"));
+                chai.expect(client2.eventStreamUri.split ('&')[0]).to.satisfy(x => x.endsWith("?channels=B"));
 
                 complete(done, client1, client2);
             }            
         });
     })
 
-    it('Does fire multiple listeners for custom trigger', done => {
+    it ('Does fire multiple listeners for custom trigger', done => {
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];
 
@@ -1062,8 +1061,7 @@ describe('ServerEventsClient Tests', function() {
         })
     });
 
-    it("Does raise Error Messages", done => {
-        this.timeout(5000);
+    it ("Does raise Error Messages", done => {
 
         var errors = [];
         var states = [];
@@ -1079,12 +1077,13 @@ describe('ServerEventsClient Tests', function() {
         var client2 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             onTick: run(states)
         }).start();
+        
+        var client3;
 
         states.unshift({ 
             test: () => errors.length >= 1,
             fn(){
-                client1.stop();
-                client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
+                client3 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
                     handlers: {
                         onConnect: (e:ServerEventConnect) => {
                             e.heartbeatIntervalMs = 1000;
@@ -1097,14 +1096,14 @@ describe('ServerEventsClient Tests', function() {
                     onTick: run(states)
                 }).start();
             }
-        }, {test: () => client1.hasConnected() && client2.hasConnected(),
+        }, {test: () => client3.hasConnected() && client2.hasConnected(),
             fn(){
                 return client2.serviceClient.post(new ResetServerEvents());
             } 
         }, {test: () => errors.length >= 2,
             fn(){
                 // errors.forEach(e => console.log(e.message));
-                complete(done, client1, client2);
+                complete(done, client1, client2, client3);
             }
         });
     })

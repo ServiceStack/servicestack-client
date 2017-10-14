@@ -234,6 +234,8 @@ export class ServerEventsClient {
                 var fn = opt.handlers["onConnect"];
                 if (fn){
                     fn.call(el || document.body, this.connectionInfo, request);
+                    if (this.stopped)
+                        return;
                 }
 
                 if (opt.heartbeatUrl) {
@@ -369,6 +371,11 @@ export class ServerEventsClient {
             this.eventSource.close();
         }
 
+        var opt = this.options;
+        if (opt && opt.heartbeat) {
+            clearInterval(opt.heartbeat);
+        }
+        
         var hold = this.connectionInfo;
         if (hold == null || hold.unRegisterUrl == null)
             return new Promise<void>((resolve, reject) => resolve());

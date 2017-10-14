@@ -116,6 +116,8 @@ var ServerEventsClient = (function () {
                     var fn = opt.handlers["onConnect"];
                     if (fn) {
                         fn.call(el || document.body, _this.connectionInfo, request);
+                        if (_this.stopped)
+                            return;
                     }
                     if (opt.heartbeatUrl) {
                         if (opt.heartbeat) {
@@ -251,6 +253,10 @@ var ServerEventsClient = (function () {
         this.stopped = true;
         if (this.eventSource) {
             this.eventSource.close();
+        }
+        var opt = this.options;
+        if (opt && opt.heartbeat) {
+            clearInterval(opt.heartbeat);
         }
         var hold = this.connectionInfo;
         if (hold == null || hold.unRegisterUrl == null)
