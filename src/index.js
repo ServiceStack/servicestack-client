@@ -1,25 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("fetch-everywhere");
-var ResponseStatus = (function () {
+var ResponseStatus = /** @class */ (function () {
     function ResponseStatus() {
     }
     return ResponseStatus;
 }());
 exports.ResponseStatus = ResponseStatus;
-var ResponseError = (function () {
+var ResponseError = /** @class */ (function () {
     function ResponseError() {
     }
     return ResponseError;
 }());
 exports.ResponseError = ResponseError;
-var ErrorResponse = (function () {
+var ErrorResponse = /** @class */ (function () {
     function ErrorResponse() {
     }
     return ErrorResponse;
 }());
 exports.ErrorResponse = ErrorResponse;
-var NewInstanceResolver = (function () {
+var NewInstanceResolver = /** @class */ (function () {
     function NewInstanceResolver() {
     }
     NewInstanceResolver.prototype.tryResolve = function (ctor) {
@@ -28,7 +28,7 @@ var NewInstanceResolver = (function () {
     return NewInstanceResolver;
 }());
 exports.NewInstanceResolver = NewInstanceResolver;
-var SingletonInstanceResolver = (function () {
+var SingletonInstanceResolver = /** @class */ (function () {
     function SingletonInstanceResolver() {
     }
     SingletonInstanceResolver.prototype.tryResolve = function (ctor) {
@@ -54,7 +54,7 @@ var ReadyState;
     ReadyState[ReadyState["OPEN"] = 1] = "OPEN";
     ReadyState[ReadyState["CLOSED"] = 2] = "CLOSED";
 })(ReadyState = exports.ReadyState || (exports.ReadyState = {}));
-var ServerEventsClient = (function () {
+var ServerEventsClient = /** @class */ (function () {
     function ServerEventsClient(baseUrl, channels, options, eventSource) {
         if (options === void 0) { options = {}; }
         if (eventSource === void 0) { eventSource = null; }
@@ -463,14 +463,14 @@ var ServerEventsClient = (function () {
     return ServerEventsClient;
 }());
 exports.ServerEventsClient = ServerEventsClient;
-var ServerEventReceiver = (function () {
+var ServerEventReceiver = /** @class */ (function () {
     function ServerEventReceiver() {
     }
     ServerEventReceiver.prototype.noSuchMethod = function (selector, message) { };
     return ServerEventReceiver;
 }());
 exports.ServerEventReceiver = ServerEventReceiver;
-var UpdateEventSubscriber = (function () {
+var UpdateEventSubscriber = /** @class */ (function () {
     function UpdateEventSubscriber() {
     }
     UpdateEventSubscriber.prototype.createResponse = function () { return new UpdateEventSubscriberResponse(); };
@@ -478,13 +478,13 @@ var UpdateEventSubscriber = (function () {
     return UpdateEventSubscriber;
 }());
 exports.UpdateEventSubscriber = UpdateEventSubscriber;
-var UpdateEventSubscriberResponse = (function () {
+var UpdateEventSubscriberResponse = /** @class */ (function () {
     function UpdateEventSubscriberResponse() {
     }
     return UpdateEventSubscriberResponse;
 }());
 exports.UpdateEventSubscriberResponse = UpdateEventSubscriberResponse;
-var GetEventSubscribers = (function () {
+var GetEventSubscribers = /** @class */ (function () {
     function GetEventSubscribers() {
     }
     GetEventSubscribers.prototype.createResponse = function () { return []; };
@@ -492,13 +492,13 @@ var GetEventSubscribers = (function () {
     return GetEventSubscribers;
 }());
 exports.GetEventSubscribers = GetEventSubscribers;
-var ServerEventUser = (function () {
+var ServerEventUser = /** @class */ (function () {
     function ServerEventUser() {
     }
     return ServerEventUser;
 }());
 exports.ServerEventUser = ServerEventUser;
-var HttpMethods = (function () {
+var HttpMethods = /** @class */ (function () {
     function HttpMethods() {
     }
     HttpMethods.Get = "GET";
@@ -514,20 +514,20 @@ var HttpMethods = (function () {
     return HttpMethods;
 }());
 exports.HttpMethods = HttpMethods;
-var GetAccessToken = (function () {
+var GetAccessToken = /** @class */ (function () {
     function GetAccessToken() {
     }
     GetAccessToken.prototype.createResponse = function () { return new GetAccessTokenResponse(); };
     GetAccessToken.prototype.getTypeName = function () { return "GetAccessToken"; };
     return GetAccessToken;
 }());
-var GetAccessTokenResponse = (function () {
+var GetAccessTokenResponse = /** @class */ (function () {
     function GetAccessTokenResponse() {
     }
     return GetAccessTokenResponse;
 }());
 exports.GetAccessTokenResponse = GetAccessTokenResponse;
-var JsonServiceClient = (function () {
+var JsonServiceClient = /** @class */ (function () {
     function JsonServiceClient(baseUrl) {
         if (baseUrl == null)
             throw "baseUrl is required";
@@ -687,14 +687,16 @@ var JsonServiceClient = (function () {
         }
         return res.json().then(function (o) { return o; }); //fallback
     };
-    JsonServiceClient.prototype.handleError = function (holdRes, res) {
+    JsonServiceClient.prototype.handleError = function (holdRes, res, type) {
         var _this = this;
+        if (type === void 0) { type = null; }
         if (res instanceof Error)
             throw this.raiseError(holdRes, res);
         // res.json can only be called once.
         if (res.bodyUsed)
-            throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
-        if (typeof res.json == "undefined" && res.responseStatus) {
+            throw this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
+        var isErrorResponse = typeof res.json == "undefined" && res.responseStatus;
+        if (isErrorResponse) {
             return new Promise(function (resolve, reject) {
                 return reject(_this.raiseError(null, res));
             });
@@ -702,12 +704,14 @@ var JsonServiceClient = (function () {
         return res.json().then(function (o) {
             var errorDto = exports.sanitize(o);
             if (!errorDto.responseStatus)
-                throw createErrorResponse(res.status, res.statusText);
+                throw createErrorResponse(res.status, res.statusText, type);
+            if (type != null)
+                errorDto.type = type;
             throw errorDto;
         }).catch(function (error) {
             // No responseStatus body, set from `res` Body object
             if (error instanceof Error)
-                throw _this.raiseError(res, createErrorResponse(res.status, res.statusText));
+                throw _this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
             throw _this.raiseError(res, error);
         });
     };
@@ -730,6 +734,12 @@ var JsonServiceClient = (function () {
         var _a = this.createRequest(info), req = _a[0], opt = _a[1];
         var returns = info.returns || info.request;
         var holdRes = null;
+        var resendRequest = function () {
+            var _a = _this.createRequest(info), req = _a[0], opt = _a[1];
+            return fetch(opt.url || req.url, req)
+                .then(function (res) { return _this.createResponse(res, returns); })
+                .catch(function (res) { return _this.handleError(holdRes, res); });
+        };
         return fetch(opt.url || req.url, req)
             .then(function (res) {
             holdRes = res;
@@ -739,26 +749,21 @@ var JsonServiceClient = (function () {
             .catch(function (res) {
             if (res.status === 401) {
                 if (_this.refreshToken) {
-                    var jwtReq = new GetAccessToken();
-                    jwtReq.refreshToken = _this.refreshToken;
-                    var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq);
-                    return _this.postToUrl(url, jwtReq)
-                        .then(function (r) {
-                        _this.bearerToken = r.accessToken;
-                        var _a = _this.createRequest(info), req = _a[0], opt = _a[1];
-                        return fetch(opt.url || req.url, req)
-                            .then(function (res) { return _this.createResponse(res, returns); })
-                            .catch(function (res) { return _this.handleError(holdRes, res); });
-                    })
-                        .catch(function (res) { return _this.handleError(holdRes, res); });
+                    var jwtReq_1 = new GetAccessToken();
+                    jwtReq_1.refreshToken = _this.refreshToken;
+                    var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq_1);
+                    var _a = _this.createRequest({ method: HttpMethods.Post, request: jwtReq_1, args: null, url: url }), jwtRequest = _a[0], jwtOpt = _a[1];
+                    return fetch(url, jwtRequest)
+                        .then(function (r) { return _this.createResponse(r, jwtReq_1).then(function (jwtResponse) {
+                        _this.bearerToken = jwtResponse.accessToken;
+                        return resendRequest();
+                    }); })
+                        .catch(function (res) {
+                        return _this.handleError(holdRes, res, "RefreshTokenException");
+                    });
                 }
                 if (_this.onAuthenticationRequired) {
-                    return _this.onAuthenticationRequired().then(function () {
-                        var _a = _this.createRequest(info), req = _a[0], opt = _a[1];
-                        return fetch(opt.url || req.url, req)
-                            .then(function (res) { return _this.createResponse(res, returns); })
-                            .catch(function (res) { return _this.handleError(holdRes, res); });
-                    });
+                    return _this.onAuthenticationRequired().then(resendRequest);
                 }
             }
             return _this.handleError(holdRes, res);
@@ -773,8 +778,11 @@ var JsonServiceClient = (function () {
     return JsonServiceClient;
 }());
 exports.JsonServiceClient = JsonServiceClient;
-var createErrorResponse = function (errorCode, message) {
+var createErrorResponse = function (errorCode, message, type) {
+    if (type === void 0) { type = null; }
     var error = new ErrorResponse();
+    if (type != null)
+        error.type = type;
     error.responseStatus = new ResponseStatus();
     error.responseStatus.errorCode = errorCode && errorCode.toString();
     error.responseStatus.message = message;

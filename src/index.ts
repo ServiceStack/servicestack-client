@@ -20,8 +20,11 @@ export class ResponseError {
     meta: { [index: string]: string; };
 }
 export class ErrorResponse {
+    type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+
+export type ErrorResponseType = null | "RefreshTokenException";
 
 export interface IResolver
 {
@@ -897,16 +900,17 @@ export class JsonServiceClient {
         return res.json().then(o => o as Object as T); //fallback
     }
 
-    private handleError(holdRes:Response, res) {
+    private handleError(holdRes:Response, res, type:ErrorResponseType=null) {
 
         if (res instanceof Error)
             throw this.raiseError(holdRes, res);
 
         // res.json can only be called once.
         if (res.bodyUsed)
-            throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
+            throw this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
 
-        if (typeof res.json == "undefined" && res.responseStatus) {
+        let isErrorResponse = typeof res.json == "undefined" && res.responseStatus;
+        if (isErrorResponse) {
             return new Promise((resolve,reject) => 
                 reject(this.raiseError(null, res))
             );
@@ -915,12 +919,14 @@ export class JsonServiceClient {
         return res.json().then(o => {
             var errorDto = sanitize(o);
             if (!errorDto.responseStatus)
-                throw createErrorResponse(res.status, res.statusText);
+                throw createErrorResponse(res.status, res.statusText, type);
+            if (type != null)
+                errorDto.type = type;
             throw errorDto;
         }).catch(error => {
             // No responseStatus body, set from `res` Body object
             if (error instanceof Error)
-                throw this.raiseError(res, createErrorResponse(res.status, res.statusText));
+                throw this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
             throw this.raiseError(res, error);
         });
     }
@@ -946,8 +952,15 @@ export class JsonServiceClient {
         const [req, opt] = this.createRequest(info);
 
         const returns = info.returns || info.request;
+        let holdRes:Response  = null;
+        
+        const resendRequest = () => {
+            const [req, opt] = this.createRequest(info);
+            return fetch(opt.url || req.url, req)
+                .then(res => this.createResponse(res, returns))
+                .catch(res => this.handleError(holdRes, res));
+        }
 
-        let holdRes:Response  = null;        
         return fetch(opt.url || req.url, req)
             .then(res => {
                 holdRes = res;
@@ -961,24 +974,20 @@ export class JsonServiceClient {
                         const jwtReq = new GetAccessToken();
                         jwtReq.refreshToken = this.refreshToken;
                         let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
-                        return this.postToUrl<GetAccessTokenResponse>(url, jwtReq)
-                            .then(r => {
-                                this.bearerToken = r.accessToken;
-                                const [req, opt] = this.createRequest(info);
-                                return fetch(opt.url || req.url, req)
-                                    .then(res => this.createResponse(res, returns))
-                                    .catch(res => this.handleError(holdRes, res));
-                            })
-                            .catch(res => this.handleError(holdRes, res));
+
+                        let [jwtRequest, jwtOpt] = this.createRequest({ method:HttpMethods.Post, request:jwtReq, args:null, url });
+                        return fetch(url, jwtRequest)
+                            .then(r => this.createResponse(r, jwtReq).then(jwtResponse => {
+                                this.bearerToken = jwtResponse.accessToken;
+                                return resendRequest();
+                            }))
+                            .catch(res => {
+                                return this.handleError(holdRes, res, "RefreshTokenException")
+                            });
                     }
 
                     if (this.onAuthenticationRequired) {
-                        return this.onAuthenticationRequired().then(() => {
-                            const [req, opt] = this.createRequest(info);
-                            return fetch(opt.url || req.url, req)
-                                .then(res => this.createResponse(res, returns))
-                                .catch(res => this.handleError(holdRes, res));
-                        });
+                        return this.onAuthenticationRequired().then(resendRequest);
                     }
                 }
 
@@ -994,8 +1003,10 @@ export class JsonServiceClient {
     }
 }
 
-const createErrorResponse = (errorCode: string|number, message: string) => {
+const createErrorResponse = (errorCode: string|number, message: string, type:ErrorResponseType=null) => {
     const error = new ErrorResponse();
+    if (type != null)
+        error.type = type;
     error.responseStatus = new ResponseStatus();
     error.responseStatus.errorCode = errorCode && errorCode.toString();
     error.responseStatus.message = message;

@@ -23,8 +23,10 @@ export declare class ResponseError {
     };
 }
 export declare class ErrorResponse {
+    type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+export declare type ErrorResponseType = null | "RefreshTokenException";
 export interface IResolver {
     tryResolve(Function: any): any;
 }
@@ -274,7 +276,7 @@ export declare class JsonServiceClient {
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     private createRequest({method, request, url, args, body});
     private createResponse<T>(res, request);
-    private handleError(holdRes, res);
+    private handleError(holdRes, res, type?);
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
     private sendBody<T>(method, request, body, args?);
     sendRequest<T>(info: ISendRequest): Promise<T>;

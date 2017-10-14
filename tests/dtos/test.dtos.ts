@@ -1,5 +1,5 @@
 /* Options:
-Date: 2017-07-01 08:18:57
+Date: 2017-10-14 06:32:19
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -10,20 +10,24 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
+IncludeTypes: IReturn`1,IReturnVoid,IPost,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,CreateRefreshJwt,CreateRefreshJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
 //ExcludeTypes: 
 //DefaultImports: 
 */
 
+
+export interface IReturn<T>
+{
+    createResponse() : T;
+}
 
 export interface IReturnVoid
 {
     createResponse() : void;
 }
 
-export interface IReturn<T>
+export interface IPost
 {
-    createResponse() : T;
 }
 
 // @DataContract
@@ -205,6 +209,9 @@ export class AuthUserSession
 
     // @DataMember(Order=43)
     providerOAuthAccess: IAuthTokens[];
+
+    // @DataMember(Order=44)
+    meta: { [index:string]: string; };
 }
 
 export class ThrowValidationResponse
@@ -216,6 +223,12 @@ export class ThrowValidationResponse
 }
 
 export class CreateJwtResponse
+{
+    token: string;
+    responseStatus: ResponseStatus;
+}
+
+export class CreateRefreshJwtResponse
 {
     token: string;
     responseStatus: ResponseStatus;
@@ -317,6 +330,15 @@ export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtRespo
     getTypeName() { return "CreateJwt"; }
 }
 
+// @Route("/jwt-refresh")
+export class CreateRefreshJwt implements IReturn<CreateRefreshJwtResponse>
+{
+    userAuthId: string;
+    jwtExpiry: string;
+    createResponse() { return new CreateRefreshJwtResponse(); }
+    getTypeName() { return "CreateRefreshJwt"; }
+}
+
 // @Route("/hello")
 // @Route("/hello/{Name}")
 export class Hello implements IReturn<HelloResponse>
@@ -401,7 +423,7 @@ export class TestAuth implements IReturn<TestAuthResponse>
 // @Route("/authenticate")
 // @Route("/authenticate/{provider}")
 // @DataContract
-export class Authenticate implements IReturn<AuthenticateResponse>
+export class Authenticate implements IReturn<AuthenticateResponse>, IPost
 {
     // @DataMember(Order=1)
     provider: string;

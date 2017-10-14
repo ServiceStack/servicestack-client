@@ -5,13 +5,15 @@ import {
     ResponseStatus, ResponseError,
     Authenticate,AuthenticateResponse,
     TestAuth, TestAuthResponse,
-    CreateJwt,CreateJwtResponse
+    CreateJwt,CreateJwtResponse,
+    CreateRefreshJwt,CreateRefreshJwtResponse,
 } from "./dtos/test.dtos";
 import * as chai from "chai";
 import { 
     JsonServiceClient,
     ErrorResponse,
     appendQueryString,
+    nameOf
 } from  '../src/index';
 
 const expect = chai.expect;
@@ -175,6 +177,38 @@ describe ('JsonServiceClient Auth Tests', () => {
             var status = (e as ErrorResponse).responseStatus;
             expect(status.errorCode).eq("Unauthorized");
             expect(status.message).eq("Invalid UserName or Password");
+        }
+    })
+
+    it ("Invalid RefreshToken throws RefreshTokenException ErrorResponse", async () => {
+        var client = new JsonServiceClient(TEST_URL);
+        client.refreshToken = "Invalid.Refresh.Token";
+
+        try {
+            var response = await client.get(new TestAuth());
+            assert.fail("should throw");
+        } catch(e) {
+            expect(e.type).eq("RefreshTokenException");
+            expect(e.responseStatus.errorCode).eq("ArgumentException");
+            expect(e.responseStatus.message).eq("Illegal base64url string!");
+        }
+    })
+
+    it ("Expires RefreshToken throws RefreshTokenException", async () => {
+        var client = new JsonServiceClient(TEST_URL);
+
+        let createExpiredJwt = new CreateRefreshJwt();
+        createExpiredJwt.jwtExpiry = "2000-01-01";
+        const expiredJwt = await client.post(createExpiredJwt);
+        client.refreshToken = expiredJwt.token;
+
+        try {
+            var response = await client.get(new TestAuth());
+            assert.fail("should throw");
+        } catch(e) {
+            expect(e.type).eq("RefreshTokenException");
+            expect(e.responseStatus.errorCode).eq("TokenException");
+            expect(e.responseStatus.message).eq("Token has expired");
         }
     })
 
