@@ -420,7 +420,7 @@ describe('JsonServiceClient Tests', () => {
         client.get(request, { VendorName: "Amazon" })
             .then(r => {
                 chai.expect(r.Results.length).to.equal(3);
-                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon"]);
+                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
                 done();
             }, done);
     })
@@ -431,7 +431,7 @@ describe('JsonServiceClient Tests', () => {
         client.get<dtos.QueryResponse<dtos.Technology>>("/technology/search", request)
             .then(r => {
                 chai.expect(r.Results.length).to.equal(3);
-                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon"]);
+                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
                 done();
             }, done);
     })

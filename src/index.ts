@@ -205,7 +205,7 @@ export class ServerEventsClient {
         const els = cssSelector && document.querySelectorAll(cssSelector);
         const el = els && els[0];
 
-        const eventId = (e as any).lastEventId;
+        const eventId = parseInt((e as any).lastEventId);
         const data = e.data;
         const type = TypeMap[cmd] || "ServerEventMessage";
         const request:ServerEventMessage = { eventId, data, type,

@@ -93,7 +93,7 @@ var ServerEventsClient = (function () {
             var cmd = tokens[0], cssSelector = tokens[1];
             var els = cssSelector && document.querySelectorAll(cssSelector);
             var el = els && els[0];
-            var eventId = e.lastEventId;
+            var eventId = parseInt(e.lastEventId);
             var data = e.data;
             var type = TypeMap[cmd] || "ServerEventMessage";
             var request = { eventId: eventId, data: data, type: type,
