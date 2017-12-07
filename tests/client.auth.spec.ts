@@ -11,6 +11,8 @@ import {
 import * as chai from "chai";
 import { 
     JsonServiceClient,
+    ServerEventsClient,
+    ServerEventConnect, ServerEventJoin, ServerEventLeave, ServerEventUpdate, ServerEventMessage, ServerEventHeartbeat,
     ErrorResponse,
     appendQueryString,
     nameOf
@@ -31,6 +33,7 @@ const createJwt = (opt:any={}) : CreateJwt => {
 }
 
 const TEST_URL = "http://test.servicestack.net";
+// const TEST_URL = "http://localhost:55799";
 
 describe ('JsonServiceClient Auth Tests', () => {
 
@@ -211,5 +214,35 @@ describe ('JsonServiceClient Auth Tests', () => {
             expect(e.responseStatus.message).eq("Token has expired");
         }
     })
+
+    it ("Can authenticate with ServerEvents using JWT", done => {
+        (async () => {
+
+            var authClient = new JsonServiceClient(TEST_URL);
+            
+            const request = createJwt();
+            let response = await authClient.post(request);
+    
+            var headers = new Headers();
+            headers.set("Authorization", "Bearer " + response.token);
+            await fetch(TEST_URL + "/session-to-token", 
+                { method:"POST", headers, credentials:"include" });
+    
+            var client = new ServerEventsClient(TEST_URL, ["*"], {
+                handlers: {
+                    onConnect: (e => {
+                        console.log('onConnect: ', e);
+                        done();
+                    })
+                },
+                onException: (e:Error) => {
+                    expect(JSON.stringify(e)).null;
+                },
+            });
+
+            client.start();
+
+        })();
+     })
 
 });

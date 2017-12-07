@@ -302,8 +302,9 @@ describe ('ServerEventsClient Tests', () => {
         
     })
 
-    it ('Does send multiple heartbeats', done => {
-
+    it ('Does send multiple heartbeats', function(done) {
+        this.timeout(5000);
+        
         var heartbeats:ServerEventHeartbeat[] = [];
 
         var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
