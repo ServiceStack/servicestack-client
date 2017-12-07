@@ -710,7 +710,7 @@ var JsonServiceClient = /** @class */ (function () {
             throw errorDto;
         }).catch(function (error) {
             // No responseStatus body, set from `res` Body object
-            if (error instanceof Error)
+            if (error instanceof Error || error instanceof DOMException /*MS Edge*/)
                 throw _this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
             throw _this.raiseError(res, error);
         });
@@ -1016,6 +1016,10 @@ exports.parseCookie = function (setCookie) {
             }
             else if (lower == "expires") {
                 to.expires = new Date(value);
+                // MS Edge returns Invalid Date when using '-' in "12-Mar-2037"
+                if (to.expires.toString() === "Invalid Date") {
+                    to.expires = new Date(value.replace(/-/g, " "));
+                }
             }
             else {
                 to[name] = value;
