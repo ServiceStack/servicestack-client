@@ -232,18 +232,26 @@ describe ('JsonServiceClient Auth Tests', () => {
             const request = createJwt();
             let response = await authClient.post(request);
 
-            // Alternative for browsers is to convert the JWT to a cookie so applies to future HTTP requests
+            // Alternatives for browsers is to convert the JWT to a cookie so it's sent in future HTTP requests
+
+            // a) Typed API
+            // var client = new JsonServiceClient(TEST_URL);
+            // client.setBearerToken(response.token);
+            // await client.post(new dtos.ConvertSessionToToken());
+            
+            // b) Using fetch directly without types
             // var headers = new Headers();
             // headers.set("Authorization", "Bearer " + response.token);
             // await fetch(TEST_URL + "/session-to-token", 
             //     { method:"POST", headers, credentials:"include" });
-    
+
             // Remote Server needs `new JwtAuthProvider { AllowInQueryString = true }`
-            var client = new ServerEventsClient(TEST_URL, ["*"], {
+            var sseClient = new ServerEventsClient(TEST_URL, ["*"], {
+                // Works in both browers + node.exe server apps
                 resolveStreamUrl: url => appendQueryString(url, { "ss-tok": response.token }),
                 handlers: {
                     onConnect: (e => {
-                        client.stop();
+                        sseClient.stop();
                         done();
                     })
                 },
@@ -252,7 +260,11 @@ describe ('JsonServiceClient Auth Tests', () => {
                 },
             });
 
-            client.start();
+            // c) also works in browsers:
+            // sseClient.serviceClient.setBearerToken(response.token);
+            // await sseClient.serviceClient.post(new dtos.ConvertSessionToToken());
+
+            sseClient.start();
 
         })();
      })
