@@ -138,6 +138,7 @@ export interface IEventSourceOptions {
     updateSubscriberUrl?: string;
     heartbeatIntervalMs?: number;
     heartbeat?: number;
+    resolveStreamUrl?: (url:string) => string;
 }
 
 export class ServerEventsClient {
@@ -337,9 +338,15 @@ export class ServerEventsClient {
             this.onError(opt.error);
 
         const hold = this.eventSource;
+        
+        var url = opt.url || this.eventStreamUri || hold.url;
+        if (this.options.resolveStreamUrl != null) {
+            url = this.options.resolveStreamUrl(url);
+        }
+
         const es = this.EventSource
-            ? new this.EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions())
-            : new EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions());
+            ? new this.EventSource(url, this.getEventSourceOptions())
+            : new EventSource(url, this.getEventSourceOptions());
         es.addEventListener('error', e => opt.onerror || hold.onerror || this.onError);
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
 
@@ -358,9 +365,14 @@ export class ServerEventsClient {
     start() {
         this.stopped = false;
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
+            var url = this.eventStreamUri;
+            if (this.options.resolveStreamUrl != null) {
+                url = this.options.resolveStreamUrl(url);
+            }
+
             this.eventSource = this.EventSource
-                ? new this.EventSource(this.eventStreamUri, this.getEventSourceOptions())
-                : new EventSource(this.eventStreamUri, this.getEventSourceOptions());
+                ? new this.EventSource(url, this.getEventSourceOptions())
+                : new EventSource(url, this.getEventSourceOptions());
             this.eventSource.addEventListener('error', this.onError);
             this.eventSource.addEventListener('message', e => this.onMessage(e as any));
         }

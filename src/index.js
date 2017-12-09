@@ -222,9 +222,13 @@ var ServerEventsClient = /** @class */ (function () {
         if (opt.error)
             this.onError(opt.error);
         var hold = this.eventSource;
+        var url = opt.url || this.eventStreamUri || hold.url;
+        if (this.options.resolveStreamUrl != null) {
+            url = this.options.resolveStreamUrl(url);
+        }
         var es = this.EventSource
-            ? new this.EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions())
-            : new EventSource(opt.url || this.eventStreamUri || hold.url, this.getEventSourceOptions());
+            ? new this.EventSource(url, this.getEventSourceOptions())
+            : new EventSource(url, this.getEventSourceOptions());
         es.addEventListener('error', function (e) { return opt.onerror || hold.onerror || _this.onError; });
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
         var fn = this.options.onReconnect;
@@ -241,9 +245,13 @@ var ServerEventsClient = /** @class */ (function () {
         var _this = this;
         this.stopped = false;
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
+            var url = this.eventStreamUri;
+            if (this.options.resolveStreamUrl != null) {
+                url = this.options.resolveStreamUrl(url);
+            }
             this.eventSource = this.EventSource
-                ? new this.EventSource(this.eventStreamUri, this.getEventSourceOptions())
-                : new EventSource(this.eventStreamUri, this.getEventSourceOptions());
+                ? new this.EventSource(url, this.getEventSourceOptions())
+                : new EventSource(url, this.getEventSourceOptions());
             this.eventSource.addEventListener('error', this.onError);
             this.eventSource.addEventListener('message', function (e) { return _this.onMessage(e); });
         }

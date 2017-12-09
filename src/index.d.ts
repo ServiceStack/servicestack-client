@@ -120,6 +120,7 @@ export interface IEventSourceOptions {
     updateSubscriberUrl?: string;
     heartbeatIntervalMs?: number;
     heartbeat?: number;
+    resolveStreamUrl?: (url: string) => string;
 }
 export declare class ServerEventsClient {
     channels: string[];

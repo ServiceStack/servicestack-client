@@ -231,16 +231,19 @@ describe ('JsonServiceClient Auth Tests', () => {
             
             const request = createJwt();
             let response = await authClient.post(request);
+
+            // Alternative for browsers is to convert the JWT to a cookie so applies to future HTTP requests
+            // var headers = new Headers();
+            // headers.set("Authorization", "Bearer " + response.token);
+            // await fetch(TEST_URL + "/session-to-token", 
+            //     { method:"POST", headers, credentials:"include" });
     
-            var headers = new Headers();
-            headers.set("Authorization", "Bearer " + response.token);
-            await fetch(TEST_URL + "/session-to-token", 
-                { method:"POST", headers, credentials:"include" });
-    
+            // Remote Server needs `new JwtAuthProvider { AllowInQueryString = true }`
             var client = new ServerEventsClient(TEST_URL, ["*"], {
+                resolveStreamUrl: url => appendQueryString(url, { "ss-tok": response.token }),
                 handlers: {
                     onConnect: (e => {
-                        console.log('onConnect: ', e);
+                        client.stop();
                         done();
                     })
                 },
