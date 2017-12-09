@@ -23,13 +23,23 @@ import {
 const expect = chai.expect; 
 const assert = chai.assert; 
 
+const TECHSTACKS_URL = "http://techstacks.io";
+const TEST_URL = "http://test.servicestack.net";
+
+//Clear existing User Session
+const clearSession = async (client:JsonServiceClient) => {
+    let logout = new Authenticate();
+    logout.provider = "logout";
+    await client.post(logout);
+};
+
 describe('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
     var testClient : JsonServiceClient;
 
     beforeEach(() => {
-        client = new JsonServiceClient('http://techstacks.io/');
-        testClient = new JsonServiceClient('http://test.servicestack.net');
+        client = new JsonServiceClient(TECHSTACKS_URL);
+        testClient = new JsonServiceClient(TEST_URL);
     });
 
     it('Should get techs response', done => {
@@ -108,12 +118,11 @@ describe('JsonServiceClient Tests', () => {
     })
 
     it ('Should generate default value', () => {
-        var url = "http://test.servicestack.net";
         var request = new HelloTypes();
         request.bool = false;
         request.int = 0;
-        var requestUrl = appendQueryString(url, request);
-        chai.expect(requestUrl).to.equal("http://test.servicestack.net?bool=false&int=0");
+        var requestUrl = appendQueryString(TEST_URL, request);
+        chai.expect(requestUrl).to.equal(TEST_URL + "?bool=false&int=0");
     })
 
     it ('Should return raw text', async () => {
@@ -149,27 +158,25 @@ describe('JsonServiceClient Tests', () => {
             }, done);
     })
 
-    it ('Can authenticate with Credentials', () => {
+    it ('Can authenticate with Credentials', async () => {
+
+        await clearSession(testClient);
+
         var request = new Authenticate();
         request.provider = "credentials";
         request.userName = "test";
         request.password = "test";
         request.rememberMe = true;
-        return testClient.post(request)
-            .then(r => {
-                chai.expect(r.userId).not.empty;
-                chai.expect(r.sessionId).not.empty;
+        let authResponse = await testClient.post(request);
 
-                //authenticated request
-                return testClient.get(new TestAuth())
-                    .then(r => {
-                        chai.expect(r.userName).to.equal("test");
+        chai.expect(authResponse.userId).not.empty;
+        chai.expect(authResponse.sessionId).not.empty;
 
-                        var logout = new Authenticate();
-                        logout.provider = "logout";
-                        return testClient.post(logout);
-                    });
-            });
+        //authenticated request
+        var r = await testClient.get(new TestAuth());
+        chai.expect(r.userName).to.equal("test");
+    
+        await clearSession(testClient);
     })
 
     it ('Can authenticate with BearerToken', async () => {
@@ -186,7 +193,7 @@ describe('JsonServiceClient Tests', () => {
         logout.provider = "logout";
         await testClient.post(logout);
 
-        var newClient = new JsonServiceClient("http://test.servicestack.net");
+        var newClient = new JsonServiceClient(TEST_URL);
 
         try {
             //New Client without BearerToken should fail
@@ -443,7 +450,7 @@ describe('JsonServiceClient Tests', () => {
         request.id = 1;
         request.name = "name";
 
-        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        var testClient = new JsonServiceClient(TEST_URL);
         if (typeof document == "undefined") //fetch in browser ignores custom headers
             testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
 
@@ -459,7 +466,7 @@ describe('JsonServiceClient Tests', () => {
         request.id = 1;
         request.name = "name";
 
-        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        var testClient = new JsonServiceClient(TEST_URL);
         if (typeof document == "undefined") //fetch in browser ignores custom headers
             testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
 
@@ -476,7 +483,7 @@ describe('JsonServiceClient Tests', () => {
         request.name = "name";
         request.contentType = "text/plain";
 
-        var testClient = new JsonServiceClient('http://test.servicestack.net');
+        var testClient = new JsonServiceClient(TEST_URL);
         if (typeof document == "undefined") //fetch in browser ignores custom headers
             testClient.responseFilter = res => chai.expect(res.headers.get("X-Args")).to.eq("1,name");
 

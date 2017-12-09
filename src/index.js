@@ -710,8 +710,10 @@ var JsonServiceClient = /** @class */ (function () {
             throw errorDto;
         }).catch(function (error) {
             // No responseStatus body, set from `res` Body object
-            if (error instanceof Error || error instanceof DOMException /*MS Edge*/)
+            if (error instanceof Error
+                || (typeof window != "undefined" && error instanceof window.DOMException /*MS Edge*/)) {
                 throw _this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
+            }
             throw _this.raiseError(res, error);
         });
     };

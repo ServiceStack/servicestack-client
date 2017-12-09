@@ -21,6 +21,9 @@ import {
 const expect = chai.expect;
 const assert = chai.assert;
 
+const TEST_URL = "http://test.servicestack.net";
+// const TEST_URL = "http://localhost:55799";
+
 const createJwt = (opt:any={}) : CreateJwt => {
     const request = Object.assign(new CreateJwt(), opt);
     if (!request.userAuthId)
@@ -32,8 +35,15 @@ const createJwt = (opt:any={}) : CreateJwt => {
     return request;
 }
 
-const TEST_URL = "http://test.servicestack.net";
-// const TEST_URL = "http://localhost:55799";
+//Clear existing User Session
+const clearSession = async (client:JsonServiceClient) => {
+    let logout = new Authenticate();
+    logout.provider = "logout";
+    await client.post(logout);
+};
+
+declare var global;
+const supportsServerEvents = () => typeof global.EventSource != "undefined";
 
 describe ('JsonServiceClient Auth Tests', () => {
 
@@ -163,10 +173,7 @@ describe ('JsonServiceClient Auth Tests', () => {
         const expiredJwt = await client.post(createExpiredJwt);
         var bearerToken = expiredJwt.token;
 
-        //Clear existing User Session
-        var logout = new Authenticate();
-        logout.provider = "logout";
-        await client.post(logout);
+        await clearSession(client);
 
         client = new JsonServiceClient(TEST_URL);
         client.bearerToken = bearerToken;
@@ -217,6 +224,8 @@ describe ('JsonServiceClient Auth Tests', () => {
 
     it ("Can authenticate with ServerEvents using JWT", done => {
         (async () => {
+
+            if (!supportsServerEvents()) return done();
 
             var authClient = new JsonServiceClient(TEST_URL);
             

@@ -925,8 +925,12 @@ export class JsonServiceClient {
             throw errorDto;
         }).catch(error => {
             // No responseStatus body, set from `res` Body object
-            if (error instanceof Error || error instanceof DOMException /*MS Edge*/)
+            if (error instanceof Error 
+                || (typeof window != "undefined" && error instanceof (window as any).DOMException /*MS Edge*/))
+            {
                 throw this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
+            }
+
             throw this.raiseError(res, error);
         });
     }
