@@ -18,9 +18,7 @@ React Native iOS and Android Mobile Apps as seen in [TypeScript Server Event Exa
 
 ## Install
 
-This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Templates](https://github.com/ServiceStack/ServiceStackVS)
-
-Node.js projects can install it with:
+This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Templates](https://github.com/ServiceStack/ServiceStackVS) or can be installed with:
 
     npm install @servicestack/client
 
