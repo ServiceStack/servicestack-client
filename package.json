@@ -1,22 +1,20 @@
 {
-  "name": "servicestack-client",
-  "title": "ServiceStack JavaScript Utils",
-  "version": "0.0.42",
+  "name": "@servicestack/client",
+  "title": "ServiceStack Client Utils",
+  "version": "0.1.0",
   "description": "ServiceStack's TypeScript library providing convenience utilities in developing web apps. Integrates with ServiceStack's Server features including ServiceClient, Server Events, Error Handling and Validation",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
-  "bugs": "https://github.com/ServiceStack/Issues",
   "license": "BSD-3-Clause",
-  "author": {
-    "name": "ServiceStack Inc",
-    "email": "team@servicestack.net",
-    "url": "https://servicestack.net"
+  "bugs": {
+    "url": "https://github.com/ServiceStack/Issues"
   },
+  "author": "ServiceStack, Inc. (https://servicestack.net)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ServiceStack/servicestack-client.git"
+    "url": "git+https://github.com/ServiceStack/servicestack-client.git"
   },
   "scripts": {
-    "pretest": "node_modules/.bin/tsc",
+    "pretest": "tsc",
     "test": "mocha -t 5000 ./tests/*.js",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
