@@ -1,4 +1,4 @@
-# servicestack-client
+# @servicestack/client
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)](http://docs.servicestack.net/typescript-add-servicestack-reference)
 
@@ -22,14 +22,7 @@ This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Template
 
 Node.js projects can install it with:
 
-    npm install --save servicestack-client
-
-or if using jspm:
-
-    jspm install servicestack-client
-    npm install --save-dev servicestack-client
-
-Where you'll also need to install the Type Definitions contained in the `servicestack-client` npm package separately.
+    npm install @servicestack/client
 
 ### Ideal Typed Message-based API
 
@@ -43,11 +36,11 @@ Typed API.
 Here's a quick look at what it looks like. The example below shows how to create a 
 [C# Gist in Gislyn](https://github.com/ServiceStack/Gistlyn) 
 after adding a [TypeScript ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
-to `gistlyn.com` and installing the [servicestack-client](https://www.npmjs.com/package/servicestack-client) 
+to `gistlyn.com` and installing the [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) 
 npm package: 
 
 ```ts
-import { JsonServiceClient } from 'servicestack-client';
+import { JsonServiceClient } from '@servicestack/client';
 import { StoreGist, GithubFile } from './Gistlyn.dtos';
 
 var client = new JsonServiceClient("http://gistlyn.com");
