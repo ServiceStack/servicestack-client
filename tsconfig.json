@@ -18,6 +18,7 @@
     "./tests/client.spec.ts",
     "./tests/client.auth.spec.ts",
     "./tests/serverevents.spec.ts",
-    "./tests/utils.spec.ts"
+    "./tests/utils.spec.ts",
+    "./tests/issues.spec.ts"
    ]
 }
