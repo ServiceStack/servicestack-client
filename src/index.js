@@ -537,8 +537,7 @@ var GetAccessTokenResponse = /** @class */ (function () {
 exports.GetAccessTokenResponse = GetAccessTokenResponse;
 var JsonServiceClient = /** @class */ (function () {
     function JsonServiceClient(baseUrl) {
-        if (baseUrl == null)
-            throw "baseUrl is required";
+        if (baseUrl === void 0) { baseUrl = "/"; }
         this.baseUrl = baseUrl;
         this.replyBaseUrl = exports.combinePaths(baseUrl, "json", "reply") + "/";
         this.oneWayBaseUrl = exports.combinePaths(baseUrl, "json", "oneway") + "/";

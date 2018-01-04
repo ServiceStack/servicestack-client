@@ -716,10 +716,7 @@ export class JsonServiceClient {
 
     static toBase64: (rawString:string) => string;
 
-    constructor(baseUrl: string) {
-        if (baseUrl == null)
-            throw "baseUrl is required";
-
+    constructor(baseUrl: string = "/") {
         this.baseUrl = baseUrl;
         this.replyBaseUrl = combinePaths(baseUrl, "json", "reply") + "/";
         this.oneWayBaseUrl = combinePaths(baseUrl, "json", "oneway") + "/";

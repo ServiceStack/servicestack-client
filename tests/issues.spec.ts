@@ -8,7 +8,7 @@ import {
 
 describe('Issues', () => {
     
-    it.only ('Does generate URL', done => {
+    it ('Does generate URL', done => {
         
         let dtoName = nameOf(new GetProducts());
         expect(dtoName).eq('GetProducts');
