@@ -772,7 +772,7 @@ export class JsonServiceClient {
     }
 
     putBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body, args);
+        return this.sendBody<T>(HttpMethods.Put, request, body, args);
     }
 
     patch<T>(request: IReturn<T>, args?:any): Promise<T> {
@@ -784,7 +784,7 @@ export class JsonServiceClient {
     }
 
     patchBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body, args);
+        return this.sendBody<T>(HttpMethods.Patch, request, body, args);
     }
 
     createUrlFromDto<T>(method:string, request: IReturn<T>) : string {

@@ -582,7 +582,7 @@ var JsonServiceClient = /** @class */ (function () {
         return this.send(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     };
     JsonServiceClient.prototype.putBody = function (request, body, args) {
-        return this.sendBody(HttpMethods.Post, request, body, args);
+        return this.sendBody(HttpMethods.Put, request, body, args);
     };
     JsonServiceClient.prototype.patch = function (request, args) {
         return this.send(HttpMethods.Patch, request, args);
@@ -591,7 +591,7 @@ var JsonServiceClient = /** @class */ (function () {
         return this.send(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     };
     JsonServiceClient.prototype.patchBody = function (request, body, args) {
-        return this.sendBody(HttpMethods.Post, request, body, args);
+        return this.sendBody(HttpMethods.Patch, request, body, args);
     };
     JsonServiceClient.prototype.createUrlFromDto = function (method, request) {
         var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
