@@ -643,8 +643,12 @@ var JsonServiceClient = /** @class */ (function () {
             compress: false
         };
         var req = new Request(url, reqOptions);
-        if (HttpMethods.hasRequestBody(method))
+        if (HttpMethods.hasRequestBody(method)) {
             req.body = body || JSON.stringify(request);
+            if (typeof window != "undefined" && body instanceof FormData) {
+                req.headers.delete('Content-Type'); //set by FormData
+            }
+        }
         var opt = { url: url };
         if (this.requestFilter != null)
             this.requestFilter(req, opt);
@@ -732,7 +736,11 @@ var JsonServiceClient = /** @class */ (function () {
         return this.sendRequest({
             method: method,
             request: body,
-            body: typeof body == "string" ? body : JSON.stringify(body),
+            body: typeof body == "string"
+                ? body
+                : typeof window != "undefined" && body instanceof FormData
+                    ? body
+                    : JSON.stringify(body),
             url: exports.appendQueryString(url, request),
             args: args,
             returns: request
@@ -1075,6 +1083,57 @@ exports.parseResponseStatus = function (json, defaultMsg) {
         };
     }
 };
+function toFormData(o) {
+    if (typeof window == "undefined")
+        return;
+    var formData = new FormData();
+    for (var name in o) {
+        formData.append(name, o[name]);
+    }
+    return formData;
+}
+exports.toFormData = toFormData;
+function toObject(keys) {
+    var _this = this;
+    var to = {};
+    if (!keys)
+        return to;
+    if (typeof keys != "object")
+        throw new Error("keys must be an Array of object keys");
+    var arr = Array.prototype.slice.call(keys);
+    arr.forEach(function (key) {
+        if (_this[key]) {
+            to[key] = _this[key];
+        }
+    });
+    return to;
+}
+exports.toObject = toObject;
+function errorResponseSummary() {
+    var responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+    var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
+    return !status.errors || status.errors.length == 0
+        ? status.message || status.errorCode
+        : undefined;
+}
+exports.errorResponseSummary = errorResponseSummary;
+function errorResponse(field) {
+    if (field == null)
+        return errorResponseSummary.call(this);
+    var responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+    var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
+    if (status.errors == null || status.errors.length == 0)
+        return undefined;
+    var field = status.errors.find(function (x) { return (x.fieldName || '').toLowerCase() == field.toLowerCase(); });
+    return field
+        ? field.message || field.errorCode
+        : undefined;
+}
+exports.errorResponse = errorResponse;
 exports.toDate = function (s) { return new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])); };
 exports.toDateFmt = function (s) { return exports.dateFmt(exports.toDate(s)); };
 exports.padInt = function (n) { return n < 10 ? '0' + n : n; };

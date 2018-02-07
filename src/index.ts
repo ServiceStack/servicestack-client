@@ -845,8 +845,13 @@ export class JsonServiceClient {
         };
         const req = new Request(url, reqOptions);
 
-        if (HttpMethods.hasRequestBody(method))
+        if (HttpMethods.hasRequestBody(method)) {
             (req as any).body = body || JSON.stringify(request);
+
+            if (typeof window != "undefined" && body instanceof FormData) {
+                req.headers.delete('Content-Type'); //set by FormData
+            }
+        }
 
         var opt:IRequestFilterOptions = { url };
         if (this.requestFilter != null)
@@ -953,7 +958,11 @@ export class JsonServiceClient {
         return this.sendRequest<T>({
             method,
             request: body, 
-            body: typeof body == "string" ? body : JSON.stringify(body),
+            body: typeof body == "string" 
+                ? body 
+                : typeof window != "undefined" && body instanceof FormData
+                    ? body
+                    : JSON.stringify(body),
             url: appendQueryString(url, request), 
             args,
             returns: request 
@@ -1320,6 +1329,59 @@ export const parseResponseStatus = (json:string, defaultMsg=null) => {
         };
     }
 };
+
+export function toFormData(o) {
+    if (typeof window == "undefined") return;
+    var formData = new FormData();
+    for (var name in o) {
+        formData.append(name, o[name]);
+    }
+    return formData;    
+}
+
+export function toObject(keys) {
+    const to = {};
+    if (!keys) return to;
+    if (typeof keys != "object")
+        throw new Error("keys must be an Array of object keys");
+
+    const arr = Array.prototype.slice.call(keys);
+    arr.forEach(key => {
+        if (this[key]) {
+            to[key] = this[key];
+        }
+    });
+    return to;
+}
+
+export function errorResponseSummary() {
+    const responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+
+    var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+    return !status.errors || status.errors.length == 0
+        ? status.message || status.errorCode
+        : undefined;
+}
+
+export function errorResponse(field) {
+    if (field == null)
+        return errorResponseSummary.call(this);
+
+    const responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+
+    var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+    if (status.errors == null || status.errors.length == 0)
+        return undefined;
+
+    var field = status.errors.find(x => (x.fieldName || '').toLowerCase() == field.toLowerCase());
+    return field 
+        ? field.message || field.errorCode 
+        : undefined;
+}
 
 export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
