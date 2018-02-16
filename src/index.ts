@@ -257,7 +257,7 @@ export class ServerEventsClient {
                             return;
                         }
 
-                        fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers }))
+                        fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials }))
                             .then(res => { if (!res.ok) throw new Error(`${res.status} - ${res.statusText}`); })
                             .catch(error => this.reconnectServerEvents({ error }));
                     }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);

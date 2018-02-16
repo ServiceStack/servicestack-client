@@ -132,7 +132,7 @@ var ServerEventsClient = /** @class */ (function () {
                                 _this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
                                 return;
                             }
-                            fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers }))
+                            fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: _this.serviceClient.credentials }))
                                 .then(function (res) { if (!res.ok)
                                 throw new Error(res.status + " - " + res.statusText); })
                                 .catch(function (error) { return _this.reconnectServerEvents({ error: error }); });
