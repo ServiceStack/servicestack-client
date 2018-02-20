@@ -270,7 +270,7 @@ var ServerEventsClient = /** @class */ (function () {
         if (hold == null || hold.unRegisterUrl == null)
             return new Promise(function (resolve, reject) { return resolve(); });
         this.connectionInfo = null;
-        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }))
+        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors", credentials: this.serviceClient.credentials }))
             .then(function (res) { if (!res.ok)
             throw new Error(res.status + " - " + res.statusText); })
             .catch(this.onError);

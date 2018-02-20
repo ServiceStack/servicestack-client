@@ -396,7 +396,7 @@ export class ServerEventsClient {
             return new Promise<void>((resolve, reject) => resolve());
 
         this.connectionInfo = null;
-        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors" }))
+        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors", credentials: this.serviceClient.credentials }))
             .then(res => { if (!res.ok) throw new Error(`${res.status} - ${res.statusText}`); })
             .catch(this.onError);
     }
