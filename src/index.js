@@ -1119,8 +1119,26 @@ function errorResponseSummary() {
         : undefined;
 }
 exports.errorResponseSummary = errorResponseSummary;
-function errorResponse(field) {
-    if (field == null)
+function errorResponseExcept(fieldNames) {
+    var responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+    var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
+    if (typeof fieldNames == 'string')
+        fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
+    if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
+        for (var _i = 0, _a = status.errors; _i < _a.length; _i++) {
+            var field = _a[_i];
+            if (fieldNames.indexOf(field.fieldName) === -1) {
+                return field.message || field.errorCode;
+            }
+        }
+    }
+    return status.message || status.errorCode || undefined;
+}
+exports.errorResponseExcept = errorResponseExcept;
+function errorResponse(fieldName) {
+    if (fieldName == null)
         return errorResponseSummary.call(this);
     var responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
@@ -1128,7 +1146,7 @@ function errorResponse(field) {
     var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
     if (status.errors == null || status.errors.length == 0)
         return undefined;
-    var field = status.errors.find(function (x) { return (x.fieldName || '').toLowerCase() == field.toLowerCase(); });
+    var field = status.errors.find(function (x) { return (x.fieldName || '').toLowerCase() == fieldName.toLowerCase(); });
     return field
         ? field.message || field.errorCode
         : undefined;

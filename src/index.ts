@@ -1359,25 +1359,46 @@ export function errorResponseSummary() {
     if (responseStatus == null)
         return undefined;
 
-    var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+    const status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
     return !status.errors || status.errors.length == 0
         ? status.message || status.errorCode
         : undefined;
 }
 
-export function errorResponse(field) {
-    if (field == null)
+export function errorResponseExcept(fieldNames) {
+    const responseStatus = this.responseStatus || this.ResponseStatus;
+    if (responseStatus == null)
+        return undefined;
+
+    const status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+
+    if (typeof fieldNames == 'string')
+        fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
+
+    if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
+        for (let field of status.errors) {
+            if (fieldNames.indexOf(field.fieldName) === -1) {
+                return field.message || field.errorCode;
+            }
+        }
+    }
+
+    return status.message || status.errorCode || undefined;
+}
+
+export function errorResponse(fieldName) {
+    if (fieldName == null)
         return errorResponseSummary.call(this);
 
     const responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
         return undefined;
 
-    var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+    const status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
     if (status.errors == null || status.errors.length == 0)
         return undefined;
 
-    var field = status.errors.find(x => (x.fieldName || '').toLowerCase() == field.toLowerCase());
+    const field = status.errors.find(x => (x.fieldName || '').toLowerCase() == fieldName.toLowerCase());
     return field 
         ? field.message || field.errorCode 
         : undefined;

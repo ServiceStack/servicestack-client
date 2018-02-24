@@ -5,10 +5,11 @@ import {
     JsonServiceClient,
     parseCookie,
     errorResponse,
+    errorResponseExcept,
     toObject,
 } from  '../src/index';
 
-describe('Util Tests', () => {
+describe ('Util Tests', () => {
     it ('Can parse cookie', done => {
         var cookie = parseCookie('ss-pid=2quSav3JNK2T3Xbf7MiU; expires=Thu, 12-Mar-2037 18:54:06 GMT; path=/; HttpOnly');
         expect(cookie.name).eq("ss-pid");
@@ -65,6 +66,22 @@ describe('Util Tests', () => {
 
         expect(errorResponse.call({ ResponseStatus: { Message: message, ErrorCode: errorCode, Errors: errors } }, fieldName)).eq(fieldMessage);
         expect(errorResponse.call({ ResponseStatus: { ErrorCode: errorCode, Errors: errors } }, fieldName)).eq(fieldMessage);
+    })
+
+    it ('errorResponseExcept returns first unspecified error', () => {
+        const errorCode = "ERROR_CODE";
+        const message = "The Message";
+        const fieldName = "TheField";
+        const fieldMessage = "Field Message";
+        const errors = [{ errorCode: "FIELD_ERROR", message: fieldMessage, fieldName }];
+
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, fieldName)).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName])).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName'])).eq(fieldMessage);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName',fieldName])).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, 'AnotherFieldName',fieldName)).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode } }, [fieldName])).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { errorCode } }, [fieldName])).eq(errorCode);
     })
 
     it ('returns object with specified field names', () => {
