@@ -306,7 +306,7 @@ export declare const parseResponseStatus: (json: string, defaultMsg?: any) => an
 export declare function toFormData(o: any): FormData;
 export declare function toObject(keys: any): {};
 export declare function errorResponseSummary(): any;
-export declare function errorResponseExcept(fieldNames: any): any;
+export declare function errorResponseExcept(fieldNames: [string]): any;
 export declare function errorResponse(fieldName: any): any;
 export declare const toDate: (s: string) => Date;
 export declare const toDateFmt: (s: string) => string;

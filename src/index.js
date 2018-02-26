@@ -1127,9 +1127,16 @@ function errorResponseExcept(fieldNames) {
     if (typeof fieldNames == 'string')
         fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
     if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
+        var lowerFieldsNames = fieldNames.map(function (x) { return (x || '').toLowerCase(); });
         for (var _i = 0, _a = status.errors; _i < _a.length; _i++) {
             var field = _a[_i];
-            if (fieldNames.indexOf(field.fieldName) === -1) {
+            if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) !== -1) {
+                return undefined;
+            }
+        }
+        for (var _b = 0, _c = status.errors; _b < _c.length; _b++) {
+            var field = _c[_b];
+            if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) === -1) {
                 return field.message || field.errorCode;
             }
         }

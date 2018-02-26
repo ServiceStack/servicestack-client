@@ -68,18 +68,31 @@ describe ('Util Tests', () => {
         expect(errorResponse.call({ ResponseStatus: { ErrorCode: errorCode, Errors: errors } }, fieldName)).eq(fieldMessage);
     })
 
-    it ('errorResponseExcept returns first unspecified error', () => {
+    it ('errorResponseExcept returns undefined when Except fieldName exists', () => {
         const errorCode = "ERROR_CODE";
         const message = "The Message";
         const fieldName = "TheField";
         const fieldMessage = "Field Message";
         const errors = [{ errorCode: "FIELD_ERROR", message: fieldMessage, fieldName }];
 
-        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, fieldName)).eq(message);
-        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName])).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, fieldName)).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, fieldName.toUpperCase())).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName])).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName.toUpperCase()])).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName',fieldName.toUpperCase()])).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, 'AnotherFieldName',fieldName.toUpperCase())).undefined;
+    })
+
+    it ('errorResponseExcept returns first unspecified error or message summary if no field match found', () => {
+        const errorCode = "ERROR_CODE";
+        const message = "The Message";
+        const fieldName = "TheField";
+        const fieldMessage = "Field Message";
+        const errors = [{ errorCode: "FIELD_ERROR", message: fieldMessage, fieldName }];
+
         expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName'])).eq(fieldMessage);
-        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName',fieldName])).eq(message);
-        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, 'AnotherFieldName',fieldName)).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode } }, ['AnotherFieldName'])).eq(message);
+        expect(errorResponseExcept.call({ responseStatus: { errorCode } }, ['AnotherFieldName'])).eq(errorCode);
         expect(errorResponseExcept.call({ responseStatus: { message, errorCode } }, [fieldName])).eq(message);
         expect(errorResponseExcept.call({ responseStatus: { errorCode } }, [fieldName])).eq(errorCode);
     })

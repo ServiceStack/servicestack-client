@@ -1365,7 +1365,7 @@ export function errorResponseSummary() {
         : undefined;
 }
 
-export function errorResponseExcept(fieldNames) {
+export function errorResponseExcept(fieldNames:[string]) {
     const responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
         return undefined;
@@ -1376,8 +1376,14 @@ export function errorResponseExcept(fieldNames) {
         fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
 
     if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
+        const lowerFieldsNames = fieldNames.map(x => (x || '').toLowerCase());
         for (let field of status.errors) {
-            if (fieldNames.indexOf(field.fieldName) === -1) {
+            if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) !== -1) {
+                return undefined;
+            }
+        }
+        for (let field of status.errors) {
+            if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) === -1) {
                 return field.message || field.errorCode;
             }
         }
