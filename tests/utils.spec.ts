@@ -104,4 +104,8 @@ describe ('Util Tests', () => {
         expect(toObject.call(o, 'a foo unknown'.split(' '))).deep.eq({ a: 1, foo:"bar" });
         expect(toObject.call(o, Object.keys(o))).deep.eq(o);
     })
+
+    it ('Can base64 encode', () => {
+        expect(JsonServiceClient.toBase64("Aa1&/:+=!()|[]@")).eq("QWExJi86Kz0hKCl8W11A");
+    })
 });
