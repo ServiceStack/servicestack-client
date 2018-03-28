@@ -15,6 +15,7 @@
   },
   "scripts": {
     "pretest": "tsc",
+    "dtos": "cd tests/dtos && typescript-ref",
     "test": "mocha -t 5000 ./tests/*.js",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },

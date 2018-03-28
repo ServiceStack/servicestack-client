@@ -4,6 +4,11 @@ export interface IReturn<T> {
 export interface IReturnVoid {
     createResponse(): void;
 }
+export interface IMeta {
+    meta?: {
+        [index: string]: string;
+    };
+}
 export interface IPost {
 }
 export declare class ResponseError {
@@ -85,10 +90,10 @@ export declare class AuthUserSession {
     };
 }
 export declare class ThrowValidationResponse {
+    responseStatus: ResponseStatus;
     age: number;
     required: string;
     email: string;
-    responseStatus: ResponseStatus;
 }
 export declare class CreateJwtResponse {
     token: string;
@@ -155,7 +160,7 @@ export declare class ThrowValidation implements IReturn<ThrowValidationResponse>
     createResponse(): ThrowValidationResponse;
     getTypeName(): string;
 }
-export declare class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse> {
+export declare class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>, IMeta {
     jwtExpiry: string;
     createResponse(): CreateJwtResponse;
     getTypeName(): string;
@@ -216,7 +221,7 @@ export declare class TestAuth implements IReturn<TestAuthResponse> {
     createResponse(): TestAuthResponse;
     getTypeName(): string;
 }
-export declare class Authenticate implements IReturn<AuthenticateResponse>, IPost {
+export declare class Authenticate implements IReturn<AuthenticateResponse>, IPost, IMeta {
     provider: string;
     state: string;
     oauth_token: string;
