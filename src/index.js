@@ -593,6 +593,19 @@ var JsonServiceClient = /** @class */ (function () {
     JsonServiceClient.prototype.patchBody = function (request, body, args) {
         return this.sendBody(HttpMethods.Patch, request, body, args);
     };
+    JsonServiceClient.prototype.sendAll = function (requests) {
+        if (requests.length == 0)
+            return Promise.resolve([]);
+        var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(requests[0]) + "[]");
+        return this.send(HttpMethods.Post, requests, null, url);
+    };
+    JsonServiceClient.prototype.sendAllOneWay = function (requests) {
+        if (requests.length == 0)
+            return Promise.resolve(void 0);
+        var url = exports.combinePaths(this.oneWayBaseUrl, exports.nameOf(requests[0]) + "[]");
+        return this.send(HttpMethods.Post, requests, null, url)
+            .then(function (r) { return void 0; });
+    };
     JsonServiceClient.prototype.createUrlFromDto = function (method, request) {
         var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
         var hasRequestBody = HttpMethods.hasRequestBody(method);
@@ -753,10 +766,14 @@ var JsonServiceClient = /** @class */ (function () {
         var holdRes = null;
         var resendRequest = function () {
             var _a = _this.createRequest(info), req = _a[0], opt = _a[1];
+            if (_this.urlFilter)
+                _this.urlFilter(opt.url || req.url);
             return fetch(opt.url || req.url, req)
                 .then(function (res) { return _this.createResponse(res, returns); })
                 .catch(function (res) { return _this.handleError(holdRes, res); });
         };
+        if (this.urlFilter)
+            this.urlFilter(opt.url || req.url);
         return fetch(opt.url || req.url, req)
             .then(function (res) {
             holdRes = res;

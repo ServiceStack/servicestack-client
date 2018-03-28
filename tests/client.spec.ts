@@ -23,7 +23,7 @@ import {
 const expect = chai.expect; 
 const assert = chai.assert; 
 
-const TECHSTACKS_URL = "http://techstacks.io";
+const TECHSTACKS_URL = "http://www.techstacks.io";
 const TEST_URL = "http://test.servicestack.net";
 
 //Clear existing User Session
@@ -51,7 +51,7 @@ describe('JsonServiceClient Tests', () => {
 
         testPromise.then((res: dtos.GetAllTechnologiesResponse) => {
             try {
-                chai.expect(res.Results.length).to.be.greaterThan(0);
+                chai.expect(res.results.length).to.be.greaterThan(0);
                 done();
             } catch(error) {
                 done(error);
@@ -68,7 +68,7 @@ describe('JsonServiceClient Tests', () => {
 
         testPromise.then((res: dtos.OverviewResponse) => {
             try {
-                chai.expect(res.TopTechnologies.length).to.be.greaterThan(0);
+                chai.expect(res.topTechnologies.length).to.be.greaterThan(0);
                 done();
             } catch(error) {
                 done(error);
@@ -252,8 +252,8 @@ describe('JsonServiceClient Tests', () => {
 
         var request = new dtos.Authenticate();
         request.provider = "credentials";
-        request.UserName = "test";
-        request.Password = "wrong";
+        request.userName = "test";
+        request.password = "wrong";
 
         var testPromise = new Promise((resolve,reject) => {
             client.post(request).then(response => {
@@ -282,8 +282,8 @@ describe('JsonServiceClient Tests', () => {
 
         var request = new dtos.Authenticate();
         request.provider = "credentials";
-        request.UserName = "test";
-        request.Password = "wrong";
+        request.userName = "test";
+        request.password = "wrong";
 
         var testPromise = new Promise((resolve,reject) => {
             testClient.post(request).then(response => {
@@ -422,12 +422,12 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can query AutoQuery with runtime args', done => {
         let request = new dtos.FindTechnologies();
-        request.Take = 3;
+        request.take = 3;
         
         client.get(request, { VendorName: "Amazon" })
             .then(r => {
-                chai.expect(r.Results.length).to.equal(3);
-                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
+                chai.expect(r.results.length).to.equal(3);
+                chai.expect(r.results.map(x => x.vendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
                 done();
             }, done);
     })
@@ -437,8 +437,8 @@ describe('JsonServiceClient Tests', () => {
         
         client.get<dtos.QueryResponse<dtos.Technology>>("/technology/search", request)
             .then(r => {
-                chai.expect(r.Results.length).to.equal(3);
-                chai.expect(r.Results.map(x => x.VendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
+                chai.expect(r.results.length).to.equal(3);
+                chai.expect(r.results.map(x => x.vendorName)).to.have.members(["Amazon","Amazon","Amazon"]);
                 done();
             }, done);
     })
@@ -490,5 +490,42 @@ describe('JsonServiceClient Tests', () => {
         var str = await testClient.postBody(request, "foo");
         chai.expect(str).to.eq("foo");
     });
+
+    it ('Can sendAll batch request', async () => {
+        const requests = ["foo","bar","baz"].map(name => Object.assign(new Hello(), { name }));
+
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/reply/Hello[]");
+
+        const responses = await testClient.sendAll(requests);
+
+        expect(responses.map(x => x.result)).deep.equals(['Hello, foo!', 'Hello, bar!', 'Hello, baz!'])
+
+        testClient.urlFilter = null;
+    })
+
+    it ('Can sendAllOneWay IReturn<T> batch request', async () => {
+        const requests = ["foo","bar","baz"].map(name => Object.assign(new Hello(), { name }));
+
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/oneway/Hello[]");
+
+        const response = await testClient.sendAllOneWay(requests);
+
+        expect(response).to.undefined;
+
+        testClient.urlFilter = null;
+    })
+
+    it ('Can sendAllOneWay IReturnVoid batch request', async () => {
+        const requests = ["foo","bar","baz"].map(name => Object.assign(new HelloReturnVoid(), { name }));
+
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/oneway/HelloReturnVoid[]");
+
+        const response = await testClient.sendAllOneWay(requests);
+
+        expect(response).to.undefined;
+
+        testClient.urlFilter = null;
+    })
+
 });
 

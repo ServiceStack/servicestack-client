@@ -710,6 +710,7 @@ export class JsonServiceClient {
     requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
+    urlFilter: (url:string) => void;
     onAuthenticationRequired: () => Promise<any>;
     manageCookies: boolean;
     cookies:{ [index:string]: Cookie };
@@ -785,6 +786,23 @@ export class JsonServiceClient {
 
     patchBody<T>(request:IReturn<T>, body:string|any, args?:any) {
         return this.sendBody<T>(HttpMethods.Patch, request, body, args);
+    }
+
+    sendAll<T>(requests:IReturn<T>[]) : Promise<T[]> {
+        if (requests.length == 0)
+            return Promise.resolve([]);
+
+        const url = combinePaths(this.replyBaseUrl, nameOf(requests[0]) + "[]");
+        return this.send<T[]>(HttpMethods.Post, requests, null, url);
+    }
+
+    sendAllOneWay<T>(requests:IReturn<T>[]) : Promise<void> {
+        if (requests.length == 0)
+            return Promise.resolve(void 0);
+
+        const url = combinePaths(this.oneWayBaseUrl, nameOf(requests[0]) + "[]");
+        return this.send<T[]>(HttpMethods.Post, requests, null, url)
+            .then(r => void 0);
     }
 
     createUrlFromDto<T>(method:string, request: IReturn<T>) : string {
@@ -978,10 +996,15 @@ export class JsonServiceClient {
         
         const resendRequest = () => {
             const [req, opt] = this.createRequest(info);
+            if (this.urlFilter)
+                this.urlFilter(opt.url || req.url);
             return fetch(opt.url || req.url, req)
                 .then(res => this.createResponse(res, returns))
                 .catch(res => this.handleError(holdRes, res));
         }
+
+        if (this.urlFilter)
+            this.urlFilter(opt.url || req.url);
 
         return fetch(opt.url || req.url, req)
             .then(res => {
