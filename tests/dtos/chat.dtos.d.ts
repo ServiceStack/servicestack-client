@@ -1,8 +1,15 @@
+export interface IReturn<T> {
+    createResponse(): T;
+}
 export interface IReturnVoid {
     createResponse(): void;
 }
-export interface IReturn<T> {
-    createResponse(): T;
+export interface IPost {
+}
+export interface IMeta {
+    meta?: {
+        [index: string]: string;
+    };
 }
 export declare class ResponseError {
     errorCode: string;
@@ -138,7 +145,7 @@ export declare class GetUserDetails implements IReturn<GetUserDetailsResponse> {
     createResponse(): GetUserDetailsResponse;
     getTypeName(): string;
 }
-export declare class Authenticate implements IReturn<AuthenticateResponse> {
+export declare class Authenticate implements IReturn<AuthenticateResponse>, IPost, IMeta {
     provider: string;
     state: string;
     oauth_token: string;
@@ -162,14 +169,14 @@ export declare class Authenticate implements IReturn<AuthenticateResponse> {
     createResponse(): AuthenticateResponse;
     getTypeName(): string;
 }
-export declare class AssignRoles implements IReturn<AssignRolesResponse> {
+export declare class AssignRoles implements IReturn<AssignRolesResponse>, IPost {
     userName: string;
     permissions: string[];
     roles: string[];
     createResponse(): AssignRolesResponse;
     getTypeName(): string;
 }
-export declare class UnAssignRoles implements IReturn<UnAssignRolesResponse> {
+export declare class UnAssignRoles implements IReturn<UnAssignRolesResponse>, IPost {
     userName: string;
     permissions: string[];
     roles: string[];

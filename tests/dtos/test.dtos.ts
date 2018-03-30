@@ -1,6 +1,6 @@
 /* Options:
-Date: 2017-10-14 06:32:19
-Version: 4.00
+Date: 2018-03-28 20:12:56
+Version: 5.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
 
@@ -10,7 +10,7 @@ BaseUrl: http://test.servicestack.net
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,IPost,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,CreateRefreshJwt,CreateRefreshJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
+IncludeTypes: IReturn`1,IReturnVoid,IPost,IMeta,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,CreateRefreshJwt,CreateRefreshJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -24,6 +24,11 @@ export interface IReturn<T>
 export interface IReturnVoid
 {
     createResponse() : void;
+}
+
+export interface IMeta
+{
+    meta?: { [index:string]: string; };
 }
 
 export interface IPost
@@ -216,10 +221,10 @@ export class AuthUserSession
 
 export class ThrowValidationResponse
 {
+    responseStatus: ResponseStatus;
     age: number;
     required: string;
     email: string;
-    responseStatus: ResponseStatus;
 }
 
 export class CreateJwtResponse
@@ -323,7 +328,7 @@ export class ThrowValidation implements IReturn<ThrowValidationResponse>
 }
 
 // @Route("/jwt")
-export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>
+export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>, IMeta
 {
     jwtExpiry: string;
     createResponse() { return new CreateJwtResponse(); }
@@ -423,7 +428,7 @@ export class TestAuth implements IReturn<TestAuthResponse>
 // @Route("/authenticate")
 // @Route("/authenticate/{provider}")
 // @DataContract
-export class Authenticate implements IReturn<AuthenticateResponse>, IPost
+export class Authenticate implements IReturn<AuthenticateResponse>, IPost, IMeta
 {
     // @DataMember(Order=1)
     provider: string;

@@ -253,6 +253,7 @@ export declare class JsonServiceClient {
     requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
     responseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
+    urlFilter: (url: string) => void;
     onAuthenticationRequired: () => Promise<any>;
     manageCookies: boolean;
     cookies: {
@@ -273,6 +274,8 @@ export declare class JsonServiceClient {
     patch<T>(request: IReturn<T>, args?: any): Promise<T>;
     patchToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
     patchBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
+    sendAll<T>(requests: IReturn<T>[]): Promise<T[]>;
+    sendAllOneWay<T>(requests: IReturn<T>[]): Promise<void>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     private createRequest({method, request, url, args, body});

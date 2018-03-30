@@ -1,6 +1,6 @@
 /* Options:
-Date: 2017-07-01 08:18:56
-Version: 4.00
+Date: 2018-03-28 20:12:56
+Version: 5.00
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://chat.servicestack.net
 
@@ -16,14 +16,23 @@ BaseUrl: http://chat.servicestack.net
 */
 
 
+export interface IReturn<T>
+{
+    createResponse() : T;
+}
+
 export interface IReturnVoid
 {
     createResponse() : void;
 }
 
-export interface IReturn<T>
+export interface IPost
 {
-    createResponse() : T;
+}
+
+export interface IMeta
+{
+    meta?: { [index:string]: string; };
 }
 
 // @DataContract
@@ -248,7 +257,7 @@ export class GetUserDetails implements IReturn<GetUserDetailsResponse>
 // @Route("/authenticate")
 // @Route("/authenticate/{provider}")
 // @DataContract
-export class Authenticate implements IReturn<AuthenticateResponse>
+export class Authenticate implements IReturn<AuthenticateResponse>, IPost, IMeta
 {
     // @DataMember(Order=1)
     provider: string;
@@ -309,7 +318,7 @@ export class Authenticate implements IReturn<AuthenticateResponse>
 
 // @Route("/assignroles")
 // @DataContract
-export class AssignRoles implements IReturn<AssignRolesResponse>
+export class AssignRoles implements IReturn<AssignRolesResponse>, IPost
 {
     // @DataMember(Order=1)
     userName: string;
@@ -325,7 +334,7 @@ export class AssignRoles implements IReturn<AssignRolesResponse>
 
 // @Route("/unassignroles")
 // @DataContract
-export class UnAssignRoles implements IReturn<UnAssignRolesResponse>
+export class UnAssignRoles implements IReturn<UnAssignRolesResponse>, IPost
 {
     // @DataMember(Order=1)
     userName: string;
