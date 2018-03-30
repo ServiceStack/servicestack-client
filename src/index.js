@@ -132,9 +132,7 @@ var ServerEventsClient = /** @class */ (function () {
                                 _this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
                                 return;
                             }
-                            fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: _this.serviceClient.credentials }))
-                                .then(function (res) { if (!res.ok)
-                                throw new Error(res.status + " - " + res.statusText); })
+                            _this.serviceClient.send("POST", null, null, opt.heartbeatUrl)
                                 .catch(function (error) { return _this.reconnectServerEvents({ error: error }); });
                         }, (_this.connectionInfo && _this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                     }
@@ -270,9 +268,7 @@ var ServerEventsClient = /** @class */ (function () {
         if (hold == null || hold.unRegisterUrl == null)
             return new Promise(function (resolve, reject) { return resolve(); });
         this.connectionInfo = null;
-        return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors", credentials: this.serviceClient.credentials }))
-            .then(function (res) { if (!res.ok)
-            throw new Error(res.status + " - " + res.statusText); })
+        return this.serviceClient.send("POST", null, null, hold.unRegisterUrl)
             .catch(this.onError);
     };
     ServerEventsClient.prototype.invokeReceiver = function (r, cmd, el, request, name) {
