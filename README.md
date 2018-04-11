@@ -279,6 +279,13 @@ const client = new ServerEventsClient("/", channels, {
 
 When publishing a DTO Type for your Server Events message, your clients will be able to benefit from the generated DTOs in [TypeScript ServiceStack References](http://docs.servicestack.net/typescript-add-servicestack-reference).
 
+## Feedback and Support
+
+Support is available from the [ServiceStack Customer Forums](https://forums.servicestack.net) 
+or [StackOverflow](https://stackoverflow.com/questions/ask) using the `[servicestack]` tag.
+
+Any reproducible issues can be submitted to [ServiceStack's Issue Tracker](https://github.com/ServiceStack/Issues).
+
 ## Troubleshooting
 
 If you're getting missing Type Definitions for `Headers`, `Response`, `Request`, etc. You'll need to import

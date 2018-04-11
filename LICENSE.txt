@@ -1,4 +1,4 @@
-Copyright (c) 2007-2017, ServiceStack Inc.
+Copyright (c) 2007-2018, ServiceStack Inc.
 https://servicestack.net
 All rights reserved.
 
