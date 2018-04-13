@@ -869,10 +869,11 @@ export class JsonServiceClient {
         if (hasRequestBody) {
             reqOptions.body = body || JSON.stringify(request);
         }
-        
+
         const req = new Request(url, reqOptions);
         if (hasRequestBody) {
             try {
+                //throws in Safari iOS 11, reqOptions.body doesn't work in a lot of browsers
                 (req as any).body = body || JSON.stringify(request);
             } catch(e){}
             if (typeof window != "undefined" && body instanceof FormData) {
