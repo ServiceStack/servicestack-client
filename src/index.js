@@ -663,8 +663,14 @@ var JsonServiceClient = /** @class */ (function () {
             reqOptions.body = body || JSON.stringify(request);
         }
         var req = new Request(url, reqOptions);
-        if (hasRequestBody && typeof window != "undefined" && body instanceof FormData) {
-            req.headers.delete('Content-Type'); //set by FormData
+        if (hasRequestBody) {
+            try {
+                req.body = body || JSON.stringify(request);
+            }
+            catch (e) { }
+            if (typeof window != "undefined" && body instanceof FormData) {
+                req.headers.delete('Content-Type'); //set by FormData
+            }
         }
         var opt = { url: url };
         if (this.requestFilter != null)
