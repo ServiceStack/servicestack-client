@@ -852,23 +852,27 @@ export class JsonServiceClient {
                 this.headers.delete("Cookie");
         }
 
-        // Set `compress` false due to common error
-        // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
-        var reqOptions = {
+        var hasRequestBody = HttpMethods.hasRequestBody(method);
+        var reqOptions:RequestInit = {
             method: method,
             mode: this.mode,
             credentials: this.credentials,
             headers: this.headers,
-            compress: false
         };
+
+        // Set `compress` false due to common error
+        // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
+        try {
+            (reqOptions as any).compress = false;
+        } catch(e){}
+
+        if (hasRequestBody) {
+            reqOptions.body = body || JSON.stringify(request);
+        }
         const req = new Request(url, reqOptions);
 
-        if (HttpMethods.hasRequestBody(method)) {
-            (req as any).body = body || JSON.stringify(request);
-
-            if (typeof window != "undefined" && body instanceof FormData) {
-                req.headers.delete('Content-Type'); //set by FormData
-            }
+        if (hasRequestBody && typeof window != "undefined" && body instanceof FormData) {
+            req.headers.delete('Content-Type'); //set by FormData
         }
 
         var opt:IRequestFilterOptions = { url };
