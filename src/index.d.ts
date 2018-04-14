@@ -214,6 +214,10 @@ export declare class HttpMethods {
 export interface IRequestFilterOptions {
     url: string;
 }
+export interface IRequestInit extends RequestInit {
+    url?: string;
+    compress?: boolean;
+}
 export interface Cookie {
     name: string;
     value: string;
@@ -250,7 +254,7 @@ export declare class JsonServiceClient {
     bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
-    requestFilter: (req: Request, options?: IRequestFilterOptions) => void;
+    requestFilter: (req: IRequestInit) => void;
     responseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
     urlFilter: (url: string) => void;

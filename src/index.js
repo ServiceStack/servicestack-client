@@ -646,36 +646,25 @@ var JsonServiceClient = /** @class */ (function () {
             else
                 this.headers.delete("Cookie");
         }
+        var headers = new Headers(this.headers);
         var hasRequestBody = HttpMethods.hasRequestBody(method);
-        var reqOptions = {
+        var reqInit = {
+            url: url,
             method: method,
             mode: this.mode,
             credentials: this.credentials,
-            headers: this.headers,
+            headers: headers,
+            compress: false,
         };
-        // Set `compress` false due to common error
-        // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
-        try {
-            reqOptions.compress = false;
-        }
-        catch (e) { }
         if (hasRequestBody) {
-            reqOptions.body = body || JSON.stringify(request);
-        }
-        var req = new Request(url, reqOptions);
-        if (hasRequestBody) {
-            try {
-                req.body = body || JSON.stringify(request);
-            }
-            catch (e) { }
+            reqInit.body = body || JSON.stringify(request);
             if (typeof window != "undefined" && body instanceof FormData) {
-                req.headers.delete('Content-Type'); //set by FormData
+                headers.delete('Content-Type'); //set by FormData
             }
         }
-        var opt = { url: url };
         if (this.requestFilter != null)
-            this.requestFilter(req, opt);
-        return [req, opt];
+            this.requestFilter(reqInit);
+        return reqInit;
     };
     JsonServiceClient.prototype.createResponse = function (res, request) {
         var _this = this;
@@ -771,20 +760,20 @@ var JsonServiceClient = /** @class */ (function () {
     };
     JsonServiceClient.prototype.sendRequest = function (info) {
         var _this = this;
-        var _a = this.createRequest(info), req = _a[0], opt = _a[1];
+        var req = this.createRequest(info);
         var returns = info.returns || info.request;
         var holdRes = null;
         var resendRequest = function () {
-            var _a = _this.createRequest(info), req = _a[0], opt = _a[1];
+            var req = _this.createRequest(info);
             if (_this.urlFilter)
-                _this.urlFilter(opt.url || req.url);
-            return fetch(opt.url || req.url, req)
+                _this.urlFilter(req.url);
+            return fetch(req.url, req)
                 .then(function (res) { return _this.createResponse(res, returns); })
                 .catch(function (res) { return _this.handleError(holdRes, res); });
         };
         if (this.urlFilter)
-            this.urlFilter(opt.url || req.url);
-        return fetch(opt.url || req.url, req)
+            this.urlFilter(req.url);
+        return fetch(req.url, req)
             .then(function (res) {
             holdRes = res;
             var response = _this.createResponse(res, returns);
@@ -796,7 +785,7 @@ var JsonServiceClient = /** @class */ (function () {
                     var jwtReq_1 = new GetAccessToken();
                     jwtReq_1.refreshToken = _this.refreshToken;
                     var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq_1);
-                    var _a = _this.createRequest({ method: HttpMethods.Post, request: jwtReq_1, args: null, url: url }), jwtRequest = _a[0], jwtOpt = _a[1];
+                    var jwtRequest = _this.createRequest({ method: HttpMethods.Post, request: jwtReq_1, args: null, url: url });
                     return fetch(url, jwtRequest)
                         .then(function (r) { return _this.createResponse(r, jwtReq_1).then(function (jwtResponse) {
                         _this.bearerToken = jwtResponse.accessToken;

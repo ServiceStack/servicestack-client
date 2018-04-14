@@ -333,8 +333,8 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can handle Validation Errors with Camel Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            testClient.requestFilter = (req,opt) => {
-                opt.url += "?jsconfig=EmitCamelCaseNames:true";
+            testClient.requestFilter = req => {
+                req.url += "?jsconfig=EmitCamelCaseNames:true";
             };
             testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);
@@ -360,8 +360,8 @@ describe('JsonServiceClient Tests', () => {
 
     it ('Can handle Validation Errors with Pascal Casing', done => {
         var testPromise = new Promise((resolve,reject) => {
-            testClient.requestFilter = (req,opt) => {
-                opt.url += "?jsconfig=EmitCamelCaseNames:false";
+            testClient.requestFilter = req => {
+                req.url += "?jsconfig=EmitCamelCaseNames:false";
             };
             testClient.get(new ThrowValidation()).then((response) => {
                 reject(response);

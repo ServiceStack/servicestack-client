@@ -664,6 +664,12 @@ export interface IRequestFilterOptions {
     url:string
 }
 
+export interface IRequestInit extends RequestInit
+{
+    url?: string;
+    compress?: boolean;
+}
+
 export interface Cookie {
     name: string;
     value: string;
@@ -707,7 +713,7 @@ export class JsonServiceClient {
     bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
-    requestFilter: (req:Request, options?:IRequestFilterOptions) => void;
+    requestFilter: (req:IRequestInit) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
     urlFilter: (url:string) => void;
@@ -822,7 +828,7 @@ export class JsonServiceClient {
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
     }
 
-    private createRequest({ method, request, url, args, body } : ISendRequest) : [Request,IRequestFilterOptions] {
+    private createRequest({ method, request, url, args, body } : ISendRequest) : IRequestInit {
 
         if (!url)
             url = this.createUrlFromDto(method, request);
@@ -852,40 +858,29 @@ export class JsonServiceClient {
                 this.headers.delete("Cookie");
         }
 
+        var headers = new Headers(this.headers);
         var hasRequestBody = HttpMethods.hasRequestBody(method);
-        var reqOptions:RequestInit = {
+        var reqInit:IRequestInit = {
+            url,
             method: method,
             mode: this.mode,
             credentials: this.credentials,
-            headers: this.headers,
+            headers,
+            compress: false,  // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
         };
 
-        // Set `compress` false due to common error
-        // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
-        try {
-            (reqOptions as any).compress = false;
-        } catch(e){}
-
         if (hasRequestBody) {
-            reqOptions.body = body || JSON.stringify(request);
-        }
+            reqInit.body = body || JSON.stringify(request);
 
-        const req = new Request(url, reqOptions);
-        if (hasRequestBody) {
-            try {
-                //throws in Safari iOS 11, but reqOptions.body above doesn't work in a lot of browsers
-                (req as any).body = body || JSON.stringify(request);
-            } catch(e){}
             if (typeof window != "undefined" && body instanceof FormData) {
-                req.headers.delete('Content-Type'); //set by FormData
+                headers.delete('Content-Type'); //set by FormData
             }
         }
 
-        var opt:IRequestFilterOptions = { url };
         if (this.requestFilter != null)
-            this.requestFilter(req, opt);
+            this.requestFilter(reqInit);
 
-        return [req, opt];
+        return reqInit;
     }
 
     private createResponse<T>(res:Response, request:any|null) {
@@ -999,24 +994,24 @@ export class JsonServiceClient {
 
     sendRequest<T>(info:ISendRequest): Promise<T> {
 
-        const [req, opt] = this.createRequest(info);
+        const req = this.createRequest(info);
 
         const returns = info.returns || info.request;
         let holdRes:Response  = null;
         
         const resendRequest = () => {
-            const [req, opt] = this.createRequest(info);
+            const req = this.createRequest(info);
             if (this.urlFilter)
-                this.urlFilter(opt.url || req.url);
-            return fetch(opt.url || req.url, req)
+                this.urlFilter(req.url);
+            return fetch(req.url, req)
                 .then(res => this.createResponse(res, returns))
                 .catch(res => this.handleError(holdRes, res));
         }
 
         if (this.urlFilter)
-            this.urlFilter(opt.url || req.url);
+            this.urlFilter(req.url);
 
-        return fetch(opt.url || req.url, req)
+        return fetch(req.url, req)
             .then(res => {
                 holdRes = res;
                 const response = this.createResponse(res, returns);
@@ -1030,7 +1025,7 @@ export class JsonServiceClient {
                         jwtReq.refreshToken = this.refreshToken;
                         let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
 
-                        let [jwtRequest, jwtOpt] = this.createRequest({ method:HttpMethods.Post, request:jwtReq, args:null, url });
+                        let jwtRequest = this.createRequest({ method:HttpMethods.Post, request:jwtReq, args:null, url });
                         return fetch(url, jwtRequest)
                             .then(r => this.createResponse(r, jwtReq).then(jwtResponse => {
                                 this.bearerToken = jwtResponse.accessToken;
