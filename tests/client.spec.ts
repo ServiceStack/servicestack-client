@@ -23,7 +23,7 @@ import {
 const expect = chai.expect; 
 const assert = chai.assert; 
 
-const TECHSTACKS_URL = "http://www.techstacks.io";
+const TECHSTACKS_URL = "https://www.techstacks.io";
 const TEST_URL = "http://test.servicestack.net";
 
 //Clear existing User Session
