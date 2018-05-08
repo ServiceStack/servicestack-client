@@ -1190,4 +1190,3 @@ exports.timeFmt12 = function (d) {
     if (d === void 0) { d = new Date(); }
     return exports.padInt((d.getHours() + 24) % 12 || 12) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
 };
-//# sourceMappingURL=index.js.map
