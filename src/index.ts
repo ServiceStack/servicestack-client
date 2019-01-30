@@ -1358,7 +1358,7 @@ export const parseResponseStatus = (json:string, defaultMsg=null) => {
     }
 };
 
-export function toFormData(o) {
+export function toFormData(o:any) {
     if (typeof window == "undefined") return;
     var formData = new FormData();
     for (var name in o) {
@@ -1367,7 +1367,7 @@ export function toFormData(o) {
     return formData;    
 }
 
-export function toObject(keys) {
+export function toObject(keys: any) {
     const to = {};
     if (!keys) return to;
     if (typeof keys != "object")
@@ -1420,7 +1420,7 @@ export function errorResponseExcept(fieldNames:[string]) {
     return status.message || status.errorCode || undefined;
 }
 
-export function errorResponse(fieldName) {
+export function errorResponse(fieldName:string) {
     if (fieldName == null)
         return errorResponseSummary.call(this);
 

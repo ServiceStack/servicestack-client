@@ -85,7 +85,7 @@ export interface IReconnectServerEventsOptions {
 export declare enum ReadyState {
     CONNECTING = 0,
     OPEN = 1,
-    CLOSED = 2,
+    CLOSED = 2
 }
 export interface IEventSourceStatic extends EventTarget {
     new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
@@ -282,11 +282,11 @@ export declare class JsonServiceClient {
     sendAllOneWay<T>(requests: IReturn<T>[]): Promise<void>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
-    private createRequest({method, request, url, args, body});
-    private createResponse<T>(res, request);
-    private handleError(holdRes, res, type?);
+    private createRequest;
+    private createResponse;
+    private handleError;
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody<T>(method, request, body, args?);
+    private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
@@ -314,7 +314,7 @@ export declare function toFormData(o: any): FormData;
 export declare function toObject(keys: any): {};
 export declare function errorResponseSummary(): any;
 export declare function errorResponseExcept(fieldNames: [string]): any;
-export declare function errorResponse(fieldName: any): any;
+export declare function errorResponse(fieldName: string): any;
 export declare const toDate: (s: string) => Date;
 export declare const toDateFmt: (s: string) => string;
 export declare const padInt: (n: number) => string | number;

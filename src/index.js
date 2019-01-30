@@ -158,7 +158,7 @@ var ServerEventsClient = /** @class */ (function () {
                         }
                     }
                     else {
-                        if (!isCmdMsg) {
+                        if (!isCmdMsg) { //global receiver
                             var r = opt.receivers && opt.receivers["cmd"];
                             _this.invokeReceiver(r, cmd, el, request, "cmd");
                         }
@@ -734,7 +734,7 @@ var JsonServiceClient = /** @class */ (function () {
         }).catch(function (error) {
             // No responseStatus body, set from `res` Body object
             if (error instanceof Error
-                || (typeof window != "undefined" && window.DOMException && error instanceof window.DOMException /*MS Edge*/)) {
+                || (typeof window != "undefined" && error instanceof window.DOMException /*MS Edge*/)) {
                 throw _this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
             }
             throw _this.raiseError(res, error);
