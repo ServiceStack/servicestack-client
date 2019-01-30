@@ -35,16 +35,16 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "es6-shim": "^0.35.3",
-    "eventsource": "^0.2.2",
+    "es6-shim": "^0.35.4",
+    "eventsource": "^1.0.7",
     "fetch-everywhere": "^1.0.5"
   },
   "devDependencies": {
-    "@types/chai": "^3.5.2",
-    "@types/mocha": "^2.2.48",
-    "chai": "^4.1.2",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "chai": "^4.2.0",
     "fetch-everywhere": "^1.0.5",
-    "mocha": "^4.1.0",
-    "typescript": "^2.8.1"
+    "mocha": "^5.2.0",
+    "typescript": "^3.2.4"
   }
 }
