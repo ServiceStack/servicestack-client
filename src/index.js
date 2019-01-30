@@ -1190,3 +1190,41 @@ exports.timeFmt12 = function (d) {
     if (d === void 0) { d = new Date(); }
     return exports.padInt((d.getHours() + 24) % 12 || 12) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
 };
+var keyAliases = { className: 'class', htmlFor: 'for' };
+function createElement(tagName, options, attrs) {
+    var el = document.createElement(tagName);
+    if (attrs) {
+        for (var key in attrs) {
+            el.setAttribute(keyAliases[key] || key, attrs[key]);
+        }
+    }
+    if (options && options.insertAfter) {
+        options.insertAfter.parentNode.insertBefore(el, options.insertAfter.nextSibling);
+    }
+    return el;
+}
+exports.createElement = createElement;
+function showInvalidInputs() {
+    var errorMsg = this.getAttribute('data-invalid');
+    if (errorMsg) {
+        addClass(this, 'is-invalid');
+        var elError = this.nextSibling && hasClass(this.nextSibling, 'invalid-feedback')
+            ? this.nextSibling
+            : createElement("div", { insertAfter: this }, { className: 'invalid-feedback' });
+        elError.innerHTML = errorMsg;
+    }
+}
+var hasClass = function (el, cls) {
+    return (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
+};
+var addClass = function (el, cls) {
+    return !hasClass(el, cls) ? el.className = (el.className + " " + cls).trim() : null;
+};
+// init generic behavior to bootstrap elements
+function bootstrap(el) {
+    var els = (el || document).querySelectorAll('[data-invalid]'), i;
+    for (i = 0; i < els.length; i++) {
+        showInvalidInputs.call(els[i]);
+    }
+}
+exports.bootstrap = bootstrap;

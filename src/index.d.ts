@@ -321,3 +321,8 @@ export declare const padInt: (n: number) => string | number;
 export declare const dateFmt: (d?: Date) => string;
 export declare const dateFmtHM: (d?: Date) => string;
 export declare const timeFmt12: (d?: Date) => string;
+export interface ICreateElementOptions {
+    insertAfter?: Element;
+}
+export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
+export declare function bootstrap(el?: Element): void;

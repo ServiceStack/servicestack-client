@@ -1444,3 +1444,42 @@ export const padInt = (n: number) => n < 10 ? '0' + n : n;
 export const dateFmt = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
 export const dateFmtHM = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes());
 export const timeFmt12 = (d: Date = new Date()) => padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
+
+export interface ICreateElementOptions {
+    insertAfter?:Element
+}
+
+var keyAliases = {className:'class',htmlFor:'for'};
+export function createElement(tagName:string, options?:ICreateElementOptions, attrs?:any) {
+    var el = document.createElement(tagName);
+    if (attrs) {
+        for (var key in attrs) {
+            el.setAttribute(keyAliases[key] || key, attrs[key]);
+        }
+    }
+    if (options && options.insertAfter) {
+        options.insertAfter.parentNode.insertBefore(el, options.insertAfter.nextSibling);
+    }
+    return el;
+}
+function showInvalidInputs() {
+    var errorMsg:string = this.getAttribute('data-invalid');
+    if (errorMsg) {
+        addClass(this, 'is-invalid');
+        var elError = this.nextSibling && hasClass(this.nextSibling, 'invalid-feedback')
+            ? this.nextSibling
+            : createElement("div", { insertAfter:this }, { className: 'invalid-feedback' });
+        elError.innerHTML = errorMsg;
+    }
+}
+const hasClass = (el:Element, cls:string) =>
+    (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
+const addClass = (el:Element, cls:string) =>
+    !hasClass(el, cls) ? el.className = (el.className + " " + cls).trim() : null;
+// init generic behavior to bootstrap elements
+export function bootstrap(el?:Element) {
+    var els = (el || document).querySelectorAll('[data-invalid]'), i:number;
+    for (i=0; i<els.length; i++) {
+        showInvalidInputs.call(els[i]);
+    }
+}
