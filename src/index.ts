@@ -1063,9 +1063,9 @@ const createErrorResponse = (errorCode: string|number, message: string, type:Err
     return error;
 };
 
-export const toCamelCase = (key: string) => {
-    return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
-};
+export const toCamelCase = (s: string) => !s ? s : s.charAt(0).toLowerCase() + s.substring(1);
+
+export const toPascalCase = (s: string) => !s ? s : s.charAt(0).toUpperCase() + s.substring(1);
 
 export const sanitize = (status: any): any => {
     if (status.responseStatus)

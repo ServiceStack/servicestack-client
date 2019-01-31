@@ -290,7 +290,8 @@ export declare class JsonServiceClient {
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
-export declare const toCamelCase: (key: string) => string;
+export declare const toCamelCase: (s: string) => string;
+export declare const toPascalCase: (s: string) => string;
 export declare const sanitize: (status: any) => any;
 export declare const nameOf: (o: any) => any;
 export declare const css: (selector: string | NodeListOf<Element>, name: string, value: string) => void;

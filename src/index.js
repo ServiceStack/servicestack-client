@@ -821,9 +821,8 @@ var createErrorResponse = function (errorCode, message, type) {
     error.responseStatus.message = message;
     return error;
 };
-exports.toCamelCase = function (key) {
-    return !key ? key : key.charAt(0).toLowerCase() + key.substring(1);
-};
+exports.toCamelCase = function (s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); };
+exports.toPascalCase = function (s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); };
 exports.sanitize = function (status) {
     if (status.responseStatus)
         return status;
