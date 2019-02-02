@@ -1465,13 +1465,29 @@ export function createElement(tagName:string, options?:ICreateElementOptions, at
 function showInvalidInputs() {
     var errorMsg:string = this.getAttribute('data-invalid');
     if (errorMsg) {
-        addClass(this, 'is-invalid');
-        var elError = this.nextSibling && hasClass(this.nextSibling, 'invalid-feedback')
-            ? this.nextSibling
-            : createElement("div", { insertAfter:this }, { className: 'invalid-feedback' });
+        var isCheck = this.type === "checkbox" || this.type === "radio";
+        var elFormCheck = isCheck ? parent(this.parentElement,'form-check') : null;
+        if (!isCheck)
+            addClass(this, 'is-invalid');
+        else
+            addClass(elFormCheck || this.parentElement, 'is-invalid form-control');
+
+        var elNext = this.nextElementSibling;
+        var elLast = elNext && (elNext.getAttribute('for') === this.id || elNext.tagName === "SMALL")
+            ? (isCheck ? elFormCheck || elNext.parentElement : elNext)
+            : this;
+        var elError = elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
+            ? elLast.nextElementSibling
+            : createElement("div", { insertAfter:elLast }, { className: 'invalid-feedback' });
         elError.innerHTML = errorMsg;
     }
 }
+function parent(el:Element,cls:string) {
+    while (!hasClass(el,cls))
+        el = el.parentElement;
+    return el;
+}
+
 const hasClass = (el:Element, cls:string) =>
     (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
 const addClass = (el:Element, cls:string) =>
