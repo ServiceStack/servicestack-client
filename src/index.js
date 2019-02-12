@@ -1,20 +1,31 @@
 "use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("fetch-everywhere");
 var ResponseStatus = /** @class */ (function () {
-    function ResponseStatus() {
+    function ResponseStatus(init) {
+        Object.assign(this, init);
     }
     return ResponseStatus;
 }());
 exports.ResponseStatus = ResponseStatus;
 var ResponseError = /** @class */ (function () {
-    function ResponseError() {
+    function ResponseError(init) {
+        Object.assign(this, init);
     }
     return ResponseError;
 }());
 exports.ResponseError = ResponseError;
 var ErrorResponse = /** @class */ (function () {
-    function ErrorResponse() {
+    function ErrorResponse(init) {
+        Object.assign(this, init);
     }
     return ErrorResponse;
 }());
@@ -71,6 +82,7 @@ var ServerEventsClient = /** @class */ (function () {
                     querySelectorAll: function (sel) { return []; }
                 };
             }
+            var $ = document.querySelectorAll.bind(document);
             var parts = exports.splitOnFirst(e.data, " ");
             var channel = null;
             var selector = parts[0];
@@ -91,7 +103,7 @@ var ServerEventsClient = /** @class */ (function () {
             var op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
             var tokens = exports.splitOnFirst(target, "$");
             var cmd = tokens[0], cssSelector = tokens[1];
-            var els = cssSelector && document.querySelectorAll(cssSelector);
+            var els = cssSelector && $(cssSelector);
             var el = els && els[0];
             var eventId = parseInt(e.lastEventId);
             var data = e.data;
@@ -175,7 +187,7 @@ var ServerEventsClient = /** @class */ (function () {
                 _this.raiseEvent(target, request);
             }
             else if (op === "css") {
-                exports.css(els || document.querySelectorAll("body"), cmd, body);
+                exports.css(els || $("body"), cmd, body);
             }
             //Named Receiver
             var r = opt.receivers && opt.receivers[op];
@@ -1189,12 +1201,16 @@ exports.timeFmt12 = function (d) {
     if (d === void 0) { d = new Date(); }
     return exports.padInt((d.getHours() + 24) % 12 || 12) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
 };
+var bsAlert = function (msg) { return '<div class="alert alert-danger">' + msg + '</div>'; };
+var attr = function (e, name) { return e.getAttribute(name); };
+var sattr = function (e, name, value) { return e.setAttribute(name, value); };
+var rattr = function (e, name) { return e.removeAttribute(name); };
 var keyAliases = { className: 'class', htmlFor: 'for' };
 function createElement(tagName, options, attrs) {
     var el = document.createElement(tagName);
     if (attrs) {
         for (var key in attrs) {
-            el.setAttribute(keyAliases[key] || key, attrs[key]);
+            sattr(el, keyAliases[key] || key, attrs[key]);
         }
     }
     if (options && options.insertAfter) {
@@ -1204,7 +1220,7 @@ function createElement(tagName, options, attrs) {
 }
 exports.createElement = createElement;
 function showInvalidInputs() {
-    var errorMsg = this.getAttribute('data-invalid');
+    var errorMsg = attr(this, 'data-invalid');
     if (errorMsg) {
         var isCheck = this.type === "checkbox" || this.type === "radio";
         var elFormCheck = isCheck ? parent(this.parentElement, 'form-check') : null;
@@ -1213,31 +1229,416 @@ function showInvalidInputs() {
         else
             addClass(elFormCheck || this.parentElement, 'is-invalid form-control');
         var elNext = this.nextElementSibling;
-        var elLast = elNext && (elNext.getAttribute('for') === this.id || elNext.tagName === "SMALL")
+        var elLast = elNext && (attr(elNext, 'for') === this.id || elNext.tagName === "SMALL")
             ? (isCheck ? elFormCheck || elNext.parentElement : elNext)
             : this;
-        var elError = elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
+        var elError = elLast != null && elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
             ? elLast.nextElementSibling
             : createElement("div", { insertAfter: elLast }, { className: 'invalid-feedback' });
         elError.innerHTML = errorMsg;
     }
 }
 function parent(el, cls) {
-    while (!hasClass(el, cls))
+    while (el != null && !hasClass(el, cls))
         el = el.parentElement;
     return el;
 }
 var hasClass = function (el, cls) {
-    return (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
+    return !el ? false : el.classList ? el.classList.contains(cls)
+        : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
 };
 var addClass = function (el, cls) {
-    return !hasClass(el, cls) ? el.className = (el.className + " " + cls).trim() : null;
+    return !el ? null : el.classList ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
+        ? el.className = (el.className + " " + cls).trim() : null;
+    var _a;
+};
+var remClass = function (el, cls) {
+    return !el ? null : el.classList ? el.classList.remove(cls)
+        : hasClass(el, cls)
+            ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ')
+            : null;
 };
 // init generic behavior to bootstrap elements
 function bootstrap(el) {
-    var els = (el || document).querySelectorAll('[data-invalid]'), i;
-    for (i = 0; i < els.length; i++) {
+    var els = (el || document).querySelectorAll('[data-invalid]');
+    for (var i = 0; i < els.length; i++) {
         showInvalidInputs.call(els[i]);
     }
 }
 exports.bootstrap = bootstrap;
+if (typeof window != "undefined" && window.Element !== undefined) { // polyfill IE9+
+    if (!Element.prototype.matches) {
+        Element.prototype.matches = Element.prototype.msMatchesSelector ||
+            Element.prototype.webkitMatchesSelector;
+    }
+    if (!Element.prototype.closest) {
+        Element.prototype.closest = function (s) {
+            var el = this;
+            do {
+                if (el.matches(s))
+                    return el;
+                el = el.parentElement || el.parentNode;
+            } while (el !== null && el.nodeType === 1);
+            return null;
+        };
+    }
+}
+function bindHandlers(handlers, el) {
+    if (el === void 0) { el = document; }
+    el.addEventListener('click', function (evt) {
+        var el = evt.target;
+        var x = attr(el, 'data-click');
+        if (!x) {
+            var elParent = el.closest('[data-click]');
+            if (elParent)
+                x = attr(elParent, 'data-click');
+        }
+        if (!x)
+            return;
+        var pos = x.indexOf(':');
+        if (pos >= 0) {
+            var cmd = x.substring(0, pos);
+            var data = x.substring(pos + 1);
+            var fn = handlers[cmd];
+            if (fn) {
+                fn.apply(evt.target, data.split(','));
+            }
+        }
+        else {
+            var fn = handlers[x];
+            if (fn) {
+                fn.apply(evt.target, [].slice.call(arguments));
+            }
+        }
+    });
+}
+exports.bindHandlers = bindHandlers;
+function bootstrapForm(form, options) {
+    if (!form)
+        return;
+    form.onsubmit = function (evt) {
+        evt.preventDefault();
+        options.type = "bootstrap-v4";
+        return ajaxSubmit(form, options);
+    };
+}
+exports.bootstrapForm = bootstrapForm;
+var validation = {
+    overrideMessages: false,
+    messages: {
+        NotEmpty: "Required",
+        NotNull: "Required",
+        Email: "Invalid email",
+        AlreadyExists: "Already exists"
+    },
+    errorFilter: function (errorMsg, errorCode, type) {
+        return this.overrideMessages
+            ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
+            : errorMsg || splitCase(errorCode);
+    }
+};
+function applyErrors(f, status, opt) {
+    clearErrors(f);
+    if (!status)
+        return;
+    status = exports.sanitize(status);
+    addClass(f, "has-errors");
+    var bs4 = opt && opt.type === "bootstrap-v4";
+    var v = __assign({}, validation, opt);
+    if (opt.messages) {
+        v.overrideMessages = true;
+    }
+    var filter = v.errorFilter.bind(v);
+    var errors = status.errors;
+    var $ = f.querySelectorAll.bind(f);
+    if (errors && errors.length) {
+        var fieldMap_1 = {}, fieldLabelMap_1 = {};
+        $("input,textarea,select,button").forEach(function (x) {
+            var el = x;
+            var prev = el.previousElementSibling;
+            var next = el.nextElementSibling;
+            var isCheck = el.type === "radio" || el.type === "checkbox";
+            var fieldId = (!isCheck ? el.id : null) || attr(el, "name");
+            if (!fieldId)
+                return;
+            var key = fieldId.toLowerCase();
+            fieldMap_1[key] = el;
+            if (!bs4) {
+                if (hasClass(prev, "help-inline") || hasClass(prev, "help-block")) {
+                    fieldLabelMap_1[key] = prev;
+                }
+                else if (hasClass(next, "help-inline") || hasClass(next, "help-block")) {
+                    fieldLabelMap_1[key] = next;
+                }
+            }
+        });
+        $(".help-inline[data-for],.help-block[data-for]").forEach(function (el) {
+            var key = attr(el, "data-for").toLowerCase();
+            fieldLabelMap_1[key] = el;
+        });
+        for (var _i = 0, errors_1 = errors; _i < errors_1.length; _i++) {
+            var error = errors_1[_i];
+            var key = (error.fieldName || "").toLowerCase();
+            var field = fieldMap_1[key];
+            if (field) {
+                if (!bs4) {
+                    addClass(field, "error");
+                    addClass(field.parentElement, "has-error");
+                }
+                else {
+                    var type = attr(field, 'type'), isCheck = type === "radio" || type === "checkbox";
+                    if (!isCheck)
+                        addClass(field, "is-invalid");
+                    sattr(field, "data-invalid", filter(error.message, error.errorCode, "field"));
+                }
+            }
+            var lblErr = fieldLabelMap_1[key];
+            if (!lblErr)
+                continue;
+            addClass(lblErr, "error");
+            lblErr.innerHTML = filter(error.message, error.errorCode, "field");
+            lblErr.style.display = 'block';
+        }
+        $("[data-validation-summary]").forEach(function (el) {
+            var fields = attr(el, 'data-validation-summary').split(',');
+            var summaryMsg = errorResponseExcept.call(status, fields);
+            if (summaryMsg)
+                el.innerHTML = bsAlert(summaryMsg);
+        });
+    }
+    else {
+        var htmlSummary_1 = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
+        if (!bs4) {
+            $(".error-summary").forEach(function (el) {
+                el.innerHTML = htmlSummary_1;
+                el.style.display = 'block';
+            });
+        }
+        else {
+            $('[data-validation-summary]').forEach(function (el) {
+                return el.innerHTML = htmlSummary_1[0] === "<" ? htmlSummary_1 : bsAlert(htmlSummary_1);
+            });
+        }
+    }
+    return f;
+}
+function clearErrors(f) {
+    remClass(f, 'has-errors');
+    var $ = f.querySelectorAll.bind(f);
+    $('.error-summary').forEach(function (el) {
+        el.innerHTML = "";
+        el.style.display = "none";
+    });
+    $('[data-validation-summary]').forEach(function (el) {
+        el.innerHTML = "";
+    });
+    $('.error').forEach(function (el) { return remClass(el, 'error'); });
+    $('.form-check.is-invalid [data-invalid]').forEach(function (el) {
+        rattr(el, 'data-invalid');
+    });
+    $('.form-check.is-invalid').forEach(function (el) { return remClass(el, 'form-control'); });
+    $('.is-invalid').forEach(function (el) {
+        remClass(el, 'is-invalid');
+        rattr(el, 'data-invalid');
+    });
+    $('.is-valid').forEach(function (el) { return remClass(el, 'is-valid'); });
+}
+var Types = {
+    MultiPart: 'multipart/form-data',
+    UrlEncoded: 'application/x-www-form-urlencoded',
+    Json: 'application/json',
+};
+function formSubmit(options) {
+    if (options === void 0) { options = {}; }
+    var f = this;
+    var contentType = attr(f, 'enctype') || Types.UrlEncoded;
+    if (contentType == Types.MultiPart && window.FormData === undefined)
+        throw new Error("FormData Type is needed to send '" + Types.MultiPart + "' Content Types");
+    var body;
+    try {
+        body = serializeForm(f, contentType);
+    }
+    catch (e) {
+        throw new Error("" + (e.message || e));
+    }
+    var headers = new Headers();
+    headers.set("Accept", Types.Json);
+    headers.set("Content-Type", contentType);
+    var req = {
+        method: attr(f, 'method') || 'POST',
+        credentials: 'include',
+        mode: 'cors',
+        headers: headers,
+        body: body,
+    };
+    if (options.requestFilter)
+        options.requestFilter(req);
+    return fetch(new Request(options.url || attr(f, 'action'), req))
+        .catch(function (e) { throw new Error("Network is unreachable (" + (e.message || e) + ")"); })
+        .then(function (r) {
+        if (options.responseFilter)
+            options.responseFilter(r);
+        if (!r.ok) {
+            return r.json()
+                .catch(function (e) { throw new Error("The request failed with " + (r.statusText || r.status)); })
+                .then(function (o) { throw Object.assign.apply(Object, [new ErrorResponse()].concat(exports.sanitize(o))); });
+        }
+        handleHeaderBehaviors(f, r);
+        return fromResponse(r);
+    });
+}
+exports.formSubmit = formSubmit;
+function handleHeaderBehaviors(f, r) {
+    var loc = r.headers.get('X-Location');
+    if (loc) {
+        location.href = loc;
+    }
+    var evt = r.headers.get('X-Trigger');
+    if (evt) {
+        var pos = evt.indexOf(':');
+        var cmd = pos >= 0 ? evt.substring(0, pos) : evt;
+        var data = pos >= 0 ? evt.substring(pos + 1) : null;
+        triggerEvent(f, cmd, data ? [data] : []);
+    }
+}
+function ajaxSubmit(f, options) {
+    if (options === void 0) { options = {}; }
+    var type = options.type;
+    var bs4 = type === "bootstrap-v4";
+    clearErrors(f);
+    try {
+        if (options.validate && options.validate.call(f) === false)
+            return false;
+    }
+    catch (e) {
+        return false;
+    }
+    var $ = f.querySelectorAll.bind(f);
+    addClass(f, 'loading');
+    var disableSel = options.onSubmitDisable == null
+        ? "[type=submit]"
+        : options.onSubmitDisable;
+    var disable = disableSel != null && disableSel != "";
+    if (disable) {
+        $(disableSel).forEach(function (el) {
+            sattr(el, 'disabled', 'disabled');
+        });
+    }
+    function handleError(errMsg, err) {
+        if (err === void 0) { err = null; }
+        if (err) {
+            applyErrors(f, err.ResponseStatus || err.responseStatus, __assign({}, options));
+        }
+        else if (errMsg) {
+            addClass(f, "has-errors");
+            var errorSummary = $(".error-summary")[0];
+            if (errorSummary) {
+                errorSummary.innerHTML = errMsg;
+            }
+            if (bs4) {
+                var elSummary = $('[data-validation-summary]')[0];
+                if (elSummary) {
+                    elSummary.innerHTML = bsAlert(errMsg);
+                }
+            }
+        }
+        if (options.error) {
+            options.error.call(f, err);
+        }
+        if (bs4) {
+            $('[data-invalid]').forEach(function (el) { return showInvalidInputs.call(el); });
+        }
+    }
+    var submitFn = options.submit || formSubmit;
+    return submitFn.call(f, options)
+        .then(function (obj) {
+        if (options.success)
+            options.success.call(f, obj);
+        return false;
+    })
+        .catch(function (e) {
+        if (e.responseStatus)
+            handleError(null, e);
+        else
+            handleError("" + (e.message || e), null);
+    })
+        .finally(function () {
+        remClass(f, 'loading');
+        if (disable) {
+            $(disableSel).forEach(function (el) {
+                rattr(el, 'disabled');
+            });
+        }
+        if (options.complete) {
+            options.complete.call(f);
+        }
+    });
+}
+exports.ajaxSubmit = ajaxSubmit;
+function fromResponse(r) {
+    var contentType = r.headers.get("content-type");
+    var isJson = contentType && contentType.indexOf(Types.Json) !== -1;
+    if (isJson)
+        return r.json();
+    var len = r.headers.get("content-length");
+    if (len === "0" || (len == null && !isJson))
+        return null;
+    return r.json();
+}
+function serializeForm(form, contentType) {
+    if (contentType === void 0) { contentType = null; }
+    return contentType === Types.MultiPart
+        ? new FormData(form)
+        : contentType == Types.Json
+            ? JSON.stringify(exports.serializeToObject(form))
+            : serializeToUrlEncoded(form);
+}
+exports.serializeForm = serializeForm;
+function formEntries(form, state, fn) {
+    var field, f = form;
+    var len = f.elements.length;
+    for (var i = 0; i < len; i++) {
+        field = f.elements[i];
+        if (field.name && !field.disabled && field.type != 'file' && field.type != 'reset' && field.type != 'submit' && field.type != 'button') {
+            if (field.type == 'select-multiple') {
+                for (var j = f.elements[i].options.length - 1; j >= 0; j--) {
+                    if (field.options[j].selected)
+                        fn(state, field.name, field.options[j].value);
+                }
+            }
+            else if ((field.type != 'checkbox' && field.type != 'radio') || field.checked) {
+                fn(state, field.name, field.value);
+            }
+        }
+    }
+    return state;
+}
+exports.serializeToObject = function (form) {
+    return formEntries(form, {}, function (to, name, value) { return to[name] = value; });
+};
+function serializeToUrlEncoded(form) {
+    var to = formEntries(form, [], function (s, name, value) {
+        return typeof value == 'string'
+            ? s.push(encodeURIComponent(name) + "=" + encodeURIComponent(value))
+            : null;
+    });
+    return to.join('&').replace(/%20/g, '+');
+}
+exports.serializeToUrlEncoded = serializeToUrlEncoded;
+exports.serializeToFormData = function (form) {
+    return formEntries(form, new FormData(), function (to, name, value) { return to.append(name, value); });
+};
+function triggerEvent(el, name, data) {
+    if (data === void 0) { data = null; }
+    if (document.createEvent) {
+        var evt = document.createEvent(name == 'click' || name.startsWith('mouse') ? 'MouseEvents' : 'HTMLEvents');
+        evt.initEvent(name, true, true);
+        evt.data = data;
+        el.dispatchEvent(evt);
+    }
+    else {
+        var evt = document.createEventObject();
+        el.fireEvent("on" + name, evt);
+    }
+}
+exports.triggerEvent = triggerEvent;

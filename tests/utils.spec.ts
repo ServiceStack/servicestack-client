@@ -11,7 +11,7 @@ import {
 
 describe ('Util Tests', () => {
     it ('Can parse cookie', done => {
-        var cookie = parseCookie('ss-pid=2quSav3JNK2T3Xbf7MiU; expires=Thu, 12-Mar-2037 18:54:06 GMT; path=/; HttpOnly');
+        var cookie = parseCookie('ss-pid=2quSav3JNK2T3Xbf7MiU; expires=Thu, 12-Mar-2037 12:54:06 GMT; path=/; HttpOnly');
         expect(cookie.name).eq("ss-pid");
         expect(cookie.value).eq("2quSav3JNK2T3Xbf7MiU");
         expect(cookie.path).eq("/");

@@ -7,6 +7,7 @@ export interface IReturn<T> {
     createResponse(): T;
 }
 export class ResponseStatus {
+    public constructor(init?:Partial<ResponseStatus>) { Object.assign(this, init); }
     errorCode: string;
     message: string;
     stackTrace: string;
@@ -14,12 +15,14 @@ export class ResponseStatus {
     meta: { [index: string]: string; };
 }
 export class ResponseError {
+    public constructor(init?:Partial<ResponseError>) { Object.assign(this, init); }
     errorCode: string;
     fieldName: string;
     message: string;
     meta: { [index: string]: string; };
 }
 export class ErrorResponse {
+    public constructor(init?:Partial<ErrorResponse>) { Object.assign(this, init); }
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
@@ -182,6 +185,7 @@ export class ServerEventsClient {
                 querySelectorAll: sel => []
             };
         }
+        let $ = document.querySelectorAll.bind(document);
 
         var parts = splitOnFirst(e.data, " ");
         var channel = null;
@@ -206,7 +210,7 @@ export class ServerEventsClient {
 
         const tokens = splitOnFirst(target, "$");
         const [cmd, cssSelector] = tokens;
-        const els = cssSelector && document.querySelectorAll(cssSelector);
+        const els = cssSelector && $(cssSelector);
         const el = els && els[0];
 
         const eventId = parseInt((e as any).lastEventId);
@@ -296,7 +300,7 @@ export class ServerEventsClient {
             this.raiseEvent(target, request);
         }
         else if (op === "css") {
-            css(els || document.querySelectorAll("body"), cmd, body);
+            css(els || $("body"), cmd, body);
         }
 
         //Named Receiver
@@ -1446,56 +1450,475 @@ export const dateFmtHM = (d: Date = new Date()) => d.getFullYear() + '/' + padIn
 export const timeFmt12 = (d: Date = new Date()) => padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
 
 export interface ICreateElementOptions {
-    insertAfter?:Element
+  insertAfter?:Element|null
 }
-
-var keyAliases = {className:'class',htmlFor:'for'};
+const bsAlert = (msg:string) => '<div class="alert alert-danger">' + msg + '</div>';
+const attr = (e:Element,name:string) => e.getAttribute(name);
+const sattr = (e:Element,name:string,value:string) => e.setAttribute(name,value);
+const rattr = (e:Element,name:string) => e.removeAttribute(name);
+  
+const keyAliases:{ [index:string]: string } = {className: 'class', htmlFor: 'for'};
 export function createElement(tagName:string, options?:ICreateElementOptions, attrs?:any) {
-    var el = document.createElement(tagName);
-    if (attrs) {
-        for (var key in attrs) {
-            el.setAttribute(keyAliases[key] || key, attrs[key]);
-        }
+  const el = document.createElement(tagName);
+  if (attrs) {
+    for (const key in attrs) {
+      sattr(el,keyAliases[key] || key,attrs[key]);
     }
-    if (options && options.insertAfter) {
-        options.insertAfter.parentNode.insertBefore(el, options.insertAfter.nextSibling);
-    }
-    return el;
+  }
+  if (options && options.insertAfter) {
+    options.insertAfter.parentNode!.insertBefore(el, options.insertAfter.nextSibling);
+  }
+  return el;
 }
-function showInvalidInputs() {
-    var errorMsg:string = this.getAttribute('data-invalid');
-    if (errorMsg) {
-        var isCheck = this.type === "checkbox" || this.type === "radio";
-        var elFormCheck = isCheck ? parent(this.parentElement,'form-check') : null;
-        if (!isCheck)
-            addClass(this, 'is-invalid');
-        else
-            addClass(elFormCheck || this.parentElement, 'is-invalid form-control');
+function showInvalidInputs(this:HTMLInputElement) {
+  let errorMsg: string|null = attr(this,'data-invalid');
+  if (errorMsg) {
+    const isCheck = this.type === "checkbox" || this.type === "radio";
+    const elFormCheck = isCheck ? parent(this.parentElement, 'form-check') : null;
+    if (!isCheck)
+      addClass(this, 'is-invalid');
+    else
+      addClass(elFormCheck || this.parentElement, 'is-invalid form-control');
 
-        var elNext = this.nextElementSibling;
-        var elLast = elNext && (elNext.getAttribute('for') === this.id || elNext.tagName === "SMALL")
-            ? (isCheck ? elFormCheck || elNext.parentElement : elNext)
-            : this;
-        var elError = elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
-            ? elLast.nextElementSibling
-            : createElement("div", { insertAfter:elLast }, { className: 'invalid-feedback' });
-        elError.innerHTML = errorMsg;
-    }
+    const elNext = this.nextElementSibling;
+    const elLast = elNext && (attr(elNext,'for') === this.id || elNext.tagName === "SMALL")
+        ? (isCheck ? elFormCheck || elNext.parentElement : elNext)
+        : this;
+    const elError = elLast != null && elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
+        ? elLast.nextElementSibling
+        : createElement("div", {insertAfter: elLast}, {className: 'invalid-feedback'});
+    elError.innerHTML = errorMsg;
+  }
 }
-function parent(el:Element,cls:string) {
-    while (!hasClass(el,cls))
-        el = el.parentElement;
-    return el;
+function parent(el:Element|HTMLElement|null,cls:string):Element {
+  while (el != null && !hasClass(el,cls))
+    el = el.parentElement;
+  return el as Element;
 }
 
-const hasClass = (el:Element, cls:string) =>
-    (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
-const addClass = (el:Element, cls:string) =>
-    !hasClass(el, cls) ? el.className = (el.className + " " + cls).trim() : null;
+const hasClass = (el:Element|HTMLElement|null, cls:string) =>
+    !el ? false : el.classList ? el.classList.contains(cls) 
+        : (" " + el!.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
+const addClass = (el:Element|HTMLElement|null, cls:string) =>
+    !el ? null : el.classList ? el.classList.add(...cls.split(' ')) 
+        : !hasClass(el, cls) 
+        ? el.className = (el.className + " " + cls).trim() : null;
+const remClass = (el:Element|HTMLElement|null, cls:string) =>
+    !el ? null : el.classList ? el.classList.remove(cls) 
+        : hasClass(el, cls) 
+            ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ') 
+            : null;
+  
 // init generic behavior to bootstrap elements
 export function bootstrap(el?:Element) {
-    var els = (el || document).querySelectorAll('[data-invalid]'), i:number;
-    for (i=0; i<els.length; i++) {
-        showInvalidInputs.call(els[i]);
+  const els = (el || document).querySelectorAll('[data-invalid]'); 
+  for (let i=0; i<els.length; i++) {
+    showInvalidInputs.call(els[i] as HTMLInputElement);
+  }
+}
+
+if (typeof window != "undefined" && (window as any).Element !== undefined) { // polyfill IE9+
+  if (!Element.prototype.matches) {
+      Element.prototype.matches = (Element.prototype as any).msMatchesSelector ||
+          Element.prototype.webkitMatchesSelector;
+  }
+  if (!Element.prototype.closest) {
+      Element.prototype.closest = function(s:string) {
+      let el:Element = this;
+      do {
+          if (el.matches(s)) return el;
+          el = el.parentElement || el.parentNode as Element;
+      } while (el !== null && el.nodeType === 1);
+      return null;
+      };
+  }
+}
+  
+export function bindHandlers(handlers:any,el:Node=document) {
+  el.addEventListener('click', function(evt) {
+    const el = evt.target as Element;
+    let x = attr(el,'data-click');
+    if (!x) {
+      let elParent = el.closest('[data-click]');
+      if (elParent)
+        x = attr(elParent,'data-click'); 
     }
+    if (!x) return;
+
+    let pos = x.indexOf(':');
+    if (pos >= 0) {
+      const cmd = x.substring(0, pos);
+      const data = x.substring(pos + 1);
+      const fn = handlers[cmd];
+      if (fn) {
+        fn.apply(evt.target, data.split(','));
+      }
+    } else {
+      const fn = handlers[x];
+      if (fn) {
+        fn.apply(evt.target, [].slice.call(arguments));
+      }
+    }
+  });
+} 
+
+export interface IAjaxFormOptions {
+  type?:string,
+  url?: string,
+  credentials?: RequestCredentials;
+  validate?:(this:HTMLFormElement) => boolean,
+  onSubmitDisable?:string,
+  submit?:(this:HTMLFormElement,options:IAjaxFormOptions) => Promise<any>,
+  success?:(this:HTMLFormElement,result:any) => void,
+  error?:(this:HTMLFormElement,e:any) => void,
+  complete?:(this:HTMLFormElement) => void,
+  requestFilter?: (req:IRequestInit) => void,
+  responseFilter?:(res:Response) => void,
+  errorFilter?:(this:IValidation,message:string,errorCode:string,type:string) => void,
+  messages?:{ [index:string]: string },
+}
+
+export function bootstrapForm (form:HTMLFormElement|null, options:IAjaxFormOptions) {
+  if (!form) return;
+  form.onsubmit = function (evt) {
+    evt.preventDefault();
+    options.type = "bootstrap-v4";
+    return ajaxSubmit(form, options);
+  }
+}
+
+export interface IValidation {
+  overrideMessages:boolean,
+  messages: { [index:string]: string },
+  errorFilter?:(this:IValidation,message:string,errorCode:string,type:string) => void,
+}
+
+const validation:IValidation = {
+  overrideMessages: false,
+  messages: {
+    NotEmpty: "Required",
+    NotNull: "Required",
+    Email: "Invalid email",
+    AlreadyExists: "Already exists"
+  },
+  errorFilter: function (errorMsg:string, errorCode:string, type:string) {
+    return this.overrideMessages
+        ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
+        : errorMsg || splitCase(errorCode);
+  }
+};
+
+function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
+    clearErrors(f);
+    if (!status) return;
+    status = sanitize(status);
+
+    addClass(f, "has-errors");
+
+    const bs4 = opt && opt.type === "bootstrap-v4";
+    const v:IValidation = {...validation, ...opt} as object as IValidation;
+    if (opt.messages) {
+      v.overrideMessages = true;
+    }
+
+    const filter = v.errorFilter.bind(v);
+    const errors = status.errors;
+    let $ = f.querySelectorAll.bind(f);
+
+    if (errors && errors.length) {
+      let fieldMap:any = {}, fieldLabelMap:any = {};
+      $("input,textarea,select,button").forEach(x => {
+        const el = x as HTMLInputElement;
+        const prev = el.previousElementSibling;
+        const next = el.nextElementSibling;
+        const isCheck = el.type === "radio" || el.type === "checkbox";
+        const fieldId = (!isCheck ? el.id : null) || attr(el,"name");
+        if (!fieldId) return;
+
+        const key = fieldId.toLowerCase();
+        fieldMap[key] = el;
+        if (!bs4) {
+          if (hasClass(prev,"help-inline") || hasClass(prev,"help-block")) {
+            fieldLabelMap[key] = prev;
+          } else if (hasClass(next,"help-inline") || hasClass(next,"help-block")) {
+            fieldLabelMap[key] = next;
+          }
+        }
+      });
+      
+      $(".help-inline[data-for],.help-block[data-for]").forEach(el => {
+        const key = attr(el,"data-for")!.toLowerCase();
+        fieldLabelMap[key] = el;
+      });
+      
+      for (let error of errors) {
+        const key = (error.fieldName || "").toLowerCase();
+        const field:HTMLInputElement = fieldMap[key];
+        if (field) {
+          if (!bs4) {
+            addClass(field,"error");
+            addClass(field.parentElement,"has-error");
+          } else {
+            const type = attr(field,'type'), isCheck = type === "radio" || type === "checkbox";
+            if (!isCheck) addClass(field,"is-invalid");
+            sattr(field,"data-invalid", filter(error.message, error.errorCode, "field"));
+          }
+        }
+        const lblErr: HTMLElement = fieldLabelMap[key];
+        if (!lblErr) 
+          continue;
+
+        addClass(lblErr,"error");
+        lblErr.innerHTML = filter(error.message, error.errorCode, "field");
+        lblErr.style.display = 'block';
+      }
+
+      $("[data-validation-summary]").forEach(el => {
+        const fields = attr(el,'data-validation-summary')!.split(',');
+        const summaryMsg = errorResponseExcept.call(status, fields);
+        if (summaryMsg)
+          el.innerHTML = bsAlert(summaryMsg);
+      });
+    } else {
+      const htmlSummary = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
+      if (!bs4) {
+          $(".error-summary").forEach(el => {
+          el.innerHTML = htmlSummary;
+          (el as HTMLElement).style.display = 'block';
+        })
+      } else {
+          $('[data-validation-summary]').forEach(el => 
+              el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary));
+      }
+    }
+    return f;
+}
+
+function clearErrors(f: HTMLFormElement) {
+  remClass(f,'has-errors');    
+  let $ = f.querySelectorAll.bind(f);
+  $('.error-summary').forEach(el => {
+    el.innerHTML = "";
+    (el as HTMLElement).style.display = "none";
+  });
+  $('[data-validation-summary]').forEach(el => {
+    el.innerHTML = "";
+  });
+  $('.error').forEach(el => remClass(el,'error'));
+  $('.form-check.is-invalid [data-invalid]').forEach(el => {
+    rattr(el,'data-invalid');
+  });
+  $('.form-check.is-invalid').forEach(el => remClass(el,'form-control'));
+  $('.is-invalid').forEach(el => {
+    remClass(el, 'is-invalid');
+    rattr(el,'data-invalid');
+  });
+  $('.is-valid').forEach(el => remClass(el,'is-valid'));
+}
+
+var Types = {
+  MultiPart: 'multipart/form-data',
+  UrlEncoded: 'application/x-www-form-urlencoded',
+  Json: 'application/json',
+};
+    
+export function formSubmit(this:HTMLFormElement,options:IAjaxFormOptions={}) {
+  const f = this;
+  const contentType = attr(f,'enctype') || Types.UrlEncoded;
+  if (contentType == Types.MultiPart && (window as any).FormData === undefined)
+    throw new Error(`FormData Type is needed to send '${Types.MultiPart}' Content Types`);
+
+  let body;
+
+  try {
+    body = serializeForm(f, contentType);
+  } catch (e) {
+    throw new Error(`${e.message || e}`);
+  }
+
+  const headers = new Headers();
+  headers.set("Accept", Types.Json);
+  headers.set("Content-Type", contentType);
+
+  const req:RequestInit = {
+    method: attr(f,'method') || 'POST',
+    credentials: 'include',
+    mode: 'cors',
+    headers,
+    body,
+  };
+  if (options.requestFilter)
+    options.requestFilter(req);
+
+  return fetch(new Request(options.url || attr(f,'action')!, req))
+    .catch(e => { throw new Error(`Network is unreachable (${e.message || e})`); })
+    .then(r => {
+      if (options.responseFilter)
+        options.responseFilter(r);
+
+      if (!r.ok) {
+        return r.json()
+          .catch(e => { throw new Error("The request failed with " + (r.statusText || r.status)); })
+          .then(o => { throw Object.assign(new ErrorResponse(), ...sanitize(o)); });
+      }
+
+      handleHeaderBehaviors(f,r);
+      return fromResponse(r);
+    });
+}
+
+function handleHeaderBehaviors(f:HTMLFormElement,r:Response) {
+  const loc = r.headers.get('X-Location');
+  if (loc) {
+    location.href = loc;
+  }
+
+  const evt = r.headers.get('X-Trigger');
+  if (evt) {
+    const pos = evt.indexOf(':');
+    const cmd = pos >= 0 ? evt.substring(0, pos) : evt;
+    const data = pos >= 0 ? evt.substring(pos + 1) : null;
+    triggerEvent(f, cmd, data ? [data] : []);
+  }
+}
+
+export function ajaxSubmit(f:HTMLFormElement,options:IAjaxFormOptions={}) {
+  const type = options.type;
+  const bs4 = type === "bootstrap-v4";
+  clearErrors(f);
+
+  try {
+    if (options.validate && options.validate.call(f) === false)
+      return false;
+  } catch (e) {
+    return false;
+  }
+  
+  let $ = f.querySelectorAll.bind(f);
+  addClass(f, 'loading');
+  const disableSel = options.onSubmitDisable == null
+    ? "[type=submit]"
+    : options.onSubmitDisable;
+  const disable = disableSel != null && disableSel != ""; 
+  if (disable) {
+    $(disableSel).forEach(el => {
+      sattr(el,'disabled','disabled');
+    });
+  }
+  
+  function handleError(errMsg:string|null,err:any=null) {
+    if (err) {
+      applyErrors(f, err.ResponseStatus || err.responseStatus, {...options});
+    }
+    else if (errMsg) {
+      addClass(f,"has-errors");
+      const errorSummary = $(".error-summary")[0];
+      if (errorSummary) {
+        errorSummary.innerHTML = errMsg;
+      }
+      if (bs4) {
+        const elSummary = $('[data-validation-summary]')[0];
+        if (elSummary) {
+          elSummary.innerHTML = bsAlert(errMsg);
+        }
+      }
+    }
+    if (options.error) {
+      options.error.call(f, err);
+    }
+    if (bs4) {
+      $('[data-invalid]').forEach(el => showInvalidInputs.call(el as HTMLInputElement));
+    }
+  }
+
+  const submitFn = options.submit || formSubmit;
+  return submitFn.call(f, options)
+    .then(obj => {
+      if (options.success)
+        options.success.call(f, obj);
+        return false;
+    })
+    .catch(e => {
+      if (e.responseStatus)
+        handleError(null, e);
+      else
+        handleError(`${e.message || e}`, null);
+    })
+    .finally(() => {
+      remClass(f, 'loading');
+      if (disable) {
+        $(disableSel).forEach(el => {
+          rattr(el,'disabled');
+        });
+      }
+      if (options.complete) {
+        options.complete.call(f);
+      }
+    });
+}
+  
+function fromResponse(r:Response) {
+  const contentType = r.headers.get("content-type");
+  const isJson = contentType && contentType.indexOf(Types.Json) !== -1;
+  if (isJson)
+    return r.json();
+
+  let len = r.headers.get("content-length");
+  if (len === "0" || (len == null && !isJson))
+    return null;
+
+  return r.json();
+}
+
+export function serializeForm(form:HTMLFormElement, contentType:string|null=null) {
+  return contentType === Types.MultiPart
+    ? new FormData(form)
+    : contentType == Types.Json
+      ? JSON.stringify(serializeToObject(form))
+      : serializeToUrlEncoded(form);
+}
+
+function formEntries<T>(form:HTMLFormElement, state:T, fn:(state:T,name:string,value:string|Blob) => void) : T {
+  let field, f: any = form;
+  let len = f.elements.length;
+  for (let i = 0; i < len; i++) {
+    field = f.elements[i];
+    if (field.name && !field.disabled && field.type != 'file' && field.type != 'reset' && field.type != 'submit' && field.type != 'button') {
+      if (field.type == 'select-multiple') {
+        for (let j = f.elements[i].options.length - 1; j >= 0; j--) {
+          if (field.options[j].selected)
+            fn(state,field.name, field.options[j].value);
+        }
+      } else if ((field.type != 'checkbox' && field.type != 'radio') || field.checked) {
+        fn(state,field.name, field.value);
+      }
+    }
+  }
+  return state;
+}
+
+export const serializeToObject = (form:HTMLFormElement) => 
+  formEntries(form, {} as any, (to,name,value) => to[name] = value);
+
+export function serializeToUrlEncoded(form:HTMLFormElement) {
+  const to = formEntries(form, [] as string[], (s,name,value) =>
+      typeof value == 'string' 
+          ? s.push(encodeURIComponent(name) + "=" + encodeURIComponent(value))
+          : null);
+  return to.join('&').replace(/%20/g, '+');
+}
+
+export const serializeToFormData = (form:HTMLFormElement) =>
+  formEntries(form, new FormData(), (to,name,value) => to.append(name, value));
+
+export function triggerEvent(el:Element,name:string,data:any=null) {
+  if (document.createEvent) {
+    let evt = document.createEvent(name == 'click' || name.startsWith('mouse') ? 'MouseEvents' : 'HTMLEvents');
+    evt.initEvent(name, true, true);
+    (evt as any).data = data;
+    el.dispatchEvent(evt);
+  } else {
+    let evt = (document as any).createEventObject();
+    (el as any).fireEvent("on" + name, evt);
+  }
 }

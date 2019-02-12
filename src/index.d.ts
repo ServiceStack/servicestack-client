@@ -6,6 +6,7 @@ export interface IReturn<T> {
     createResponse(): T;
 }
 export declare class ResponseStatus {
+    constructor(init?: Partial<ResponseStatus>);
     errorCode: string;
     message: string;
     stackTrace: string;
@@ -15,6 +16,7 @@ export declare class ResponseStatus {
     };
 }
 export declare class ResponseError {
+    constructor(init?: Partial<ResponseError>);
     errorCode: string;
     fieldName: string;
     message: string;
@@ -23,6 +25,7 @@ export declare class ResponseError {
     };
 }
 export declare class ErrorResponse {
+    constructor(init?: Partial<ErrorResponse>);
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
@@ -85,7 +88,7 @@ export interface IReconnectServerEventsOptions {
 export declare enum ReadyState {
     CONNECTING = 0,
     OPEN = 1,
-    CLOSED = 2
+    CLOSED = 2,
 }
 export interface IEventSourceStatic extends EventTarget {
     new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
@@ -282,11 +285,11 @@ export declare class JsonServiceClient {
     sendAllOneWay<T>(requests: IReturn<T>[]): Promise<void>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
-    private createRequest;
-    private createResponse;
-    private handleError;
+    private createRequest({method, request, url, args, body});
+    private createResponse<T>(res, request);
+    private handleError(holdRes, res, type?);
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody;
+    private sendBody<T>(method, request, body, args?);
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
@@ -323,7 +326,40 @@ export declare const dateFmt: (d?: Date) => string;
 export declare const dateFmtHM: (d?: Date) => string;
 export declare const timeFmt12: (d?: Date) => string;
 export interface ICreateElementOptions {
-    insertAfter?: Element;
+    insertAfter?: Element | null;
 }
 export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
 export declare function bootstrap(el?: Element): void;
+export declare function bindHandlers(handlers: any, el?: Node): void;
+export interface IAjaxFormOptions {
+    type?: string;
+    url?: string;
+    credentials?: RequestCredentials;
+    validate?: (this: HTMLFormElement) => boolean;
+    onSubmitDisable?: string;
+    submit?: (this: HTMLFormElement, options: IAjaxFormOptions) => Promise<any>;
+    success?: (this: HTMLFormElement, result: any) => void;
+    error?: (this: HTMLFormElement, e: any) => void;
+    complete?: (this: HTMLFormElement) => void;
+    requestFilter?: (req: IRequestInit) => void;
+    responseFilter?: (res: Response) => void;
+    errorFilter?: (this: IValidation, message: string, errorCode: string, type: string) => void;
+    messages?: {
+        [index: string]: string;
+    };
+}
+export declare function bootstrapForm(form: HTMLFormElement | null, options: IAjaxFormOptions): void;
+export interface IValidation {
+    overrideMessages: boolean;
+    messages: {
+        [index: string]: string;
+    };
+    errorFilter?: (this: IValidation, message: string, errorCode: string, type: string) => void;
+}
+export declare function formSubmit(this: HTMLFormElement, options?: IAjaxFormOptions): Promise<any>;
+export declare function ajaxSubmit(f: HTMLFormElement, options?: IAjaxFormOptions): any;
+export declare function serializeForm(form: HTMLFormElement, contentType?: string | null): string | FormData;
+export declare const serializeToObject: (form: HTMLFormElement) => any;
+export declare function serializeToUrlEncoded(form: HTMLFormElement): string;
+export declare const serializeToFormData: (form: HTMLFormElement) => FormData;
+export declare function triggerEvent(el: Element, name: string, data?: any): void;
