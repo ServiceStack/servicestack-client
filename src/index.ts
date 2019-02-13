@@ -1442,7 +1442,8 @@ export function errorResponse(fieldName:string) {
         : undefined;
 }
 
-export const toDate = (s: string) => new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]));
+export const toDate = (s: string|any) => !s ? null : typeof (s as Date).getMonth === 'function' ? s as Date :
+  s[0] == '/' ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s);
 export const toDateFmt = (s: string) => dateFmt(toDate(s));
 export const padInt = (n: number) => n < 10 ? '0' + n : n;
 export const dateFmt = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
@@ -1565,6 +1566,7 @@ export function bindHandlers(handlers:any,el:Node=document) {
 export interface IAjaxFormOptions {
   type?:string,
   url?: string,
+  model?: any,
   credentials?: RequestCredentials;
   validate?:(this:HTMLFormElement) => boolean,
   onSubmitDisable?:string,
@@ -1580,6 +1582,8 @@ export interface IAjaxFormOptions {
 
 export function bootstrapForm (form:HTMLFormElement|null, options:IAjaxFormOptions) {
   if (!form) return;
+  if (options.model) 
+    populateForm(form,options.model);
   form.onsubmit = function (evt) {
     evt.preventDefault();
     options.type = "bootstrap-v4";
@@ -1920,5 +1924,53 @@ export function triggerEvent(el:Element,name:string,data:any=null) {
   } else {
     let evt = (document as any).createEventObject();
     (el as any).fireEvent("on" + name, evt);
+  }
+}
+
+export function populateForm(form:HTMLFormElement, model:any) {
+  if (!model) return;
+
+  const toggleCase = (s:string) => !s ? s : 
+    s[0] === s[0].toUpperCase() ? toCamelCase(s) : s[0] === s[0].toLowerCase() ? toPascalCase(s) : s;
+
+  for (var key in model) {
+    let val = model[key];
+
+    if (typeof val == 'undefined' || val === null)
+        val = '';
+
+    const el = form.elements.namedItem(key) || form.elements.namedItem(toggleCase(key));
+    const input = el as HTMLInputElement;
+    if (!el)
+      continue;
+
+    const type = input.type || el[0].type;
+    switch (type) {
+      case 'radio':
+      case 'checkbox':
+        const len = (el as any).length;
+        for (let i=0; i < len; i++) {
+          el[i].checked = (val.indexOf(el[i].value) > -1);
+        }
+        break;
+      case 'select-multiple':
+        const values = isArray(val) ? val : [val];
+        const select = el as HTMLSelectElement;
+        for (let i = 0; i < select.options.length; i++) {
+          select.options[i].selected = (values.indexOf(select.options[i].value) > -1);
+        }
+        break;
+      case 'select':
+      case 'select-one':
+        input.value = val.toString() || val;
+        break;
+      case 'date':
+        const d = toDate(val);
+        if (d) input.value = d.toISOString().split('T')[0];
+        break;
+      default:
+        input.value = val;
+        break;
+    }
   }
 }

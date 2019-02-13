@@ -1,11 +1,14 @@
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("fetch-everywhere");
@@ -1186,7 +1189,8 @@ function errorResponse(fieldName) {
         : undefined;
 }
 exports.errorResponse = errorResponse;
-exports.toDate = function (s) { return new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])); };
+exports.toDate = function (s) { return !s ? null : typeof s.getMonth === 'function' ? s :
+    s[0] == '/' ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s); };
 exports.toDateFmt = function (s) { return exports.dateFmt(exports.toDate(s)); };
 exports.padInt = function (n) { return n < 10 ? '0' + n : n; };
 exports.dateFmt = function (d) {
@@ -1248,9 +1252,9 @@ var hasClass = function (el, cls) {
         : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
 };
 var addClass = function (el, cls) {
+    var _a;
     return !el ? null : el.classList ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
         ? el.className = (el.className + " " + cls).trim() : null;
-    var _a;
 };
 var remClass = function (el, cls) {
     return !el ? null : el.classList ? el.classList.remove(cls)
@@ -1316,6 +1320,8 @@ exports.bindHandlers = bindHandlers;
 function bootstrapForm(form, options) {
     if (!form)
         return;
+    if (options.model)
+        populateForm(form, options.model);
     form.onsubmit = function (evt) {
         evt.preventDefault();
         options.type = "bootstrap-v4";
@@ -1642,3 +1648,48 @@ function triggerEvent(el, name, data) {
     }
 }
 exports.triggerEvent = triggerEvent;
+function populateForm(form, model) {
+    if (!model)
+        return;
+    var toggleCase = function (s) { return !s ? s :
+        s[0] === s[0].toUpperCase() ? exports.toCamelCase(s) : s[0] === s[0].toLowerCase() ? exports.toPascalCase(s) : s; };
+    for (var key in model) {
+        var val = model[key];
+        if (typeof val == 'undefined' || val === null)
+            val = '';
+        var el = form.elements.namedItem(key) || form.elements.namedItem(toggleCase(key));
+        var input = el;
+        if (!el)
+            continue;
+        var type = input.type || el[0].type;
+        switch (type) {
+            case 'radio':
+            case 'checkbox':
+                var len = el.length;
+                for (var i = 0; i < len; i++) {
+                    el[i].checked = (val.indexOf(el[i].value) > -1);
+                }
+                break;
+            case 'select-multiple':
+                var values = isArray(val) ? val : [val];
+                var select = el;
+                for (var i = 0; i < select.options.length; i++) {
+                    select.options[i].selected = (values.indexOf(select.options[i].value) > -1);
+                }
+                break;
+            case 'select':
+            case 'select-one':
+                input.value = val.toString() || val;
+                break;
+            case 'date':
+                var d = exports.toDate(val);
+                if (d)
+                    input.value = d.toISOString().split('T')[0];
+                break;
+            default:
+                input.value = val;
+                break;
+        }
+    }
+}
+exports.populateForm = populateForm;
