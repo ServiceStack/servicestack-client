@@ -317,7 +317,7 @@ export declare const parseResponseStatus: (json: string, defaultMsg?: any) => an
 export declare function toFormData(o: any): FormData;
 export declare function toObject(keys: any): {};
 export declare function errorResponseSummary(): any;
-export declare function errorResponseExcept(fieldNames: [string]): any;
+export declare function errorResponseExcept(fieldNames: string[] | string): any;
 export declare function errorResponse(fieldName: string): any;
 export declare const toDate: (s: any) => Date;
 export declare const toDateFmt: (s: string) => string;
@@ -357,6 +357,7 @@ export interface IValidation {
     };
     errorFilter?: (this: IValidation, message: string, errorCode: string, type: string) => void;
 }
+export declare const toVarNames: (names: string | string[]) => string[];
 export declare function formSubmit(this: HTMLFormElement, options?: IAjaxFormOptions): Promise<any>;
 export declare function ajaxSubmit(f: HTMLFormElement, options?: IAjaxFormOptions): any;
 export declare function serializeForm(form: HTMLFormElement, contentType?: string | null): string | FormData;

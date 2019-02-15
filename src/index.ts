@@ -1397,18 +1397,17 @@ export function errorResponseSummary() {
         : undefined;
 }
 
-export function errorResponseExcept(fieldNames:[string]) {
+export function errorResponseExcept(fieldNames:string[]|string) {
     const responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
         return undefined;
 
     const status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
 
-    if (typeof fieldNames == 'string')
-        fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
+    const names = toVarNames(fieldNames);
 
-    if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
-        const lowerFieldsNames = fieldNames.map(x => (x || '').toLowerCase());
+    if (names && !(status.errors == null || status.errors.length == 0)) {
+        const lowerFieldsNames = names.map(x => (x || '').toLowerCase());
         for (let field of status.errors) {
             if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) !== -1) {
                 return undefined;
@@ -1474,8 +1473,9 @@ export function createElement(tagName:string, options?:ICreateElementOptions, at
 function showInvalidInputs(this:HTMLInputElement) {
   let errorMsg: string|null = attr(this,'data-invalid');
   if (errorMsg) {
-    const isCheck = this.type === "checkbox" || this.type === "radio";
-    const elFormCheck = isCheck ? parent(this.parentElement, 'form-check') : null;
+    //[data-invalid] can either be on input control or .form-check container containing group of radio/checkbox
+    const isCheck = this.type === "checkbox" || this.type === "radio" || hasClass(this, 'form-check');
+    const elFormCheck = isCheck ? parent(this, 'form-check') : null;
     if (!isCheck)
       addClass(this, 'is-invalid');
     else
@@ -1725,6 +1725,11 @@ var Types = {
   UrlEncoded: 'application/x-www-form-urlencoded',
   Json: 'application/json',
 };
+
+export const toVarNames = (names:string[]|string|null) => !names ? [] :
+  isArray(names)
+    ? names as string[]
+    : (names as string).split(',').map(s => s.trim());
     
 export function formSubmit(this:HTMLFormElement,options:IAjaxFormOptions={}) {
   const f = this;

@@ -1154,10 +1154,9 @@ function errorResponseExcept(fieldNames) {
     if (responseStatus == null)
         return undefined;
     var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
-    if (typeof fieldNames == 'string')
-        fieldNames = arguments.length == 1 ? [fieldNames] : Array.prototype.slice.call(arguments);
-    if (fieldNames && !(status.errors == null || status.errors.length == 0)) {
-        var lowerFieldsNames = fieldNames.map(function (x) { return (x || '').toLowerCase(); });
+    var names = exports.toVarNames(fieldNames);
+    if (names && !(status.errors == null || status.errors.length == 0)) {
+        var lowerFieldsNames = names.map(function (x) { return (x || '').toLowerCase(); });
         for (var _i = 0, _a = status.errors; _i < _a.length; _i++) {
             var field = _a[_i];
             if (lowerFieldsNames.indexOf((field.fieldName || '').toLowerCase()) !== -1) {
@@ -1226,8 +1225,9 @@ exports.createElement = createElement;
 function showInvalidInputs() {
     var errorMsg = attr(this, 'data-invalid');
     if (errorMsg) {
-        var isCheck = this.type === "checkbox" || this.type === "radio";
-        var elFormCheck = isCheck ? parent(this.parentElement, 'form-check') : null;
+        //[data-invalid] can either be on input control or .form-check container containing group of radio/checkbox
+        var isCheck = this.type === "checkbox" || this.type === "radio" || hasClass(this, 'form-check');
+        var elFormCheck = isCheck ? parent(this, 'form-check') : null;
         if (!isCheck)
             addClass(this, 'is-invalid');
         else
@@ -1454,6 +1454,10 @@ var Types = {
     UrlEncoded: 'application/x-www-form-urlencoded',
     Json: 'application/json',
 };
+exports.toVarNames = function (names) { return !names ? [] :
+    isArray(names)
+        ? names
+        : names.split(',').map(function (s) { return s.trim(); }); };
 function formSubmit(options) {
     if (options === void 0) { options = {}; }
     var f = this;
