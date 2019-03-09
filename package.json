@@ -15,13 +15,15 @@
   },
   "scripts": {
     "pretest": "tsc",
+    "publish": "tsc && tsc --moduleResolution node --lib es2015,dom,dom.iterable -m umd -t es5 src\\index.ts -outDir dist\\ && move dist\\index.js dist\\servicestack-client.umd.js && bash inject-umd.sh && move src\\index.js dist && copy src\\index.d.ts dist",
     "dtos": "cd tests/dtos && typescript-ref",
     "test": "mocha -t 5000 ./tests/*.js",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
   "files": [
-    "src/index.js",
-    "src/index.d.ts"
+    "dist/servicestack-client.js",
+    "dist/index.js",
+    "dist/index.d.ts"
   ],
   "keywords": [
     "servicestack",
@@ -32,8 +34,8 @@
     "error-handling"
   ],
   "licenses": [],
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "es6-shim": "^0.35.4",
     "eventsource": "^1.0.7",

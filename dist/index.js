@@ -1,14 +1,11 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("fetch-everywhere");
@@ -1252,9 +1249,9 @@ var hasClass = function (el, cls) {
         : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
 };
 var addClass = function (el, cls) {
-    var _a;
     return !el ? null : el.classList ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
         ? el.className = (el.className + " " + cls).trim() : null;
+    var _a;
 };
 var remClass = function (el, cls) {
     return !el ? null : el.classList ? el.classList.remove(cls)
