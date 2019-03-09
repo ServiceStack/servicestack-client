@@ -21,7 +21,7 @@
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
   "files": [
-    "dist/servicestack-client.js",
+    "dist/servicestack-client.umd.js",
     "dist/index.js",
     "dist/index.d.ts"
   ],
