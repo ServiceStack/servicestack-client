@@ -14,7 +14,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     else if (typeof define === "function" && define.amd) {
         define(["require", "exports", "fetch-everywhere"], factory);
     }
-    else if (typeof window != "undefined") factory(function(){}, window["@servicestack/client"]={});
+    else if (typeof window != "undefined") factory(window.require||function(){}, window["@servicestack/client"]={});
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
