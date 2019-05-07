@@ -15,15 +15,17 @@
   },
   "scripts": {
     "pretest": "tsc",
-    "publish": "tsc && tsc --moduleResolution node --lib es2015,dom,dom.iterable -m umd -t es5 src\\index.ts -outDir dist\\ && move dist\\index.js dist\\servicestack-client.umd.js && bash inject-umd.sh && move src\\index.js dist && copy src\\index.d.ts dist",
+    "uglify": "uglifyjs dist\\servicestack-client.umd.js --compress --mangle -o dist\\servicestack-client.min.js",
+    "publish": "tsc && tsc -p tsconfig.umd.json && move dist\\index.js dist\\servicestack-client.umd.js && bash inject-umd.sh && npm run uglify && move src\\index.js dist && copy src\\index.d.ts dist",
     "dtos": "cd tests/dtos && typescript-ref",
     "test": "mocha -t 5000 ./tests/*.js",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
   },
   "files": [
-    "dist/servicestack-client.umd.js",
     "dist/index.js",
-    "dist/index.d.ts"
+    "dist/index.d.ts",
+    "dist/servicestack-client.umd.js",
+    "dist/servicestack-client.min.js"
   ],
   "keywords": [
     "servicestack",
