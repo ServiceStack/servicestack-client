@@ -40,6 +40,27 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return ErrorResponse;
     }());
     exports.ErrorResponse = ErrorResponse;
+    var NavItem = /** @class */ (function () {
+        function NavItem(init) {
+            Object.assign(this, init);
+        }
+        return NavItem;
+    }());
+    exports.NavItem = NavItem;
+    var GetNavItems = /** @class */ (function () {
+        function GetNavItems(init) {
+            Object.assign(this, init);
+        }
+        return GetNavItems;
+    }());
+    exports.GetNavItems = GetNavItems;
+    var GetNavItemsResponse = /** @class */ (function () {
+        function GetNavItemsResponse(init) {
+            Object.assign(this, init);
+        }
+        return GetNavItemsResponse;
+    }());
+    exports.GetNavItemsResponse = GetNavItemsResponse;
     var NewInstanceResolver = /** @class */ (function () {
         function NewInstanceResolver() {
         }

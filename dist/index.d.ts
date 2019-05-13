@@ -29,6 +29,35 @@ export declare class ErrorResponse {
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+export declare class NavItem {
+    label: string;
+    href: string;
+    exact: boolean;
+    id: string;
+    class: string;
+    iconHtml: string;
+    show: string;
+    hide: string;
+    children: NavItem[];
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<NavItem>);
+}
+export declare class GetNavItems {
+    constructor(init?: Partial<GetNavItems>);
+}
+export declare class GetNavItemsResponse {
+    results: NavItem[];
+    navItemsMap: {
+        [index: string]: NavItem[];
+    };
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<GetNavItemsResponse>);
+}
 export declare type ErrorResponseType = null | "RefreshTokenException";
 export interface IResolver {
     tryResolve(Function: any): any;

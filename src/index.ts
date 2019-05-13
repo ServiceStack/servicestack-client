@@ -26,6 +26,29 @@ export class ErrorResponse {
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+export class NavItem {
+    public label: string;
+    public href: string;
+    public exact: boolean;
+    public id: string;
+    public class: string;
+    public iconHtml: string;
+    public show: string;
+    public hide: string;
+    public children: NavItem[];
+    public meta: { [index:string]: string; };
+    public constructor(init?:Partial<NavItem>) { (Object as any).assign(this, init); }
+}
+export class GetNavItems {
+    public constructor(init?:Partial<GetNavItems>) { (Object as any).assign(this, init); }
+}
+export class GetNavItemsResponse {
+    public results: NavItem[];
+    public navItemsMap: { [index:string]: NavItem[]; };
+    public meta: { [index:string]: string; };
+    public responseStatus: ResponseStatus;
+    public constructor(init?:Partial<GetNavItemsResponse>) { (Object as any).assign(this, init); }
+}
 
 export type ErrorResponseType = null | "RefreshTokenException";
 
