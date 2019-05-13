@@ -34,7 +34,7 @@ export declare class NavItem {
     href: string;
     exact: boolean;
     id: string;
-    class: string;
+    className: string;
     iconHtml: string;
     show: string;
     hide: string;

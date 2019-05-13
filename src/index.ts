@@ -31,7 +31,7 @@ export class NavItem {
     public href: string;
     public exact: boolean;
     public id: string;
-    public class: string;
+    public className: string;
     public iconHtml: string;
     public show: string;
     public hide: string;
