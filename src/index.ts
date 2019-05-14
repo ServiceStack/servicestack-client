@@ -43,6 +43,7 @@ export class GetNavItems {
     public constructor(init?:Partial<GetNavItems>) { (Object as any).assign(this, init); }
 }
 export class GetNavItemsResponse {
+    public baseUrl: string;
     public results: NavItem[];
     public navItemsMap: { [index:string]: NavItem[]; };
     public meta: { [index:string]: string; };
