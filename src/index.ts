@@ -53,6 +53,15 @@ export class GetNavItemsResponse {
 
 export type ErrorResponseType = null | "RefreshTokenException";
 
+export interface IAuthSession {
+    userName: string;
+    displayName: string;
+    userId?: string;
+    roles?: string[];
+    permissions?: string[];
+    profileUrl?: string;
+}
+
 export interface IResolver
 {
     tryResolve(Function): any;
@@ -2002,4 +2011,200 @@ export function populateForm(form:HTMLFormElement, model:any) {
         break;
     }
   }
+}
+
+export function trimEnd(s: string, c: string) {
+    let end = s.length;
+    while (end > 0 && s[end - 1] === c) {
+        --end;
+    }
+    return (end < s.length) ? s.substring(0, end) : s;
+}
+export function safeVarName(s: string) {
+    return s.replace(/[\W]+/g, '');
+}
+export function pick(o:any, keys:string[]) {
+    const to = {};
+    for (const k in o) {
+        if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
+            to[k] = o[k];
+        }
+    }
+    return to;
+}
+export function omit(o:any, keys:string[]) {
+    const to = {};
+    for (const k in o) {
+        if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
+            to[k] = o[k];
+        }
+    }
+    return to;
+}
+
+/* NAV */
+
+export function activeClassNav(x: NavItem, activePath: string) {
+    return x.href != null && (x.exact || activePath.length <= 1
+        ? trimEnd(activePath, '/').toLowerCase() === trimEnd((x.href), '/').toLowerCase()
+        : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd((x.href), '/').toLowerCase()))
+        ? 'active'
+        : null;
+}
+
+export function activeClass(href: string|null, activePath: string, exact?: boolean) {
+    return href != null && (exact || activePath.length <= 1
+        ? trimEnd(activePath, '/').toLowerCase() === trimEnd(href, '/').toLowerCase()
+        : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd(href, '/').toLowerCase()))
+        ? 'active'
+        : null;
+}
+
+export const BootstrapColors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'];
+export function btnColorClass(props: any) {
+    for (const color of BootstrapColors) {
+        if (props[color]) {
+            return 'btn-' + color;
+        }
+        if (props['outline-' + color]) {
+            return 'btn-outline-' + color;
+        }
+    }
+    return null;
+}
+export const BootstrapSizes = ['xs','sm','md','lg']
+export function btnSizeClass(props:any) {
+    for (const size of BootstrapSizes) {
+        if (props[size]) {
+            return 'btn-' + size;
+        }
+    }
+    return null;
+};
+export function btnClasses(props:any) {
+    const to = [];
+    const color = btnColorClass(props);
+    if (color) {
+        to.push(color);
+    }
+    const size = btnSizeClass(props);
+    if (size) {
+        to.push(size);
+    }
+    if (props.block) {
+        to.push('btn-block');
+    }
+    return to;
+}
+
+export class NavDefaults {
+    public static navClass = 'nav';
+    public static navItemClass = 'nav-item';
+    public static navLinkClass = 'nav-link';
+
+    public static childNavItemClass = 'nav-item dropdown';
+    public static childNavLinkClass = 'nav-link dropdown-toggle';
+    public static childNavMenuClass = 'dropdown-menu';
+    public static childNavMenuItemClass = 'dropdown-item';
+
+    // only supports <i class="..."></i> to render arbitrary return
+    // <span dangerouslySetInnerHTML={{__html:item.iconHtml||''}} />
+    public static parseIconHtml: ((html: string) => any) | null = null;
+
+    public static create() { return new NavOptions(); }
+    public static forNav(options?: NavOptions|null) { return options || NavDefaults.create(); }
+    public static overrideDefaults(targets: NavOptions | null | undefined, source: NavOptions) {
+        if (targets == null) { return source; }
+        targets = Object.assign({}, targets); // clone
+        if (targets.navClass === NavDefaults.navClass && source.navClass != null) { targets.navClass = source.navClass; }
+        if (targets.navItemClass === NavDefaults.navItemClass && source.navItemClass != null) { targets.navItemClass = source.navItemClass; }
+        if (targets.navLinkClass === NavDefaults.navLinkClass && source.navLinkClass != null) { targets.navLinkClass = source.navLinkClass; }
+        if (targets.childNavItemClass === NavDefaults.childNavItemClass && source.childNavItemClass != null) { targets.childNavItemClass = source.childNavItemClass; }
+        if (targets.childNavLinkClass === NavDefaults.childNavLinkClass && source.childNavLinkClass != null) { targets.childNavLinkClass = source.childNavLinkClass; }
+        if (targets.childNavMenuClass === NavDefaults.childNavMenuClass && source.childNavMenuClass != null) { targets.childNavMenuClass = source.childNavMenuClass; }
+        if (targets.childNavMenuItemClass === NavDefaults.childNavMenuItemClass && source.childNavMenuItemClass != null) {
+            targets.childNavMenuItemClass = source.childNavMenuItemClass;
+        }
+        return targets;
+    }
+    public static showNav(navItem: NavItem, attributes: string[]) {
+        if (attributes == null || attributes.length === 0) {
+            return navItem.show == null;
+        }
+        if (navItem.show != null && attributes.indexOf(navItem.show) < 0) {
+            return false;
+        }
+        if (navItem.hide != null && attributes.indexOf(navItem.hide) >= 0) {
+            return false;
+        }
+        return true;
+    }
+}
+export class NavLinkDefaults {
+    public static forNavLink(options?: NavOptions|null) { return options || NavDefaults.create(); }
+}
+export class NavbarDefaults {
+    public static navClass = 'navbar-nav';
+    public static create() { return new NavOptions({ navClass: NavbarDefaults.navClass }); }
+    public static forNavbar(options?: NavOptions|null) { return NavDefaults.overrideDefaults(options, NavbarDefaults.create()); }
+}
+export class NavButtonGroupDefaults {
+    public static navClass = 'btn-group';
+    public static navItemClass = 'btn btn-primary';
+    public static create() { return new NavOptions({ navClass: NavButtonGroupDefaults.navClass, navItemClass: NavButtonGroupDefaults.navItemClass }); }
+    public static forNavButtonGroup(options?: NavOptions|null) { return NavDefaults.overrideDefaults(options, NavButtonGroupDefaults.create()); }
+}
+export class LinkButtonDefaults {
+    public static navItemClass = 'btn';
+    public static create() { return new NavOptions({ navItemClass: LinkButtonDefaults.navItemClass }); }
+    public static forLinkButton(options?: NavOptions|null) { return NavDefaults.overrideDefaults(options || null, LinkButtonDefaults.create()); }
+}
+
+export class UserAttributes
+{
+    public static fromSession(session:IAuthSession | null): string[] {
+        const to = [];
+        if (session != null) {
+            to.push('auth');
+            if (session.roles) {
+                to.push(...session.roles.map(x => 'role:' + x));
+            }
+            if (session.permissions) {
+                to.push(...session.permissions.map(x => 'perm:' + x));
+            }
+        }
+        return to;
+    }
+}
+
+export class NavOptions {
+
+    public static fromSession(session:IAuthSession | null, to?: NavOptions): NavOptions {
+        to = to || new NavOptions();
+        to.attributes = UserAttributes.fromSession(session);
+        return to;
+    }
+
+    public attributes: string[];
+    public activePath?: string;
+    public baseHref?: string;
+    public navClass?: string;
+    public navItemClass?: string;
+    public navLinkClass?: string;
+    public childNavItemClass?: string;
+    public childNavLinkClass?: string;
+    public childNavMenuClass?: string;
+    public childNavMenuItemClass?: string;
+
+    public constructor(init?: Partial<NavOptions>) {
+        this.attributes = [];
+        this.navClass = NavDefaults.navClass;
+        this.navItemClass = NavDefaults.navItemClass;
+        this.navLinkClass = NavDefaults.navLinkClass;
+        this.childNavItemClass = NavDefaults.childNavItemClass;
+        this.childNavLinkClass = NavDefaults.childNavLinkClass;
+        this.childNavMenuClass = NavDefaults.childNavMenuClass;
+        this.childNavMenuItemClass = NavDefaults.childNavMenuItemClass;
+        (Object as any).assign(this, init);
+    }
 }

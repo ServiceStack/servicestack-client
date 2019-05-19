@@ -48,6 +48,7 @@ export declare class GetNavItems {
     constructor(init?: Partial<GetNavItems>);
 }
 export declare class GetNavItemsResponse {
+    baseUrl: string;
     results: NavItem[];
     navItemsMap: {
         [index: string]: NavItem[];
@@ -59,6 +60,14 @@ export declare class GetNavItemsResponse {
     constructor(init?: Partial<GetNavItemsResponse>);
 }
 export declare type ErrorResponseType = null | "RefreshTokenException";
+export interface IAuthSession {
+    userName: string;
+    displayName: string;
+    userId?: string;
+    roles?: string[];
+    permissions?: string[];
+    profileUrl?: string;
+}
 export interface IResolver {
     tryResolve(Function: any): any;
 }
@@ -395,3 +404,64 @@ export declare function serializeToUrlEncoded(form: HTMLFormElement): string;
 export declare const serializeToFormData: (form: HTMLFormElement) => FormData;
 export declare function triggerEvent(el: Element, name: string, data?: any): void;
 export declare function populateForm(form: HTMLFormElement, model: any): void;
+export declare function trimEnd(s: string, c: string): string;
+export declare function safeVarName(s: string): string;
+export declare function pick(o: any, keys: string[]): {};
+export declare function omit(o: any, keys: string[]): {};
+export declare function activeClassNav(x: NavItem, activePath: string): string;
+export declare function activeClass(href: string | null, activePath: string, exact?: boolean): string;
+export declare const BootstrapColors: string[];
+export declare function btnColorClass(props: any): string;
+export declare const BootstrapSizes: string[];
+export declare function btnSizeClass(props: any): string;
+export declare function btnClasses(props: any): any[];
+export declare class NavDefaults {
+    static navClass: string;
+    static navItemClass: string;
+    static navLinkClass: string;
+    static childNavItemClass: string;
+    static childNavLinkClass: string;
+    static childNavMenuClass: string;
+    static childNavMenuItemClass: string;
+    static parseIconHtml: ((html: string) => any) | null;
+    static create(): NavOptions;
+    static forNav(options?: NavOptions | null): NavOptions;
+    static overrideDefaults(targets: NavOptions | null | undefined, source: NavOptions): NavOptions;
+    static showNav(navItem: NavItem, attributes: string[]): boolean;
+}
+export declare class NavLinkDefaults {
+    static forNavLink(options?: NavOptions | null): NavOptions;
+}
+export declare class NavbarDefaults {
+    static navClass: string;
+    static create(): NavOptions;
+    static forNavbar(options?: NavOptions | null): NavOptions;
+}
+export declare class NavButtonGroupDefaults {
+    static navClass: string;
+    static navItemClass: string;
+    static create(): NavOptions;
+    static forNavButtonGroup(options?: NavOptions | null): NavOptions;
+}
+export declare class LinkButtonDefaults {
+    static navItemClass: string;
+    static create(): NavOptions;
+    static forLinkButton(options?: NavOptions | null): NavOptions;
+}
+export declare class UserAttributes {
+    static fromSession(session: IAuthSession | null): string[];
+}
+export declare class NavOptions {
+    static fromSession(session: IAuthSession | null, to?: NavOptions): NavOptions;
+    attributes: string[];
+    activePath?: string;
+    baseHref?: string;
+    navClass?: string;
+    navItemClass?: string;
+    navLinkClass?: string;
+    childNavItemClass?: string;
+    childNavLinkClass?: string;
+    childNavMenuClass?: string;
+    childNavMenuItemClass?: string;
+    constructor(init?: Partial<NavOptions>);
+}

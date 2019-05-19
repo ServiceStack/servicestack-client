@@ -1715,3 +1715,226 @@ function populateForm(form, model) {
     }
 }
 exports.populateForm = populateForm;
+function trimEnd(s, c) {
+    var end = s.length;
+    while (end > 0 && s[end - 1] === c) {
+        --end;
+    }
+    return (end < s.length) ? s.substring(0, end) : s;
+}
+exports.trimEnd = trimEnd;
+function safeVarName(s) {
+    return s.replace(/[\W]+/g, '');
+}
+exports.safeVarName = safeVarName;
+function pick(o, keys) {
+    var to = {};
+    for (var k in o) {
+        if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
+            to[k] = o[k];
+        }
+    }
+    return to;
+}
+exports.pick = pick;
+function omit(o, keys) {
+    var to = {};
+    for (var k in o) {
+        if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
+            to[k] = o[k];
+        }
+    }
+    return to;
+}
+exports.omit = omit;
+/* NAV */
+function activeClassNav(x, activePath) {
+    return x.href != null && (x.exact || activePath.length <= 1
+        ? trimEnd(activePath, '/').toLowerCase() === trimEnd((x.href), '/').toLowerCase()
+        : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd((x.href), '/').toLowerCase()))
+        ? 'active'
+        : null;
+}
+exports.activeClassNav = activeClassNav;
+function activeClass(href, activePath, exact) {
+    return href != null && (exact || activePath.length <= 1
+        ? trimEnd(activePath, '/').toLowerCase() === trimEnd(href, '/').toLowerCase()
+        : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd(href, '/').toLowerCase()))
+        ? 'active'
+        : null;
+}
+exports.activeClass = activeClass;
+exports.BootstrapColors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'];
+function btnColorClass(props) {
+    for (var _i = 0, BootstrapColors_1 = exports.BootstrapColors; _i < BootstrapColors_1.length; _i++) {
+        var color = BootstrapColors_1[_i];
+        if (props[color]) {
+            return 'btn-' + color;
+        }
+        if (props['outline-' + color]) {
+            return 'btn-outline-' + color;
+        }
+    }
+    return null;
+}
+exports.btnColorClass = btnColorClass;
+exports.BootstrapSizes = ['xs', 'sm', 'md', 'lg'];
+function btnSizeClass(props) {
+    for (var _i = 0, BootstrapSizes_1 = exports.BootstrapSizes; _i < BootstrapSizes_1.length; _i++) {
+        var size = BootstrapSizes_1[_i];
+        if (props[size]) {
+            return 'btn-' + size;
+        }
+    }
+    return null;
+}
+exports.btnSizeClass = btnSizeClass;
+;
+function btnClasses(props) {
+    var to = [];
+    var color = btnColorClass(props);
+    if (color) {
+        to.push(color);
+    }
+    var size = btnSizeClass(props);
+    if (size) {
+        to.push(size);
+    }
+    if (props.block) {
+        to.push('btn-block');
+    }
+    return to;
+}
+exports.btnClasses = btnClasses;
+var NavDefaults = /** @class */ (function () {
+    function NavDefaults() {
+    }
+    NavDefaults.create = function () { return new NavOptions(); };
+    NavDefaults.forNav = function (options) { return options || NavDefaults.create(); };
+    NavDefaults.overrideDefaults = function (targets, source) {
+        if (targets == null) {
+            return source;
+        }
+        targets = Object.assign({}, targets); // clone
+        if (targets.navClass === NavDefaults.navClass && source.navClass != null) {
+            targets.navClass = source.navClass;
+        }
+        if (targets.navItemClass === NavDefaults.navItemClass && source.navItemClass != null) {
+            targets.navItemClass = source.navItemClass;
+        }
+        if (targets.navLinkClass === NavDefaults.navLinkClass && source.navLinkClass != null) {
+            targets.navLinkClass = source.navLinkClass;
+        }
+        if (targets.childNavItemClass === NavDefaults.childNavItemClass && source.childNavItemClass != null) {
+            targets.childNavItemClass = source.childNavItemClass;
+        }
+        if (targets.childNavLinkClass === NavDefaults.childNavLinkClass && source.childNavLinkClass != null) {
+            targets.childNavLinkClass = source.childNavLinkClass;
+        }
+        if (targets.childNavMenuClass === NavDefaults.childNavMenuClass && source.childNavMenuClass != null) {
+            targets.childNavMenuClass = source.childNavMenuClass;
+        }
+        if (targets.childNavMenuItemClass === NavDefaults.childNavMenuItemClass && source.childNavMenuItemClass != null) {
+            targets.childNavMenuItemClass = source.childNavMenuItemClass;
+        }
+        return targets;
+    };
+    NavDefaults.showNav = function (navItem, attributes) {
+        if (attributes == null || attributes.length === 0) {
+            return navItem.show == null;
+        }
+        if (navItem.show != null && attributes.indexOf(navItem.show) < 0) {
+            return false;
+        }
+        if (navItem.hide != null && attributes.indexOf(navItem.hide) >= 0) {
+            return false;
+        }
+        return true;
+    };
+    NavDefaults.navClass = 'nav';
+    NavDefaults.navItemClass = 'nav-item';
+    NavDefaults.navLinkClass = 'nav-link';
+    NavDefaults.childNavItemClass = 'nav-item dropdown';
+    NavDefaults.childNavLinkClass = 'nav-link dropdown-toggle';
+    NavDefaults.childNavMenuClass = 'dropdown-menu';
+    NavDefaults.childNavMenuItemClass = 'dropdown-item';
+    // only supports <i class="..."></i> to render arbitrary return
+    // <span dangerouslySetInnerHTML={{__html:item.iconHtml||''}} />
+    NavDefaults.parseIconHtml = null;
+    return NavDefaults;
+}());
+exports.NavDefaults = NavDefaults;
+var NavLinkDefaults = /** @class */ (function () {
+    function NavLinkDefaults() {
+    }
+    NavLinkDefaults.forNavLink = function (options) { return options || NavDefaults.create(); };
+    return NavLinkDefaults;
+}());
+exports.NavLinkDefaults = NavLinkDefaults;
+var NavbarDefaults = /** @class */ (function () {
+    function NavbarDefaults() {
+    }
+    NavbarDefaults.create = function () { return new NavOptions({ navClass: NavbarDefaults.navClass }); };
+    NavbarDefaults.forNavbar = function (options) { return NavDefaults.overrideDefaults(options, NavbarDefaults.create()); };
+    NavbarDefaults.navClass = 'navbar-nav';
+    return NavbarDefaults;
+}());
+exports.NavbarDefaults = NavbarDefaults;
+var NavButtonGroupDefaults = /** @class */ (function () {
+    function NavButtonGroupDefaults() {
+    }
+    NavButtonGroupDefaults.create = function () { return new NavOptions({ navClass: NavButtonGroupDefaults.navClass, navItemClass: NavButtonGroupDefaults.navItemClass }); };
+    NavButtonGroupDefaults.forNavButtonGroup = function (options) { return NavDefaults.overrideDefaults(options, NavButtonGroupDefaults.create()); };
+    NavButtonGroupDefaults.navClass = 'btn-group';
+    NavButtonGroupDefaults.navItemClass = 'btn btn-primary';
+    return NavButtonGroupDefaults;
+}());
+exports.NavButtonGroupDefaults = NavButtonGroupDefaults;
+var LinkButtonDefaults = /** @class */ (function () {
+    function LinkButtonDefaults() {
+    }
+    LinkButtonDefaults.create = function () { return new NavOptions({ navItemClass: LinkButtonDefaults.navItemClass }); };
+    LinkButtonDefaults.forLinkButton = function (options) { return NavDefaults.overrideDefaults(options || null, LinkButtonDefaults.create()); };
+    LinkButtonDefaults.navItemClass = 'btn';
+    return LinkButtonDefaults;
+}());
+exports.LinkButtonDefaults = LinkButtonDefaults;
+var UserAttributes = /** @class */ (function () {
+    function UserAttributes() {
+    }
+    UserAttributes.fromSession = function (session) {
+        var to = [];
+        if (session != null) {
+            to.push('auth');
+            if (session.roles) {
+                to.push.apply(to, session.roles.map(function (x) { return 'role:' + x; }));
+            }
+            if (session.permissions) {
+                to.push.apply(to, session.permissions.map(function (x) { return 'perm:' + x; }));
+            }
+        }
+        return to;
+    };
+    return UserAttributes;
+}());
+exports.UserAttributes = UserAttributes;
+var NavOptions = /** @class */ (function () {
+    function NavOptions(init) {
+        this.attributes = [];
+        this.navClass = NavDefaults.navClass;
+        this.navItemClass = NavDefaults.navItemClass;
+        this.navLinkClass = NavDefaults.navLinkClass;
+        this.childNavItemClass = NavDefaults.childNavItemClass;
+        this.childNavLinkClass = NavDefaults.childNavLinkClass;
+        this.childNavMenuClass = NavDefaults.childNavMenuClass;
+        this.childNavMenuItemClass = NavDefaults.childNavMenuItemClass;
+        Object.assign(this, init);
+    }
+    NavOptions.fromSession = function (session, to) {
+        to = to || new NavOptions();
+        to.attributes = UserAttributes.fromSession(session);
+        return to;
+    };
+    return NavOptions;
+}());
+exports.NavOptions = NavOptions;
