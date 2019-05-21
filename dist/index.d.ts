@@ -331,6 +331,7 @@ export declare class JsonServiceClient {
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
+export declare const isFormData: (body: any) => boolean;
 export declare const toCamelCase: (s: string) => string;
 export declare const toPascalCase: (s: string) => string;
 export declare const sanitize: (status: any) => any;

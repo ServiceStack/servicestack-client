@@ -909,7 +909,7 @@ export class JsonServiceClient {
         if (hasRequestBody) {
             reqInit.body = body || JSON.stringify(request);
 
-            if (typeof window != "undefined" && body instanceof FormData) {
+            if (isFormData(body)) {
                 headers.delete('Content-Type'); //set by FormData
             }
         }
@@ -1020,7 +1020,7 @@ export class JsonServiceClient {
             request: body, 
             body: typeof body == "string" 
                 ? body 
-                : typeof window != "undefined" && body instanceof FormData
+                : isFormData(body)
                     ? body
                     : JSON.stringify(body),
             url: appendQueryString(url, request), 
@@ -1089,6 +1089,8 @@ export class JsonServiceClient {
         return error;
     }
 }
+
+export const isFormData = (body:any) => typeof window != "undefined" && body instanceof FormData;
 
 const createErrorResponse = (errorCode: string|number, message: string, type:ErrorResponseType=null) => {
     const error = new ErrorResponse();

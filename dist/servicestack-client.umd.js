@@ -701,7 +701,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             };
             if (hasRequestBody) {
                 reqInit.body = body || JSON.stringify(request);
-                if (typeof window != "undefined" && body instanceof FormData) {
+                if (exports.isFormData(body)) {
                     headers.delete('Content-Type'); //set by FormData
                 }
             }
@@ -793,7 +793,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 request: body,
                 body: typeof body == "string"
                     ? body
-                    : typeof window != "undefined" && body instanceof FormData
+                    : exports.isFormData(body)
                         ? body
                         : JSON.stringify(body),
                 url: exports.appendQueryString(url, request),
@@ -854,6 +854,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return JsonServiceClient;
     }());
     exports.JsonServiceClient = JsonServiceClient;
+    exports.isFormData = function (body) { return typeof window != "undefined" && body instanceof FormData; };
     var createErrorResponse = function (errorCode, message, type) {
         if (type === void 0) { type = null; }
         var error = new ErrorResponse();
