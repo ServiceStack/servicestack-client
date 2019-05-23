@@ -295,6 +295,7 @@ export declare class JsonServiceClient {
     bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
+    useTokenCookie: boolean;
     requestFilter: (req: IRequestInit) => void;
     responseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
@@ -323,6 +324,7 @@ export declare class JsonServiceClient {
     sendAllOneWay<T>(requests: IReturn<T>[]): Promise<void>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
+    deleteCookie(name: string): void;
     private createRequest({method, request, url, args, body});
     private createResponse<T>(res, request);
     private handleError(holdRes, res, type?);

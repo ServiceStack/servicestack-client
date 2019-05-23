@@ -22,7 +22,7 @@ const expect = chai.expect;
 const assert = chai.assert;
 
 const TEST_URL = "http://test.servicestack.net";
-// const TEST_URL = "http://localhost:55799";
+//const TEST_URL = "http://localhost:56500";
 
 const createJwt = (opt:any={}) : CreateJwt => {
     const request = Object.assign(new CreateJwt(), opt);
@@ -157,6 +157,29 @@ describe ('JsonServiceClient Auth Tests', () => {
         expect(client.bearerToken).not.eq(expiredJwt.token);
     })
 
+    it ("Can use refreshToken to fetch new token after expired token with useTokenCookie", async () => {
+
+        let count = 0;
+        var client = new JsonServiceClient(TEST_URL);
+        client.userName = "test";
+        client.password = "test";
+        client.useTokenCookie = true;
+        var authResponse = await client.post(new Authenticate());
+
+        client.refreshToken = authResponse.refreshToken;
+        client.setCredentials(null,null);
+
+        let createExpiredJwt = createJwt();
+        createExpiredJwt.jwtExpiry = "2000-01-01";
+        const expiredJwt = await client.post(createExpiredJwt);
+
+        client.bearerToken = expiredJwt.token;
+        client.useTokenCookie = true;
+        var response = await client.get(new TestAuth());
+
+        expect(client.bearerToken).eq(null);
+    })
+
     it ("Can reauthenticate after an auto refresh access token", async () => {
 
         var client = new JsonServiceClient(TEST_URL);
@@ -186,7 +209,7 @@ describe ('JsonServiceClient Auth Tests', () => {
         } catch(e){
             var status = (e as ErrorResponse).responseStatus;
             expect(status.errorCode).eq("Unauthorized");
-            expect(status.message).eq("Invalid UserName or Password");
+            expect(status.message).eq("Invalid Username or Password");
         }
     })
 

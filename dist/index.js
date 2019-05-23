@@ -556,7 +556,8 @@ var HttpMethods = /** @class */ (function () {
 }());
 exports.HttpMethods = HttpMethods;
 var GetAccessToken = /** @class */ (function () {
-    function GetAccessToken() {
+    function GetAccessToken(init) {
+        Object.assign(this, init);
     }
     GetAccessToken.prototype.createResponse = function () { return new GetAccessTokenResponse(); };
     GetAccessToken.prototype.getTypeName = function () { return "GetAccessToken"; };
@@ -651,6 +652,16 @@ var JsonServiceClient = /** @class */ (function () {
             relativeOrAbsoluteUrl.startsWith("https://")
             ? relativeOrAbsoluteUrl
             : exports.combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
+    };
+    JsonServiceClient.prototype.deleteCookie = function (name) {
+        if (this.manageCookies) {
+            delete this.cookies[name];
+        }
+        else {
+            if (document) {
+                document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+            }
+        }
     };
     JsonServiceClient.prototype.createRequest = function (_a) {
         var _this = this;
@@ -815,21 +826,35 @@ var JsonServiceClient = /** @class */ (function () {
             .catch(function (res) {
             if (res.status === 401) {
                 if (_this.refreshToken) {
-                    var jwtReq_1 = new GetAccessToken();
-                    jwtReq_1.refreshToken = _this.refreshToken;
+                    var jwtReq_1 = new GetAccessToken({ refreshToken: _this.refreshToken, useTokenCookie: _this.useTokenCookie });
                     var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq_1);
+                    if (_this.useTokenCookie) {
+                        _this.bearerToken = null;
+                        _this.headers.delete("Authorization");
+                    }
                     var jwtRequest = _this.createRequest({ method: HttpMethods.Post, request: jwtReq_1, args: null, url: url });
                     return fetch(url, jwtRequest)
                         .then(function (r) { return _this.createResponse(r, jwtReq_1).then(function (jwtResponse) {
-                        _this.bearerToken = jwtResponse.accessToken;
+                        _this.bearerToken = jwtResponse.accessToken || null;
                         return resendRequest();
                     }); })
                         .catch(function (res) {
-                        return _this.handleError(holdRes, res, "RefreshTokenException");
+                        if (_this.onAuthenticationRequired) {
+                            return _this.onAuthenticationRequired()
+                                .then(resendRequest)
+                                .catch(function (resHandler) {
+                                return _this.handleError(holdRes, resHandler, "RefreshTokenException");
+                            });
+                        }
+                        else {
+                            return _this.handleError(holdRes, res, "RefreshTokenException");
+                        }
                     });
                 }
-                if (_this.onAuthenticationRequired) {
-                    return _this.onAuthenticationRequired().then(resendRequest);
+                else {
+                    if (_this.onAuthenticationRequired) {
+                        return _this.onAuthenticationRequired().then(resendRequest);
+                    }
                 }
             }
             return _this.handleError(holdRes, res);

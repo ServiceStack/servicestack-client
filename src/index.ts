@@ -719,9 +719,12 @@ export interface Cookie {
 }
 
 class GetAccessToken implements IReturn<GetAccessTokenResponse> {
-    refreshToken: string;
-    createResponse() { return new GetAccessTokenResponse(); }
-    getTypeName() { return "GetAccessToken"; }
+    public constructor(init?:Partial<GetAccessToken>) { (Object as any).assign(this, init); }
+
+    public refreshToken: string;
+    public useTokenCookie?: boolean;
+    public createResponse() { return new GetAccessTokenResponse(); }
+    public getTypeName() { return "GetAccessToken"; }
 }
 export class GetAccessTokenResponse {
     accessToken: string;
@@ -750,6 +753,7 @@ export class JsonServiceClient {
     bearerToken: string;
     refreshToken: string;
     refreshTokenUri: string;
+    useTokenCookie: boolean;
     requestFilter: (req:IRequestInit) => void;
     responseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
@@ -863,6 +867,16 @@ export class JsonServiceClient {
                relativeOrAbsoluteUrl.startsWith("https://")
             ? relativeOrAbsoluteUrl
             : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
+    }
+
+    deleteCookie(name:string) {
+        if (this.manageCookies) {
+            delete this.cookies[name];
+        } else {
+            if (document) {
+                document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+            }
+        }
     }
 
     private createRequest({ method, request, url, args, body } : ISendRequest) : IRequestInit {
@@ -1058,23 +1072,35 @@ export class JsonServiceClient {
 
                 if (res.status === 401) {
                     if (this.refreshToken) {
-                        const jwtReq = new GetAccessToken();
-                        jwtReq.refreshToken = this.refreshToken;
+                        const jwtReq = new GetAccessToken({ refreshToken:this.refreshToken, useTokenCookie: this.useTokenCookie });
                         let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
+
+                        if (this.useTokenCookie) {
+                            this.bearerToken = null;
+                            this.headers.delete("Authorization");
+                        }
 
                         let jwtRequest = this.createRequest({ method:HttpMethods.Post, request:jwtReq, args:null, url });
                         return fetch(url, jwtRequest)
                             .then(r => this.createResponse(r, jwtReq).then(jwtResponse => {
-                                this.bearerToken = jwtResponse.accessToken;
+                                this.bearerToken = jwtResponse.accessToken || null;
                                 return resendRequest();
                             }))
                             .catch(res => {
-                                return this.handleError(holdRes, res, "RefreshTokenException")
+                                if (this.onAuthenticationRequired) {
+                                    return this.onAuthenticationRequired()
+                                        .then(resendRequest)
+                                        .catch(resHandler => { 
+                                            return this.handleError(holdRes, resHandler, "RefreshTokenException")
+                                        });
+                                } else {
+                                    return this.handleError(holdRes, res, "RefreshTokenException")
+                                }
                             });
-                    }
-
-                    if (this.onAuthenticationRequired) {
-                        return this.onAuthenticationRequired().then(resendRequest);
+                    } else {
+                        if (this.onAuthenticationRequired) {
+                            return this.onAuthenticationRequired().then(resendRequest);
+                        }
                     }
                 }
 
