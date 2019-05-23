@@ -20,6 +20,8 @@ import {
     appendQueryString,
 } from  '../src/index';
 
+declare var process:any;
+
 const expect = chai.expect; 
 const assert = chai.assert; 
 
@@ -33,7 +35,7 @@ const clearSession = async (client:JsonServiceClient) => {
     await client.post(logout);
 };
 
-describe('JsonServiceClient Tests', () => {
+describe ('JsonServiceClient Tests', () => {
     var client : JsonServiceClient;
     var testClient : JsonServiceClient;
 
@@ -221,7 +223,7 @@ describe('JsonServiceClient Tests', () => {
 
         testClient.exceptionFilter = (res,error) => {
             chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
-            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid Username or Password');
         };
 
         var testPromise = new Promise((resolve,reject) => {
@@ -235,7 +237,7 @@ describe('JsonServiceClient Tests', () => {
         testPromise.then((res: ErrorResponse) => {
             try {
                 chai.expect(res.responseStatus.errorCode).to.be.equal('Unauthorized');
-                chai.expect(res.responseStatus.message).to.be.equal('Invalid UserName or Password');
+                chai.expect(res.responseStatus.message).to.be.equal('Invalid Username or Password');
                 done();
             } catch(error) {
                 done(error);
@@ -243,7 +245,8 @@ describe('JsonServiceClient Tests', () => {
         },done);
     })
 
-    it ('Should return 401 for failed Auth requests (HttpBenchmarks)', done => {
+    it ('Should return 401 for failed Auth requests (HttpBenchmarks)', async () => {
+        
         var client = new JsonServiceClient("https://httpbenchmarks.servicestack.net");
         client.exceptionFilter = (res,error) => {
             chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
@@ -255,29 +258,21 @@ describe('JsonServiceClient Tests', () => {
         request.userName = "test";
         request.password = "wrong";
 
-        var testPromise = new Promise((resolve,reject) => {
-            client.post(request).then(response => {
-                reject(response);
-            }).catch((error) => {
-                resolve(error);
-            })
-        });
-
-        testPromise.then((error: ErrorResponse) => {
-            try {
-                chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
-                chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
-                done();
-            } catch(ex) {
-                done(ex);
-            }
-        },done);
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+        try {
+            await client.post(request);
+        } catch(error) {
+            chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+        } finally {
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
+        }
     })
 
     it ('Should return 401 for failed Auth requests (Test)', done => {
         testClient.exceptionFilter = (res,error) => {
             chai.expect(error.responseStatus.errorCode).to.be.equal('Unauthorized');
-            chai.expect(error.responseStatus.message).to.be.equal('Invalid UserName or Password');
+            chai.expect(error.responseStatus.message).to.be.equal('Invalid Username or Password');
         };
 
         var request = new dtos.Authenticate();
@@ -296,7 +291,7 @@ describe('JsonServiceClient Tests', () => {
         testPromise.then((res: ErrorResponse) => {
             try {
                 chai.expect(res.responseStatus.errorCode).to.be.equal('Unauthorized');
-                chai.expect(res.responseStatus.message).to.be.equal('Invalid UserName or Password');
+                chai.expect(res.responseStatus.message).to.be.equal('Invalid Username or Password');
                 done();
             } catch(error) {
                 done(error);
@@ -350,7 +345,7 @@ describe('JsonServiceClient Tests', () => {
                 chai.expect(res.responseStatus.errors.length).to.be.equal(3);
                 chai.expect(res.responseStatus.errors[1].errorCode).to.be.equal("NotEmpty");
                 chai.expect(res.responseStatus.errors[1].fieldName).to.be.equal("Required");
-                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' should not be empty.");
+                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' must not be empty.");
                 done();
             } catch(error) {
                 done(error);
@@ -377,7 +372,7 @@ describe('JsonServiceClient Tests', () => {
                 chai.expect(res.responseStatus.errors.length).to.be.equal(3);
                 chai.expect(res.responseStatus.errors[1].errorCode).to.be.equal("NotEmpty");
                 chai.expect(res.responseStatus.errors[1].fieldName).to.be.equal("Required");
-                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' should not be empty.");
+                chai.expect(res.responseStatus.errors[1].message).to.be.equal("'Required' must not be empty.");
                 done();
             } catch(error) {
                 done(error);
