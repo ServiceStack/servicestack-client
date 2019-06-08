@@ -41,6 +41,8 @@ var GetNavItems = /** @class */ (function () {
     function GetNavItems(init) {
         Object.assign(this, init);
     }
+    GetNavItems.prototype.createResponse = function () { return new GetNavItemsResponse(); };
+    GetNavItems.prototype.getTypeName = function () { return 'GetNavItems'; };
     return GetNavItems;
 }());
 exports.GetNavItems = GetNavItems;

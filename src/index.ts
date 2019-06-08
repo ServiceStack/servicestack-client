@@ -41,6 +41,8 @@ export class NavItem {
 }
 export class GetNavItems {
     public constructor(init?:Partial<GetNavItems>) { (Object as any).assign(this, init); }
+    public createResponse() { return new GetNavItemsResponse(); }
+    public getTypeName() { return 'GetNavItems'; }
 }
 export class GetNavItemsResponse {
     public baseUrl: string;

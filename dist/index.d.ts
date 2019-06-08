@@ -46,6 +46,8 @@ export declare class NavItem {
 }
 export declare class GetNavItems {
     constructor(init?: Partial<GetNavItems>);
+    createResponse(): GetNavItemsResponse;
+    getTypeName(): string;
 }
 export declare class GetNavItemsResponse {
     baseUrl: string;
