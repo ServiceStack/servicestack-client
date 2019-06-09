@@ -470,4 +470,4 @@ export declare class NavOptions {
     childNavMenuItemClass?: string;
     constructor(init?: Partial<NavOptions>);
 }
-export declare function classNames(): string;
+export declare function classNames(...args: any[]): string;

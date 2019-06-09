@@ -1977,9 +1977,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }());
     exports.NavOptions = NavOptions;
     function classNames() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         var classes = [];
-        for (var i = 0; i < arguments.length; i++) {
-            var arg = arguments[i];
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
             if (!arg)
                 continue;
             var argType = typeof arg;
