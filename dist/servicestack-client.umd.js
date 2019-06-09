@@ -1987,7 +1987,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (!arg)
                 continue;
             var argType = typeof arg;
-            if (typeof arg === 'string' || argType === 'number') {
+            if (argType === 'string' || argType === 'number') {
                 classes.push(arg);
             }
             else if (Array.isArray(arg) && arg.length) {
@@ -1997,7 +1997,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 }
             }
             else if (argType === 'object') {
-                for (var key in Object.keys(arg)) {
+                for (var _a = 0, _b = Object.keys(arg); _a < _b.length; _a++) {
+                    var key = _b[_a];
                     if (arg[key]) {
                         classes.push(key);
                     }

@@ -2248,7 +2248,7 @@ export function classNames(...args: any[]) {
 
         const argType = typeof arg;
 
-        if (typeof arg === 'string' || argType === 'number') {
+        if (argType === 'string' || argType === 'number') {
             classes.push(arg);
         } else if (Array.isArray(arg) && arg.length) {
             const inner = classNames.apply(null, arg);
@@ -2256,7 +2256,7 @@ export function classNames(...args: any[]) {
                 classes.push(inner);
             }
         } else if (argType === 'object') {
-            for (let key in Object.keys(arg)) {
+            for (let key of Object.keys(arg)) {
                 if (arg[key]) {
                     classes.push(key);
                 }
