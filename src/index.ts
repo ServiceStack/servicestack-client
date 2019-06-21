@@ -1606,34 +1606,46 @@ if (typeof window != "undefined" && (window as any).Element !== undefined) { // 
       };
   }
 }
-  
-export function bindHandlers(handlers:any,el:Node=document) {
-  el.addEventListener('click', function(evt) {
-    const el = evt.target as Element;
-    let x = attr(el,'data-click');
-    if (!x) {
-      let elParent = el.closest('[data-click]');
-      if (elParent)
-        x = attr(elParent,'data-click'); 
-    }
-    if (!x) return;
 
-    let pos = x.indexOf(':');
-    if (pos >= 0) {
-      const cmd = x.substring(0, pos);
-      const data = x.substring(pos + 1);
-      const fn = handlers[cmd];
-      if (fn) {
-        fn.apply(evt.target, data.split(','));
-      }
-    } else {
-      const fn = handlers[x];
-      if (fn) {
-        fn.apply(evt.target, [].slice.call(arguments));
-      }
-    }
-  });
-} 
+const EVENTS = 'click dblclick change focus blur focusin focusout select keydown keypress keyup hover toggle input'.split(' ');
+
+function handleEvent(handlers:any,el:Node=document,type:string)
+{
+    el.addEventListener(type, function(evt) {
+        const evtData = `data-${type}`;
+        const el = evt.target as Element;
+        let x = attr(el,evtData);
+        if (!x) {
+            let elParent = el.closest(`[${evtData}]`);
+            if (elParent)
+                x = attr(elParent,evtData);
+        }
+        if (!x) return;
+
+        let pos = x.indexOf(':');
+        if (pos >= 0) {
+            const cmd = x.substring(0, pos);
+            const data = x.substring(pos + 1);
+            const fn = handlers[cmd];
+            if (fn) {
+                fn.apply(evt.target, data.split(','));
+            }
+        } else {
+            const fn = handlers[x];
+            if (fn) {
+                fn.apply(evt.target, [].slice.call(arguments));
+            }
+        }
+    });
+}
+
+export function bindHandlers(handlers:any,el:Document|Element=document) {
+    EVENTS.forEach(evt => {
+        if (el.querySelector(`[data-${evt}]`)) {
+            handleEvent(handlers, el, evt);
+        }
+    });
+}
 
 export interface IAjaxFormOptions {
   type?:string,

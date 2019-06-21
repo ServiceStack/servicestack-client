@@ -375,7 +375,7 @@ export interface ICreateElementOptions {
 }
 export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
 export declare function bootstrap(el?: Element): void;
-export declare function bindHandlers(handlers: any, el?: Node): void;
+export declare function bindHandlers(handlers: any, el?: Document | Element): void;
 export interface IAjaxFormOptions {
     type?: string;
     url?: string;

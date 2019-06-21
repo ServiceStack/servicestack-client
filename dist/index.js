@@ -1340,15 +1340,17 @@ if (typeof window != "undefined" && window.Element !== undefined) { // polyfill 
         };
     }
 }
-function bindHandlers(handlers, el) {
+var EVENTS = 'click dblclick change focus blur focusin focusout select keydown keypress keyup hover toggle input'.split(' ');
+function handleEvent(handlers, el, type) {
     if (el === void 0) { el = document; }
-    el.addEventListener('click', function (evt) {
+    el.addEventListener(type, function (evt) {
+        var evtData = "data-" + type;
         var el = evt.target;
-        var x = attr(el, 'data-click');
+        var x = attr(el, evtData);
         if (!x) {
-            var elParent = el.closest('[data-click]');
+            var elParent = el.closest("[" + evtData + "]");
             if (elParent)
-                x = attr(elParent, 'data-click');
+                x = attr(elParent, evtData);
         }
         if (!x)
             return;
@@ -1366,6 +1368,14 @@ function bindHandlers(handlers, el) {
             if (fn) {
                 fn.apply(evt.target, [].slice.call(arguments));
             }
+        }
+    });
+}
+function bindHandlers(handlers, el) {
+    if (el === void 0) { el = document; }
+    EVENTS.forEach(function (evt) {
+        if (el.querySelector("[data-" + evt + "]")) {
+            handleEvent(handlers, el, evt);
         }
     });
 }
