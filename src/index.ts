@@ -837,6 +837,15 @@ export class JsonServiceClient {
         return this.sendBody<T>(HttpMethods.Patch, request, body, args);
     }
 
+    publish(request: IReturnVoid, args?:any): Promise<any> {
+        return this.sendOneWay(request, args);
+    }
+    
+    sendOneWay<T>(request: IReturn<T>|IReturnVoid, args?:any): Promise<T> {
+        const url = combinePaths(this.oneWayBaseUrl, nameOf(request));
+        return this.send<T>(HttpMethods.Post, request, null, url);
+    }
+
     sendAll<T>(requests:IReturn<T>[]) : Promise<T[]> {
         if (requests.length == 0)
             return Promise.resolve([]);

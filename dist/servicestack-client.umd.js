@@ -639,6 +639,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         JsonServiceClient.prototype.patchBody = function (request, body, args) {
             return this.sendBody(HttpMethods.Patch, request, body, args);
         };
+        JsonServiceClient.prototype.publish = function (request, args) {
+            return this.sendOneWay(request, args);
+        };
+        JsonServiceClient.prototype.sendOneWay = function (request, args) {
+            var url = exports.combinePaths(this.oneWayBaseUrl, exports.nameOf(request));
+            return this.send(HttpMethods.Post, request, null, url);
+        };
         JsonServiceClient.prototype.sendAll = function (requests) {
             if (requests.length == 0)
                 return Promise.resolve([]);
