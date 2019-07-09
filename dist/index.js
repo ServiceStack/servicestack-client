@@ -264,7 +264,7 @@ var ServerEventsClient = /** @class */ (function () {
         var es = this.EventSource
             ? new this.EventSource(url, this.getEventSourceOptions())
             : new EventSource(url, this.getEventSourceOptions());
-        es.addEventListener('error', function (e) { return opt.onerror || hold.onerror || _this.onError; });
+        es.addEventListener('error', function (e) { return (opt.onerror || hold.onerror || _this.onError)(e); });
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
         var fn = this.options.onReconnect;
         if (fn != null)

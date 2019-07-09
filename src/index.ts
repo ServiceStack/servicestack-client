@@ -386,7 +386,7 @@ export class ServerEventsClient {
         const es = this.EventSource
             ? new this.EventSource(url, this.getEventSourceOptions())
             : new EventSource(url, this.getEventSourceOptions());
-        es.addEventListener('error', e => opt.onerror || hold.onerror || this.onError);
+        es.addEventListener('error', e => (opt.onerror || hold.onerror || this.onError)(e));
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
 
         var fn = this.options.onReconnect;
