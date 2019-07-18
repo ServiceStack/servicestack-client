@@ -35,7 +35,7 @@ export declare class NavItem {
     exact: boolean;
     id: string;
     className: string;
-    iconHtml: string;
+    iconClass: string;
     show: string;
     hide: string;
     children: NavItem[];
@@ -430,7 +430,6 @@ export declare class NavDefaults {
     static childNavLinkClass: string;
     static childNavMenuClass: string;
     static childNavMenuItemClass: string;
-    static parseIconHtml: ((html: string) => any) | null;
     static create(): NavOptions;
     static forNav(options?: NavOptions | null): NavOptions;
     static overrideDefaults(targets: NavOptions | null | undefined, source: NavOptions): NavOptions;

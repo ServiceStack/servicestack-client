@@ -32,7 +32,7 @@ export class NavItem {
     public exact: boolean;
     public id: string;
     public className: string;
-    public iconHtml: string;
+    public iconClass: string;
     public show: string;
     public hide: string;
     public children: NavItem[];
@@ -2157,10 +2157,6 @@ export class NavDefaults {
     public static childNavLinkClass = 'nav-link dropdown-toggle';
     public static childNavMenuClass = 'dropdown-menu';
     public static childNavMenuItemClass = 'dropdown-item';
-
-    // only supports <i class="..."></i> to render arbitrary return
-    // <span dangerouslySetInnerHTML={{__html:item.iconHtml||''}} />
-    public static parseIconHtml: ((html: string) => any) | null = null;
 
     public static create() { return new NavOptions(); }
     public static forNav(options?: NavOptions|null) { return options || NavDefaults.create(); }

@@ -1903,9 +1903,6 @@ var NavDefaults = /** @class */ (function () {
     NavDefaults.childNavLinkClass = 'nav-link dropdown-toggle';
     NavDefaults.childNavMenuClass = 'dropdown-menu';
     NavDefaults.childNavMenuItemClass = 'dropdown-item';
-    // only supports <i class="..."></i> to render arbitrary return
-    // <span dangerouslySetInnerHTML={{__html:item.iconHtml||''}} />
-    NavDefaults.parseIconHtml = null;
     return NavDefaults;
 }());
 exports.NavDefaults = NavDefaults;
