@@ -1639,12 +1639,20 @@ function handleEvent(handlers:any,el:Node=document,type:string)
     });
 }
 
-export function bindHandlers(handlers:any,el:Document|Element=document) {
-    EVENTS.forEach(evt => {
-        if (el.querySelector(`[data-${evt}]`)) {
-            handleEvent(handlers, el, evt);
-        }
-    });
+export interface IBindHandlersOptions
+{
+    events: string[]
+}
+export function bindHandlers(handlers:any,el:Document|Element=document,opt:IBindHandlersOptions=null) {
+    if (opt && opt.events) {
+        opt.events.forEach(evt => handleEvent(handlers, el, evt));
+    } else {
+        EVENTS.forEach(evt => {
+            if (el.querySelector(`[data-${evt}]`)) {
+                handleEvent(handlers, el, evt);
+            }
+        });
+    }
 }
 
 export interface IAjaxFormOptions {

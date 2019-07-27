@@ -1381,13 +1381,19 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             }
         });
     }
-    function bindHandlers(handlers, el) {
+    function bindHandlers(handlers, el, opt) {
         if (el === void 0) { el = document; }
-        EVENTS.forEach(function (evt) {
-            if (el.querySelector("[data-" + evt + "]")) {
-                handleEvent(handlers, el, evt);
-            }
-        });
+        if (opt === void 0) { opt = null; }
+        if (opt && opt.events) {
+            opt.events.forEach(function (evt) { return handleEvent(handlers, el, evt); });
+        }
+        else {
+            EVENTS.forEach(function (evt) {
+                if (el.querySelector("[data-" + evt + "]")) {
+                    handleEvent(handlers, el, evt);
+                }
+            });
+        }
     }
     exports.bindHandlers = bindHandlers;
     function bootstrapForm(form, options) {
