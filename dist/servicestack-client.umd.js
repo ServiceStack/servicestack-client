@@ -185,7 +185,17 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                         }
                         if (opt.unRegisterUrl) {
                             if (typeof window != "undefined") {
-                                window.onunload = function () { return _this.stop(); };
+                                window.onunload = function () {
+                                    if (navigator.sendBeacon) { // Chrome https://developers.google.com/web/updates/2019/12/chrome-80-deps-rems
+                                        _this.stopped = true;
+                                        if (_this.eventSource)
+                                            _this.eventSource.close();
+                                        navigator.sendBeacon(opt.unRegisterUrl);
+                                    }
+                                    else {
+                                        _this.stop();
+                                    }
+                                };
                             }
                         }
                         _this.updateSubscriberUrl = opt.updateSubscriberUrl;

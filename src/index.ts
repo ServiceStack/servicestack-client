@@ -303,7 +303,16 @@ export class ServerEventsClient {
                 }
                 if (opt.unRegisterUrl) {
                     if (typeof window != "undefined") {
-                        window.onunload = () => this.stop();
+                        window.onunload = () => {
+                            if (navigator.sendBeacon) { // Chrome https://developers.google.com/web/updates/2019/12/chrome-80-deps-rems
+                                this.stopped = true;
+                                if (this.eventSource) this.eventSource.close();
+                                navigator.sendBeacon(opt.unRegisterUrl);
+                            }
+                            else {
+                                this.stop();
+                            }
+                        };
                     }
                 }
                 this.updateSubscriberUrl = opt.updateSubscriberUrl;
