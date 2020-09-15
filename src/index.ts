@@ -772,6 +772,7 @@ export class JsonServiceClient {
     onAuthenticationRequired: () => Promise<any>;
     manageCookies: boolean;
     cookies:{ [index:string]: Cookie };
+    parseJson: (res:Response) => Promise<any>;
 
     static toBase64: (rawString:string) => string;
 
@@ -954,6 +955,12 @@ export class JsonServiceClient {
         return reqInit;
     }
 
+    private json(res:Response) : Promise<any> {
+        if (this.parseJson)
+            return this.parseJson(res);
+        return res.json();
+    }
+
     private createResponse<T>(res:Response, request:any|null) {
         if (!res.ok)
             throw res;
@@ -984,7 +991,7 @@ export class JsonServiceClient {
         var contentType = res.headers.get("content-type");
         var isJson = contentType && contentType.indexOf("application/json") !== -1;
         if (isJson) {
-            return res.json().then(o => o as Object as T);
+            return this.json(res).then(o => o as Object as T);
         }
 
         if (typeof Uint8Array != "undefined" && x instanceof Uint8Array) {
@@ -1005,7 +1012,7 @@ export class JsonServiceClient {
             return x;
         }
 
-        return res.json().then(o => o as Object as T); //fallback
+        return this.json(res).then(o => o as Object as T); //fallback
     }
 
     private handleError(holdRes:Response, res, type:ErrorResponseType=null) {
@@ -1024,7 +1031,7 @@ export class JsonServiceClient {
             );
         }
 
-        return res.json().then(o => {
+        return this.json(res).then(o => {
             var errorDto = sanitize(o);
             if (!errorDto.responseStatus)
                 throw createErrorResponse(res.status, res.statusText, type);
