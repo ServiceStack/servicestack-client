@@ -307,6 +307,7 @@ export declare class JsonServiceClient {
     cookies: {
         [index: string]: Cookie;
     };
+    parseJson: (res: Response) => Promise<any>;
     static toBase64: (rawString: string) => string;
     constructor(baseUrl?: string);
     setCredentials(userName: string, password: string): void;
@@ -330,6 +331,7 @@ export declare class JsonServiceClient {
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     deleteCookie(name: string): void;
     private createRequest({method, request, url, args, body});
+    private json(res);
     private createResponse<T>(res, request);
     private handleError(holdRes, res, type?);
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;

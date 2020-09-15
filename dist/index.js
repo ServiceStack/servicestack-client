@@ -729,6 +729,11 @@ var JsonServiceClient = /** @class */ (function () {
             this.requestFilter(reqInit);
         return reqInit;
     };
+    JsonServiceClient.prototype.json = function (res) {
+        if (this.parseJson)
+            return this.parseJson(res);
+        return res.json();
+    };
     JsonServiceClient.prototype.createResponse = function (res, request) {
         var _this = this;
         if (!res.ok)
@@ -755,7 +760,7 @@ var JsonServiceClient = /** @class */ (function () {
         var contentType = res.headers.get("content-type");
         var isJson = contentType && contentType.indexOf("application/json") !== -1;
         if (isJson) {
-            return res.json().then(function (o) { return o; });
+            return this.json(res).then(function (o) { return o; });
         }
         if (typeof Uint8Array != "undefined" && x instanceof Uint8Array) {
             if (typeof res.arrayBuffer != 'function')
@@ -771,7 +776,7 @@ var JsonServiceClient = /** @class */ (function () {
         if (contentLength === "0" || (contentLength == null && !isJson)) {
             return x;
         }
-        return res.json().then(function (o) { return o; }); //fallback
+        return this.json(res).then(function (o) { return o; }); //fallback
     };
     JsonServiceClient.prototype.handleError = function (holdRes, res, type) {
         var _this = this;
@@ -787,7 +792,7 @@ var JsonServiceClient = /** @class */ (function () {
                 return reject(_this.raiseError(null, res));
             });
         }
-        return res.json().then(function (o) {
+        return this.json(res).then(function (o) {
             var errorDto = exports.sanitize(o);
             if (!errorDto.responseStatus)
                 throw createErrorResponse(res.status, res.statusText, type);
