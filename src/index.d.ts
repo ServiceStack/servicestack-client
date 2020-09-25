@@ -372,6 +372,7 @@ export declare const padInt: (n: number) => string | number;
 export declare const dateFmt: (d?: Date) => string;
 export declare const dateFmtHM: (d?: Date) => string;
 export declare const timeFmt12: (d?: Date) => string;
+export declare const toLocalISOString: (d?: Date) => string;
 export interface ICreateElementOptions {
     insertAfter?: Element | null;
 }
@@ -477,3 +478,6 @@ export declare class NavOptions {
     constructor(init?: Partial<NavOptions>);
 }
 export declare function classNames(...args: any[]): string;
+export declare function fromXsdDuration(xsd: string): number;
+export declare function toXsdDuration(time: number): string;
+export declare function toTimeSpanFmt(time: number): string;

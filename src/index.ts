@@ -1536,6 +1536,8 @@ export const padInt = (n: number) => n < 10 ? '0' + n : n;
 export const dateFmt = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
 export const dateFmtHM = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes());
 export const timeFmt12 = (d: Date = new Date()) => padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
+export const toLocalISOString = (d: Date = new Date()) =>
+    `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
 
 export interface ICreateElementOptions {
   insertAfter?:Element|null
@@ -2306,3 +2308,90 @@ export function classNames(...args: any[]) {
     }
     return classes.join(' ');
 }
+
+export function fromXsdDuration(xsd:string) {
+    let days = 0;
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+    let ms = 0.0;
+
+    let t = splitOnFirst(xsd.substring(1),'T');
+    let hasTime = t.length == 2;
+
+    let d = splitOnFirst(t[0], 'D');
+    if (d.length == 2) {
+        days = parseInt(d[0], 10) || 0;
+    }
+
+    if (hasTime) {
+        let h = splitOnFirst(t[1],'H');
+        if (h.length == 2) {
+            hours = parseInt(h[0], 10) || 0;
+        }
+        let m = splitOnFirst(h[h.length-1],'M');
+        if (m.length == 2) {
+            minutes = parseInt(m[0],10) || 0;
+        }
+        let s = splitOnFirst(m[m.length-1],'S');
+        if (s.length == 2) {
+            ms = parseFloat(s[0]);
+        }
+        seconds = ms|0;
+        ms -= seconds;
+    }
+
+    let totalSecs = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds;
+    return totalSecs + ms
+}
+
+function timeFmt(time:number, asXsd:boolean) {
+    let totalSeconds = time;
+    let wholeSeconds = time|0;
+    let seconds = wholeSeconds;
+    let sec = (seconds >= 60 ? seconds % 60 : seconds)
+    seconds = (seconds / 60)
+    let min = seconds >= 60 ? seconds % 60 : seconds
+    seconds = (seconds / 60)
+    let hours = seconds >= 24 ? seconds % 24 : seconds
+    let days = seconds / 24
+    let remainingSecs = sec + (totalSeconds - wholeSeconds);
+
+    let sb = asXsd ? 'P' : '';
+    if (asXsd) {
+        if ((days|0) > 0) {
+            sb += `${days|0}D`;
+        }
+        if (days == 0 || (hours + min + sec) + remainingSecs > 0) {
+            sb += "T";
+            if ((hours|0) > 0) {
+                sb += `${hours|0}H`;
+            }
+            if ((min|0) > 0) {
+                sb += `${min|0}M`;
+            }
+            if (remainingSecs > 0) {
+                let secFmt = remainingSecs.toFixed(7);
+                secFmt = trimEnd(trimEnd(secFmt,'0'),'.');
+                sb += `${secFmt}S`;
+            } else if (sb.length == 2) {
+                sb += '0S';
+            }
+        }
+    } else {
+        if ((days|0) > 0) {
+            sb += `${days|0}:`;
+        }
+        sb += `${padInt(hours|0)}:${padInt(min|0)}:`;
+        if (remainingSecs > 0) {
+            let secFmt = remainingSecs.toFixed(7);
+            secFmt = trimEnd(trimEnd(secFmt,'0'),'.');
+            sb += remainingSecs >= 10 ? `${secFmt}` : `0${secFmt}`;
+        } else {
+            sb += '00';
+        }
+    }
+    return sb;
+}
+export function toXsdDuration(time:number) { return timeFmt(time,true); }
+export function toTimeSpanFmt(time:number) { return timeFmt(time,false); }

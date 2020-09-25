@@ -1282,6 +1282,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         if (d === void 0) { d = new Date(); }
         return exports.padInt((d.getHours() + 24) % 12 || 12) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
     };
+    exports.toLocalISOString = function (d) {
+        if (d === void 0) { d = new Date(); }
+        return d.getFullYear() + "-" + exports.padInt(d.getMonth() + 1) + "-" + exports.padInt(d.getDate()) + "T" + exports.padInt(d.getHours()) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds());
+    };
     var bsAlert = function (msg) { return '<div class="alert alert-danger">' + msg + '</div>'; };
     var attr = function (e, name) { return e.getAttribute(name); };
     var sattr = function (e, name, value) { return e.setAttribute(name, value); };
@@ -2043,4 +2047,90 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return classes.join(' ');
     }
     exports.classNames = classNames;
+    function fromXsdDuration(xsd) {
+        var days = 0;
+        var hours = 0;
+        var minutes = 0;
+        var seconds = 0;
+        var ms = 0.0;
+        var t = exports.splitOnFirst(xsd.substring(1), 'T');
+        var hasTime = t.length == 2;
+        var d = exports.splitOnFirst(t[0], 'D');
+        if (d.length == 2) {
+            days = parseInt(d[0], 10) || 0;
+        }
+        if (hasTime) {
+            var h = exports.splitOnFirst(t[1], 'H');
+            if (h.length == 2) {
+                hours = parseInt(h[0], 10) || 0;
+            }
+            var m = exports.splitOnFirst(h[h.length - 1], 'M');
+            if (m.length == 2) {
+                minutes = parseInt(m[0], 10) || 0;
+            }
+            var s = exports.splitOnFirst(m[m.length - 1], 'S');
+            if (s.length == 2) {
+                ms = parseFloat(s[0]);
+            }
+            seconds = ms | 0;
+            ms -= seconds;
+        }
+        var totalSecs = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds;
+        return totalSecs + ms;
+    }
+    exports.fromXsdDuration = fromXsdDuration;
+    function timeFmt(time, asXsd) {
+        var totalSeconds = time;
+        var wholeSeconds = time | 0;
+        var seconds = wholeSeconds;
+        var sec = (seconds >= 60 ? seconds % 60 : seconds);
+        seconds = (seconds / 60);
+        var min = seconds >= 60 ? seconds % 60 : seconds;
+        seconds = (seconds / 60);
+        var hours = seconds >= 24 ? seconds % 24 : seconds;
+        var days = seconds / 24;
+        var remainingSecs = sec + (totalSeconds - wholeSeconds);
+        var sb = asXsd ? 'P' : '';
+        if (asXsd) {
+            if ((days | 0) > 0) {
+                sb += (days | 0) + "D";
+            }
+            if (days == 0 || (hours + min + sec) + remainingSecs > 0) {
+                sb += "T";
+                if ((hours | 0) > 0) {
+                    sb += (hours | 0) + "H";
+                }
+                if ((min | 0) > 0) {
+                    sb += (min | 0) + "M";
+                }
+                if (remainingSecs > 0) {
+                    var secFmt = remainingSecs.toFixed(7);
+                    secFmt = trimEnd(trimEnd(secFmt, '0'), '.');
+                    sb += secFmt + "S";
+                }
+                else if (sb.length == 2) {
+                    sb += '0S';
+                }
+            }
+        }
+        else {
+            if ((days | 0) > 0) {
+                sb += (days | 0) + ":";
+            }
+            sb += exports.padInt(hours | 0) + ":" + exports.padInt(min | 0) + ":";
+            if (remainingSecs > 0) {
+                var secFmt = remainingSecs.toFixed(7);
+                secFmt = trimEnd(trimEnd(secFmt, '0'), '.');
+                sb += remainingSecs >= 10 ? "" + secFmt : "0" + secFmt;
+            }
+            else {
+                sb += '00';
+            }
+        }
+        return sb;
+    }
+    function toXsdDuration(time) { return timeFmt(time, true); }
+    exports.toXsdDuration = toXsdDuration;
+    function toTimeSpanFmt(time) { return timeFmt(time, false); }
+    exports.toTimeSpanFmt = toTimeSpanFmt;
 });
