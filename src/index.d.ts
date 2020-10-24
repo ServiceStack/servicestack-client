@@ -128,7 +128,7 @@ export interface IReconnectServerEventsOptions {
 export declare enum ReadyState {
     CONNECTING = 0,
     OPEN = 1,
-    CLOSED = 2,
+    CLOSED = 2
 }
 export interface IEventSourceStatic extends EventTarget {
     new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
@@ -284,6 +284,7 @@ export interface ISendRequest {
     returns?: {
         createResponse: () => any;
     };
+    signal?: AbortSignal;
 }
 export declare class JsonServiceClient {
     baseUrl: string;
@@ -334,8 +335,8 @@ export declare class JsonServiceClient {
     private json(res);
     private createResponse<T>(res, request);
     private handleError(holdRes, res, type?);
-    send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody<T>(method, request, body, args?);
+    send<T>(method: string, request: any | null, args?: any, url?: string, signal?: AbortSignal): Promise<T>;
+    private sendBody<T>(method, request, body, args?, signal?: AbortSignal);
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
