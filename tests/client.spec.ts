@@ -545,30 +545,11 @@ describe ('JsonServiceClient Tests', () => {
             console.log(JSON.stringify(res));
             try {
                 chai.expect(res.responseStatus.errorCode).to.be.equal('AbortException');
-                //chai.expect(res.responseStatus.message).to.be.equal('Invalid Username or Password');
                 done();
             } catch(error) {
                 done(error);
             }
         },done);
-
-        
-        // testClient.get(request, {signal} )
-        //     .then(r => throw, 
-        //     error => {
-
-        //         done();
-        //     });
-
-        //     testPromise.then((res: ErrorResponse) => {
-        //         try {
-        //             chai.expect(res.responseStatus.errorCode).to.be.equal('NotImplementedException');
-        //             chai.expect(res.responseStatus.message).to.be.equal('The operation \'Overview\' does not exist for this service');
-        //             done();
-        //         } catch(error) {
-        //             done(error);
-        //         }
-        //     },done);
 
     })
 });
