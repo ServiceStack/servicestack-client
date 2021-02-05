@@ -750,6 +750,7 @@ export interface ISendRequest
     args?:any; 
     url?:string; 
     returns?: { createResponse: () => any };
+    signal?: AbortSignal
 }
 
 export class JsonServiceClient {
@@ -799,77 +800,77 @@ export class JsonServiceClient {
         this.bearerToken = token;
     }
 
-    get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+    get<T>(request: IReturn<T>|string, args?:any, signal?:AbortSignal): Promise<T> {
         return typeof request != "string" 
-            ? this.send<T>(HttpMethods.Get, request, args)
-            : this.send<T>(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
+            ? this.send<T>(HttpMethods.Get, request, args, null, signal)
+            : this.send<T>(HttpMethods.Get, null, args, this.toAbsoluteUrl(request), signal);
     }
 
-    delete<T>(request: IReturn<T>|string, args?:any): Promise<T> {
+    delete<T>(request: IReturn<T>|string, args?:any, signal?:AbortSignal): Promise<T> {
         return typeof request != "string" 
-            ? this.send<T>(HttpMethods.Delete, request, args)
-            : this.send<T>(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
+            ? this.send<T>(HttpMethods.Delete, request, args, null, signal)
+            : this.send<T>(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request), signal);
     }
 
-    post<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Post, request, args);
+    post<T>(request: IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Post, request, args, null, signal);
     }
 
-    postToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
+    postToUrl<T>(url:string, request:IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url), signal);
     }
 
-    postBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body, args);
+    postBody<T>(request:IReturn<T>, body:string|any, args?:any, signal?:AbortSignal) {
+        return this.sendBody<T>(HttpMethods.Post, request, body, args, signal);
     }
 
-    put<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Put, request, args);
+    put<T>(request: IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Put, request, args, null, signal);
     }
 
-    putToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
+    putToUrl<T>(url:string, request:IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url), signal);
     }
 
-    putBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Put, request, body, args);
+    putBody<T>(request:IReturn<T>, body:string|any, args?:any, signal?:AbortSignal) {
+        return this.sendBody<T>(HttpMethods.Put, request, body, args, signal);
     }
 
-    patch<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Patch, request, args);
+    patch<T>(request: IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Patch, request, args, null, signal);
     }
 
-    patchToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
+    patchToUrl<T>(url:string, request:IReturn<T>, args?:any, signal?:AbortSignal): Promise<T> {
+        return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url), signal);
     }
 
-    patchBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Patch, request, body, args);
+    patchBody<T>(request:IReturn<T>, body:string|any, args?:any, signal?:AbortSignal) {
+        return this.sendBody<T>(HttpMethods.Patch, request, body, args, signal);
     }
 
-    publish(request: IReturnVoid, args?:any): Promise<any> {
-        return this.sendOneWay(request, args);
+    publish(request: IReturnVoid, args?:any, signal?:AbortSignal): Promise<any> {
+        return this.sendOneWay(request, args, signal);
     }
     
-    sendOneWay<T>(request: IReturn<T>|IReturnVoid, args?:any): Promise<T> {
+    sendOneWay<T>(request: IReturn<T>|IReturnVoid, args?:any, signal?:AbortSignal): Promise<T> {
         const url = combinePaths(this.oneWayBaseUrl, nameOf(request));
-        return this.send<T>(HttpMethods.Post, request, null, url);
+        return this.send<T>(HttpMethods.Post, request, null, url, signal);
     }
 
-    sendAll<T>(requests:IReturn<T>[]) : Promise<T[]> {
+    sendAll<T>(requests:IReturn<T>[], signal?: AbortSignal) : Promise<T[]> {
         if (requests.length == 0)
             return Promise.resolve([]);
 
         const url = combinePaths(this.replyBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send<T[]>(HttpMethods.Post, requests, null, url);
+        return this.send<T[]>(HttpMethods.Post, requests, null, url, signal);
     }
 
-    sendAllOneWay<T>(requests:IReturn<T>[]) : Promise<void> {
+    sendAllOneWay<T>(requests:IReturn<T>[], signal?: AbortSignal) : Promise<void> {
         if (requests.length == 0)
             return Promise.resolve(void 0);
 
         const url = combinePaths(this.oneWayBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send<T[]>(HttpMethods.Post, requests, null, url)
+        return this.send<T[]>(HttpMethods.Post, requests, null, url, signal)
             .then(r => void 0);
     }
 
@@ -900,7 +901,7 @@ export class JsonServiceClient {
         }
     }
 
-    private createRequest({ method, request, url, args, body } : ISendRequest) : IRequestInit {
+    private createRequest({ method, request, url, args, body, signal } : ISendRequest) : IRequestInit {
 
         if (!url)
             url = this.createUrlFromDto(method, request);
@@ -939,6 +940,7 @@ export class JsonServiceClient {
             credentials: this.credentials,
             headers,
             compress: false,  // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
+            signal: signal
         };
 
         if (hasRequestBody) {
@@ -1050,11 +1052,11 @@ export class JsonServiceClient {
         });
     }
 
-    send<T>(method:string, request:any|null, args?:any, url?:string): Promise<T> {
-        return this.sendRequest<T>({ method, request, args, url });
+    send<T>(method:string, request:any|null, args?:any, url?:string, signal?:AbortSignal): Promise<T> {
+        return this.sendRequest<T>({ method, request, args, url, signal });
     }
 
-    private sendBody<T>(method:string, request:IReturn<T>, body:string|any, args?:any) {
+    private sendBody<T>(method:string, request:IReturn<T>, body:string|any, args?:any, signal?:AbortSignal) {
         let url = combinePaths(this.replyBaseUrl, nameOf(request));
         return this.sendRequest<T>({
             method,
@@ -1066,7 +1068,8 @@ export class JsonServiceClient {
                     : JSON.stringify(body),
             url: appendQueryString(url, request), 
             args,
-            returns: request 
+            returns: request ,
+            signal: signal
         });
     }
 

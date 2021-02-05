@@ -128,7 +128,7 @@ export interface IReconnectServerEventsOptions {
 export declare enum ReadyState {
     CONNECTING = 0,
     OPEN = 1,
-    CLOSED = 2,
+    CLOSED = 2
 }
 export interface IEventSourceStatic extends EventTarget {
     new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
@@ -284,6 +284,7 @@ export interface ISendRequest {
     returns?: {
         createResponse: () => any;
     };
+    signal?: AbortSignal;
 }
 export declare class JsonServiceClient {
     baseUrl: string;
@@ -312,30 +313,30 @@ export declare class JsonServiceClient {
     constructor(baseUrl?: string);
     setCredentials(userName: string, password: string): void;
     setBearerToken(token: string): void;
-    get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
-    delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
-    post<T>(request: IReturn<T>, args?: any): Promise<T>;
-    postToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    postBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
-    put<T>(request: IReturn<T>, args?: any): Promise<T>;
-    putToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    putBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
-    patch<T>(request: IReturn<T>, args?: any): Promise<T>;
-    patchToUrl<T>(url: string, request: IReturn<T>, args?: any): Promise<T>;
-    patchBody<T>(request: IReturn<T>, body: string | any, args?: any): Promise<T>;
-    publish(request: IReturnVoid, args?: any): Promise<any>;
-    sendOneWay<T>(request: IReturn<T> | IReturnVoid, args?: any): Promise<T>;
-    sendAll<T>(requests: IReturn<T>[]): Promise<T[]>;
-    sendAllOneWay<T>(requests: IReturn<T>[]): Promise<void>;
+    get<T>(request: IReturn<T> | string, args?: any, signal?: AbortSignal): Promise<T>;
+    delete<T>(request: IReturn<T> | string, args?: any, signal?: AbortSignal): Promise<T>;
+    post<T>(request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    postToUrl<T>(url: string, request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    postBody<T>(request: IReturn<T>, body: string | any, args?: any, signal?: AbortSignal): Promise<T>;
+    put<T>(request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    putToUrl<T>(url: string, request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    putBody<T>(request: IReturn<T>, body: string | any, args?: any, signal?: AbortSignal): Promise<T>;
+    patch<T>(request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    patchToUrl<T>(url: string, request: IReturn<T>, args?: any, signal?: AbortSignal): Promise<T>;
+    patchBody<T>(request: IReturn<T>, body: string | any, args?: any, signal?: AbortSignal): Promise<T>;
+    publish(request: IReturnVoid, args?: any, signal?: AbortSignal): Promise<any>;
+    sendOneWay<T>(request: IReturn<T> | IReturnVoid, args?: any, signal?: AbortSignal): Promise<T>;
+    sendAll<T>(requests: IReturn<T>[], signal?: AbortSignal): Promise<T[]>;
+    sendAllOneWay<T>(requests: IReturn<T>[], signal?: AbortSignal): Promise<void>;
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     deleteCookie(name: string): void;
-    private createRequest({method, request, url, args, body});
-    private json(res);
-    private createResponse<T>(res, request);
-    private handleError(holdRes, res, type?);
-    send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody<T>(method, request, body, args?);
+    private createRequest;
+    private json;
+    private createResponse;
+    private handleError;
+    send<T>(method: string, request: any | null, args?: any, url?: string, signal?: AbortSignal): Promise<T>;
+    private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }

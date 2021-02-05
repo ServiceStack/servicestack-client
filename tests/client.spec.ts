@@ -20,6 +20,8 @@ import {
     appendQueryString,
 } from  '../src/index';
 
+import AbortController from "abort-controller"
+
 declare var process:any;
 
 const expect = chai.expect; 
@@ -522,5 +524,52 @@ describe ('JsonServiceClient Tests', () => {
         testClient.urlFilter = null;
     })
 
+    it ('Can abort GET IReturnVoid requests', done => {
+        let request = new HelloReturnVoid();
+        request.id = 1;
+
+        let controller = new AbortController();
+        const signal = controller.signal;
+
+
+        var testPromise = new Promise((resolve,reject) => {
+            testClient.get(request, {signal} ).then(response => {
+                reject(response);
+            }).catch((error) => {
+                resolve(error);
+            })
+        });
+        controller.abort();
+
+        testPromise.then((res: ErrorResponse) => {
+            console.log(JSON.stringify(res));
+            try {
+                chai.expect(res.responseStatus.errorCode).to.be.equal('AbortException');
+                //chai.expect(res.responseStatus.message).to.be.equal('Invalid Username or Password');
+                done();
+            } catch(error) {
+                done(error);
+            }
+        },done);
+
+
+        // testClient.get(request, {signal} )
+        //     .then(r => throw, 
+        //     error => {
+
+        //         done();
+        //     });
+
+        //     testPromise.then((res: ErrorResponse) => {
+        //         try {
+        //             chai.expect(res.responseStatus.errorCode).to.be.equal('NotImplementedException');
+        //             chai.expect(res.responseStatus.message).to.be.equal('The operation \'Overview\' does not exist for this service');
+        //             done();
+        //         } catch(error) {
+        //             done(error);
+        //         }
+        //     },done);
+
+    })
 });
 
