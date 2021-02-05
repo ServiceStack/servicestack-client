@@ -331,12 +331,12 @@ export declare class JsonServiceClient {
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     deleteCookie(name: string): void;
-    private createRequest;
-    private json;
-    private createResponse;
-    private handleError;
+    private createRequest({method, request, url, args, body});
+    private json(res);
+    private createResponse<T>(res, request);
+    private handleError(holdRes, res, type?);
     send<T>(method: string, request: any | null, args?: any, url?: string, signal?: AbortSignal): Promise<T>;
-    private sendBody;
+    private sendBody<T>(method, request, body, args?, signal?: AbortSignal);
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }
