@@ -533,7 +533,7 @@ describe ('JsonServiceClient Tests', () => {
 
 
         var testPromise = new Promise((resolve,reject) => {
-            testClient.get(request, {signal} ).then(response => {
+            testClient.get(request, null, signal).then(response => {
                 reject(response);
             }).catch((error) => {
                 resolve(error);
