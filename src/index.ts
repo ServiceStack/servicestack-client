@@ -1151,9 +1151,9 @@ export class JsonServiceClient {
     }
 }
 
-export const isFormData = (body:any) => typeof window != "undefined" && body instanceof FormData;
+export function isFormData(body:any) { return typeof window != "undefined" && body instanceof FormData; }
 
-const createErrorResponse = (errorCode: string|number, message: string, type:ErrorResponseType=null) => {
+function createErrorResponse(errorCode: string|number, message: string, type:ErrorResponseType=null) {
     const error = new ErrorResponse();
     if (type != null)
         error.type = type;
@@ -1163,11 +1163,11 @@ const createErrorResponse = (errorCode: string|number, message: string, type:Err
     return error;
 };
 
-export const toCamelCase = (s: string) => !s ? s : s.charAt(0).toLowerCase() + s.substring(1);
+export function toCamelCase (s: string) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
 
-export const toPascalCase = (s: string) => !s ? s : s.charAt(0).toUpperCase() + s.substring(1);
+export function toPascalCase(s: string) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
 
-export const sanitize = (status: any): any => {
+export function sanitize (status: any): any {
     if (status.responseStatus)
         return status;
     if (status.errors)
@@ -1197,7 +1197,7 @@ export const sanitize = (status: any): any => {
     return to;
 }
 
-export const nameOf = (o: any) => {
+export function nameOf(o: any) {
     if (!o)
         return "null";
 
@@ -1213,7 +1213,7 @@ export const nameOf = (o: any) => {
 
     var str = ctor.toString();
     return str.substring(9, str.indexOf("(")); //"function ".length == 9
-};
+}
 
 /* utils */
 
@@ -1222,7 +1222,7 @@ function log<T>(o:T, prefix:string="LOG") {
     return o;
 }
 
-export const css = (selector: string | NodeListOf<Element>, name: string, value: string) => {
+export function css (selector: string | NodeListOf<Element>, name: string, value: string) {
     const els = typeof selector == "string"
         ? document.querySelectorAll(selector as string)
         : selector as NodeListOf<Element>;
@@ -1235,26 +1235,27 @@ export const css = (selector: string | NodeListOf<Element>, name: string, value:
     }
 }
 
-export const splitOnFirst = (s: string, c: string): string[] => {
+export function splitOnFirst(s: string, c: string): string[] {
     if (!s) return [s];
     var pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
-};
+}
 
-export const splitOnLast = (s: string, c: string): string[] => {
+export function splitOnLast(s: string, c: string): string[] {
     if (!s) return [s];
     var pos = s.lastIndexOf(c);
     return pos >= 0
         ? [s.substring(0, pos), s.substring(pos + 1)]
         : [s];
-};
+}
 
-const splitCase = (t: string) =>
-    typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
+function splitCase(t: string) {
+    return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
+}
 
-export const humanize = s => (!s || s.indexOf(' ') >= 0 ? s : splitCase(s));
+export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(s)); }
 
-export const queryString = (url: string): any => {
+export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {};
     var pairs = splitOnFirst(url, '?')[1].split('&');
     var map = {};
@@ -1265,9 +1266,9 @@ export const queryString = (url: string): any => {
             : null;
     }
     return map;
-};
+}
 
-export const combinePaths = (...paths: string[]): string => {
+export function combinePaths(...paths: string[]): string {
     var parts = [], i, l;
     for (i = 0, l = paths.length; i < l; i++) {
         var arg = paths[i];
@@ -1284,9 +1285,9 @@ export const combinePaths = (...paths: string[]): string => {
     }
     if (parts[0] === "") combinedPaths.unshift("");
     return combinedPaths.join("/") || (combinedPaths.length ? "/" : ".");
-};
+}
 
-export const createPath = (route: string, args: any) => {
+export function createPath(route: string, args: any) {
     var argKeys = {};
     for (let k in args) {
         argKeys[k.toLowerCase()] = k;
@@ -1307,14 +1308,14 @@ export const createPath = (route: string, args: any) => {
         url += p;
     }
     return url;
-};
+}
 
-export const createUrl = (route: string, args: any) => {
+export function createUrl(route: string, args: any) {
     var url = createPath(route, args);
     return appendQueryString(url, args);
-};
+}
 
-export const appendQueryString = (url: string, args: any): string => {
+export function appendQueryString(url: string, args: any): string {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
@@ -1322,9 +1323,9 @@ export const appendQueryString = (url: string, args: any): string => {
         }
     }
     return url;
-};
+}
 
-const qsValue = (arg: any) => {
+function qsValue(arg: any) {
     if (arg == null)
         return "";
     if (typeof Uint8Array != "undefined" && arg instanceof Uint8Array)
@@ -1333,7 +1334,7 @@ const qsValue = (arg: any) => {
 }
 
 //from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
-export const bytesToBase64 = (aBytes: Uint8Array): string => {
+export function bytesToBase64(aBytes: Uint8Array): string {
     var eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
     for (var nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3;
@@ -1348,8 +1349,8 @@ export const bytesToBase64 = (aBytes: Uint8Array): string => {
         : sB64Enc.substring(0, sB64Enc.length - eqLen) + (eqLen === 1 ? "=" : "==");
 }
 
-const uint6ToB64 = (nUint6: number) : number =>
-     nUint6 < 26 ?
+function uint6ToB64(nUint6: number) : number {
+     return nUint6 < 26 ?
       nUint6 + 65
     : nUint6 < 52 ?
       nUint6 + 71
@@ -1357,6 +1358,7 @@ const uint6ToB64 = (nUint6: number) : number =>
       nUint6 - 4
     : nUint6 === 62 ? 43
     : nUint6 === 63 ? 47 : 65;
+}
 
 //JsonServiceClient.toBase64 requires IE10+ or node
 interface NodeBuffer extends Uint8Array {
@@ -1366,9 +1368,11 @@ interface Buffer extends NodeBuffer { }
 declare var Buffer: {
     new (str: string, encoding?: string): Buffer;
 }
-var _btoa = typeof btoa == 'function'
-    ? btoa
-    : (str) => new Buffer(str).toString('base64');
+function _btoa(str:string) {
+    return typeof btoa == 'function'
+        ? btoa(str)
+        : new Buffer(str).toString('base64');
+}
 
 //from: http://stackoverflow.com/a/30106551/85785
 JsonServiceClient.toBase64 = (str:string) => 
@@ -1376,18 +1380,17 @@ JsonServiceClient.toBase64 = (str:string) =>
         String.fromCharCode(new Number('0x' + p1).valueOf())
     ));
 
-export const stripQuotes = (s:string) => 
-    s && s[0] == '"' && s[s.length] == '"' ? s.slice(1,-1) : s;
+export function stripQuotes(s:string) { return s && s[0] == '"' && s[s.length] == '"' ? s.slice(1,-1) : s; }
 
-export const tryDecode = (s:string) => {
+export function tryDecode(s:string) {
     try {
         return decodeURIComponent(s);
     } catch(e) {
         return s;
     }
-};
+}
 
-export const parseCookie = (setCookie:string): Cookie => {
+export function parseCookie(setCookie:string): Cookie {
     if (!setCookie)
         return null;
     var to:Cookie = null;
@@ -1420,11 +1423,11 @@ export const parseCookie = (setCookie:string): Cookie => {
     return to; 
 }
 
-export const normalizeKey = (key: string) => key.toLowerCase().replace(/_/g, '');
+export function normalizeKey(key: string) { return key.toLowerCase().replace(/_/g, ''); }
 
-const isArray = (o: any) => Object.prototype.toString.call(o) === '[object Array]';
+function isArray(o: any) { return Object.prototype.toString.call(o) === '[object Array]'; }
 
-export const normalize = (dto: any, deep?: boolean) => {
+export function normalize(dto: any, deep?: boolean) {
     if (isArray(dto)) {
         if (!deep) return dto;
         const to = [];
@@ -1441,12 +1444,13 @@ export const normalize = (dto: any, deep?: boolean) => {
     return o;
 }
 
-export const getField = (o: any, name: string) =>
-    o == null || name == null ? null :
+export function getField(o: any, name: string) {
+    return o == null || name == null ? null :
         o[name] ||
         o[Object.keys(o).filter(k => normalizeKey(k) === normalizeKey(name))[0] || ''];
-
-export const parseResponseStatus = (json:string, defaultMsg=null) => {
+}
+    
+export function parseResponseStatus(json:string, defaultMsg=null) {
     try {
         var err = JSON.parse(json);
         return sanitize(err.ResponseStatus || err.responseStatus);
@@ -1456,7 +1460,7 @@ export const parseResponseStatus = (json:string, defaultMsg=null) => {
             __error: { error: e, json: json }
         };
     }
-};
+}
 
 export function toFormData(o:any) {
     if (typeof window == "undefined") return;
@@ -1537,27 +1541,33 @@ export function errorResponse(fieldName:string) {
         : undefined;
 }
 
-export const toDate = (s: string|any) => !s ? null : typeof (s as Date).getMonth === 'function' ? s as Date :
-  s[0] == '/' ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s);
-export const toDateFmt = (s: string) => dateFmt(toDate(s));
-export const padInt = (n: number) => n < 10 ? '0' + n : n;
-export const dateFmt = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
-export const dateFmtHM = (d: Date = new Date()) => d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes());
-export const timeFmt12 = (d: Date = new Date()) => padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
-export const toLocalISOString = (d: Date = new Date()) =>
-    `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
+export function toDate(s: string|any) { return !s ? null 
+    : typeof (s as Date).getMonth === 'function' 
+        ? s as Date 
+        : s[0] == '/' 
+            ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) 
+            : new Date(s); 
+}
+export function toDateFmt(s: string) { return dateFmt(toDate(s)); }
+export function padInt(n: number) { return n < 10 ? '0' + n : n; }
+export function dateFmt(d: Date = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()); }
+export function dateFmtHM(d: Date = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes()); }
+export function timeFmt12(d: Date = new Date()) { return padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM"); }
+export function toLocalISOString(d: Date = new Date()) {
+    return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
+}
 
 export interface ICreateElementOptions {
   insertAfter?:Element|null
 }
-const bsAlert = (msg:string) => '<div class="alert alert-danger">' + msg + '</div>';
-const attr = (e:Element,name:string) => e.getAttribute(name);
-const sattr = (e:Element,name:string,value:string) => e.setAttribute(name,value);
-const rattr = (e:Element,name:string) => e.removeAttribute(name);
+function bsAlert(msg:string) { return '<div class="alert alert-danger">' + msg + '</div>'; }
+function attr(e:Element,name:string) { return e.getAttribute(name); }
+function sattr(e:Element,name:string,value:string) { return e.setAttribute(name,value); }
+function rattr(e:Element,name:string) { return e.removeAttribute(name); }
   
-const keyAliases:{ [index:string]: string } = {className: 'class', htmlFor: 'for'};
 export function createElement(tagName:string, options?:ICreateElementOptions, attrs?:any) {
-  const el = document.createElement(tagName);
+    const keyAliases:{ [index:string]: string } = {className: 'class', htmlFor: 'for'};
+    const el = document.createElement(tagName);
   if (attrs) {
     for (const key in attrs) {
       sattr(el,keyAliases[key] || key,attrs[key]);
@@ -1595,18 +1605,24 @@ function parent(el:Element|HTMLElement|null,cls:string):Element {
   return el as Element;
 }
 
-const hasClass = (el:Element|HTMLElement|null, cls:string) =>
-    !el ? false : el.classList ? el.classList.contains(cls) 
+function hasClass(el:Element|HTMLElement|null, cls:string) { return !el ? false 
+    : el.classList 
+        ? el.classList.contains(cls) 
         : (" " + el!.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
-const addClass = (el:Element|HTMLElement|null, cls:string) =>
-    !el ? null : el.classList ? el.classList.add(...cls.split(' ')) 
-        : !hasClass(el, cls) 
-        ? el.className = (el.className + " " + cls).trim() : null;
-const remClass = (el:Element|HTMLElement|null, cls:string) =>
-    !el ? null : el.classList ? el.classList.remove(cls) 
+}
+function addClass(el:Element|HTMLElement|null, cls:string) { return !el ? null 
+    : el.classList 
+        ? el.classList.add(...cls.split(' ')) 
+            : !hasClass(el, cls) 
+            ? el.className = (el.className + " " + cls).trim() : null;
+}
+function remClass(el:Element|HTMLElement|null, cls:string) { return !el ? null 
+    : el.classList 
+        ? el.classList.remove(cls) 
         : hasClass(el, cls) 
             ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ') 
             : null;
+}
   
 // init generic behavior to bootstrap elements
 export function bootstrap(el?:Element) {
@@ -1714,22 +1730,22 @@ export interface IValidation {
   errorFilter?:(this:IValidation,message:string,errorCode:string,type:string) => void,
 }
 
-const validation:IValidation = {
-  overrideMessages: false,
-  messages: {
-    NotEmpty: "Required",
-    NotNull: "Required",
-    Email: "Invalid email",
-    AlreadyExists: "Already exists"
-  },
-  errorFilter: function (errorMsg:string, errorCode:string, type:string) {
-    return this.overrideMessages
-        ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
-        : errorMsg || splitCase(errorCode);
-  }
-};
-
 function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
+    const validation:IValidation = {
+        overrideMessages: false,
+        messages: {
+          NotEmpty: "Required",
+          NotNull: "Required",
+          Email: "Invalid email",
+          AlreadyExists: "Already exists"
+        },
+        errorFilter: function (errorMsg:string, errorCode:string, type:string) {
+          return this.overrideMessages
+              ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
+              : errorMsg || splitCase(errorCode);
+        }
+      };
+      
     clearErrors(f);
     if (!status) return;
     status = sanitize(status);
@@ -1837,16 +1853,17 @@ function clearErrors(f: HTMLFormElement) {
   $('.is-valid').forEach(el => remClass(el,'is-valid'));
 }
 
-var Types = {
-  MultiPart: 'multipart/form-data',
-  UrlEncoded: 'application/x-www-form-urlencoded',
-  Json: 'application/json',
-};
+class Types {
+  static MultiPart: 'multipart/form-data';
+  static UrlEncoded: 'application/x-www-form-urlencoded';
+  static Json: 'application/json';
+}
 
-export const toVarNames = (names:string[]|string|null) => !names ? [] :
-  isArray(names)
-    ? names as string[]
-    : (names as string).split(',').map(s => s.trim());
+export function toVarNames(names:string[]|string|null) { return !names ? [] :
+    isArray(names)
+      ? names as string[]
+      : (names as string).split(',').map(s => s.trim());
+}
     
 export function formSubmit(this:HTMLFormElement,options:IAjaxFormOptions={}) {
   const f = this;
@@ -2023,8 +2040,9 @@ function formEntries<T>(form:HTMLFormElement, state:T, fn:(state:T,name:string,v
   return state;
 }
 
-export const serializeToObject = (form:HTMLFormElement) => 
-  formEntries(form, {} as any, (to,name,value) => to[name] = value);
+export function serializeToObject(form:HTMLFormElement) { 
+    return formEntries(form, {} as any, (to,name,value) => to[name] = value);
+}
 
 export function serializeToUrlEncoded(form:HTMLFormElement) {
   const to = formEntries(form, [] as string[], (s,name,value) =>
@@ -2034,8 +2052,9 @@ export function serializeToUrlEncoded(form:HTMLFormElement) {
   return to.join('&').replace(/%20/g, '+');
 }
 
-export const serializeToFormData = (form:HTMLFormElement) =>
-  formEntries(form, new FormData(), (to,name,value) => to.append(name, value));
+export function serializeToFormData(form:HTMLFormElement) {
+    return formEntries(form, new FormData(), (to,name,value) => to.append(name, value));
+}
 
 export function triggerEvent(el:Element,name:string,data:any=null) {
   if (document.createEvent) {
@@ -2144,9 +2163,10 @@ export function activeClass(href: string|null, activePath: string, exact?: boole
         : null;
 }
 
-export const BootstrapColors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'];
+function bootstrapColors() { return ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark']; }
+export const BootstrapColors = bootstrapColors();
 export function btnColorClass(props: any) {
-    for (const color of BootstrapColors) {
+    for (const color of bootstrapColors()) {
         if (props[color]) {
             return 'btn-' + color;
         }
@@ -2156,9 +2176,10 @@ export function btnColorClass(props: any) {
     }
     return null;
 }
-export const BootstrapSizes = ['xs','sm','md','lg']
+function bootstrapSizes() { return ['xs','sm','md','lg']; }
+export const BootstrapSizes = bootstrapSizes();
 export function btnSizeClass(props:any) {
-    for (const size of BootstrapSizes) {
+    for (const size of bootstrapSizes()) {
         if (props[size]) {
             return 'btn-' + size;
         }

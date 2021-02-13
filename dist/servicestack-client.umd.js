@@ -124,10 +124,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     };
                 }
                 var $ = document.querySelectorAll.bind(document);
-                var parts = exports.splitOnFirst(e.data, " ");
+                var parts = splitOnFirst(e.data, " ");
                 var channel = null;
                 var selector = parts[0];
-                var selParts = exports.splitOnFirst(selector, "@");
+                var selParts = splitOnFirst(selector, "@");
                 if (selParts.length > 1) {
                     channel = selParts[0];
                     selector = selParts[1];
@@ -138,11 +138,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     body = json ? JSON.parse(json) : null;
                 }
                 catch (ignore) { }
-                parts = exports.splitOnFirst(selector, ".");
+                parts = splitOnFirst(selector, ".");
                 if (parts.length <= 1)
                     throw "invalid selector format: " + selector;
                 var op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
-                var tokens = exports.splitOnFirst(target, "$");
+                var tokens = splitOnFirst(target, "$");
                 var cmd = tokens[0], cssSelector = tokens[1];
                 var els = cssSelector && $(cssSelector);
                 var el = els && els[0];
@@ -238,7 +238,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     _this.raiseEvent(target, request);
                 }
                 else if (op === "css") {
-                    exports.css(els || $("body"), cmd, body);
+                    css(els || $("body"), cmd, body);
                 }
                 //Named Receiver
                 var r = opt.receivers && opt.receivers[op];
@@ -266,7 +266,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (this.channels.length === 0)
                 throw "at least 1 channel is required";
             this.resolver = this.options.resolver || new NewInstanceResolver();
-            this.eventStreamUri = exports.combinePaths(baseUrl, "event-stream") + "?";
+            this.eventStreamUri = combinePaths(baseUrl, "event-stream") + "?";
             this.updateChannels(channels);
             this.serviceClient = new JsonServiceClient(baseUrl);
             this.listeners = {};
@@ -603,8 +603,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         function JsonServiceClient(baseUrl) {
             if (baseUrl === void 0) { baseUrl = "/"; }
             this.baseUrl = baseUrl;
-            this.replyBaseUrl = exports.combinePaths(baseUrl, "json", "reply") + "/";
-            this.oneWayBaseUrl = exports.combinePaths(baseUrl, "json", "oneway") + "/";
+            this.replyBaseUrl = combinePaths(baseUrl, "json", "reply") + "/";
+            this.oneWayBaseUrl = combinePaths(baseUrl, "json", "oneway") + "/";
             this.mode = "cors";
             this.credentials = 'include';
             this.headers = new Headers();
@@ -661,34 +661,34 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             return this.sendOneWay(request, args);
         };
         JsonServiceClient.prototype.sendOneWay = function (request, args) {
-            var url = exports.combinePaths(this.oneWayBaseUrl, exports.nameOf(request));
+            var url = combinePaths(this.oneWayBaseUrl, nameOf(request));
             return this.send(HttpMethods.Post, request, null, url);
         };
         JsonServiceClient.prototype.sendAll = function (requests) {
             if (requests.length == 0)
                 return Promise.resolve([]);
-            var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(requests[0]) + "[]");
+            var url = combinePaths(this.replyBaseUrl, nameOf(requests[0]) + "[]");
             return this.send(HttpMethods.Post, requests, null, url);
         };
         JsonServiceClient.prototype.sendAllOneWay = function (requests) {
             if (requests.length == 0)
                 return Promise.resolve(void 0);
-            var url = exports.combinePaths(this.oneWayBaseUrl, exports.nameOf(requests[0]) + "[]");
+            var url = combinePaths(this.oneWayBaseUrl, nameOf(requests[0]) + "[]");
             return this.send(HttpMethods.Post, requests, null, url)
                 .then(function (r) { return void 0; });
         };
         JsonServiceClient.prototype.createUrlFromDto = function (method, request) {
-            var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
+            var url = combinePaths(this.replyBaseUrl, nameOf(request));
             var hasRequestBody = HttpMethods.hasRequestBody(method);
             if (!hasRequestBody)
-                url = exports.appendQueryString(url, request);
+                url = appendQueryString(url, request);
             return url;
         };
         JsonServiceClient.prototype.toAbsoluteUrl = function (relativeOrAbsoluteUrl) {
             return relativeOrAbsoluteUrl.startsWith("http://") ||
                 relativeOrAbsoluteUrl.startsWith("https://")
                 ? relativeOrAbsoluteUrl
-                : exports.combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
+                : combinePaths(this.baseUrl, relativeOrAbsoluteUrl);
         };
         JsonServiceClient.prototype.deleteCookie = function (name) {
             if (this.manageCookies) {
@@ -706,7 +706,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (!url)
                 url = this.createUrlFromDto(method, request);
             if (args)
-                url = exports.appendQueryString(url, args);
+                url = appendQueryString(url, args);
             if (this.bearerToken != null) {
                 this.headers.set("Authorization", "Bearer " + this.bearerToken);
             }
@@ -739,7 +739,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             };
             if (hasRequestBody) {
                 reqInit.body = body || JSON.stringify(request);
-                if (exports.isFormData(body)) {
+                if (isFormData(body)) {
                     headers.delete('Content-Type'); //set by FormData
                 }
             }
@@ -763,7 +763,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                         setCookies.push(v);
                 });
                 setCookies.forEach(function (x) {
-                    var cookie = exports.parseCookie(x);
+                    var cookie = parseCookie(x);
                     if (cookie)
                         _this.cookies[cookie.name] = cookie;
                 });
@@ -811,7 +811,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 });
             }
             return this.json(res).then(function (o) {
-                var errorDto = exports.sanitize(o);
+                var errorDto = sanitize(o);
                 if (!errorDto.responseStatus)
                     throw createErrorResponse(res.status, res.statusText, type);
                 if (type != null)
@@ -830,16 +830,16 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             return this.sendRequest({ method: method, request: request, args: args, url: url });
         };
         JsonServiceClient.prototype.sendBody = function (method, request, body, args) {
-            var url = exports.combinePaths(this.replyBaseUrl, exports.nameOf(request));
+            var url = combinePaths(this.replyBaseUrl, nameOf(request));
             return this.sendRequest({
                 method: method,
                 request: body,
                 body: typeof body == "string"
                     ? body
-                    : exports.isFormData(body)
+                    : isFormData(body)
                         ? body
                         : JSON.stringify(body),
-                url: exports.appendQueryString(url, request),
+                url: appendQueryString(url, request),
                 args: args,
                 returns: request
             });
@@ -911,8 +911,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return JsonServiceClient;
     }());
     exports.JsonServiceClient = JsonServiceClient;
-    exports.isFormData = function (body) { return typeof window != "undefined" && body instanceof FormData; };
-    var createErrorResponse = function (errorCode, message, type) {
+    function isFormData(body) { return typeof window != "undefined" && body instanceof FormData; }
+    exports.isFormData = isFormData;
+    function createErrorResponse(errorCode, message, type) {
         if (type === void 0) { type = null; }
         var error = new ErrorResponse();
         if (type != null)
@@ -921,10 +922,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         error.responseStatus.errorCode = errorCode && errorCode.toString();
         error.responseStatus.message = message;
         return error;
-    };
-    exports.toCamelCase = function (s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); };
-    exports.toPascalCase = function (s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); };
-    exports.sanitize = function (status) {
+    }
+    ;
+    function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
+    exports.toCamelCase = toCamelCase;
+    function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
+    exports.toPascalCase = toPascalCase;
+    function sanitize(status) {
         if (status.responseStatus)
             return status;
         if (status.errors)
@@ -933,9 +937,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         for (var k_1 in status) {
             if (status.hasOwnProperty(k_1)) {
                 if (status[k_1] instanceof Object)
-                    to[exports.toCamelCase(k_1)] = exports.sanitize(status[k_1]);
+                    to[toCamelCase(k_1)] = sanitize(status[k_1]);
                 else
-                    to[exports.toCamelCase(k_1)] = status[k_1];
+                    to[toCamelCase(k_1)] = status[k_1];
             }
         }
         to.errors = [];
@@ -944,13 +948,14 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 var o = status.Errors[i];
                 var err = {};
                 for (var k in o)
-                    err[exports.toCamelCase(k)] = o[k];
+                    err[toCamelCase(k)] = o[k];
                 to.errors.push(err);
             }
         }
         return to;
-    };
-    exports.nameOf = function (o) {
+    }
+    exports.sanitize = sanitize;
+    function nameOf(o) {
         if (!o)
             return "null";
         if (typeof o.getTypeName == "function")
@@ -962,14 +967,15 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             return ctor.name;
         var str = ctor.toString();
         return str.substring(9, str.indexOf("(")); //"function ".length == 9
-    };
+    }
+    exports.nameOf = nameOf;
     /* utils */
     function log(o, prefix) {
         if (prefix === void 0) { prefix = "LOG"; }
         console.log(prefix, o);
         return o;
     }
-    exports.css = function (selector, name, value) {
+    function css(selector, name, value) {
         var els = typeof selector == "string"
             ? document.querySelectorAll(selector)
             : selector;
@@ -979,29 +985,33 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 el.style[name] = value;
             }
         }
-    };
-    exports.splitOnFirst = function (s, c) {
+    }
+    exports.css = css;
+    function splitOnFirst(s, c) {
         if (!s)
             return [s];
         var pos = s.indexOf(c);
         return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
-    };
-    exports.splitOnLast = function (s, c) {
+    }
+    exports.splitOnFirst = splitOnFirst;
+    function splitOnLast(s, c) {
         if (!s)
             return [s];
         var pos = s.lastIndexOf(c);
         return pos >= 0
             ? [s.substring(0, pos), s.substring(pos + 1)]
             : [s];
-    };
-    var splitCase = function (t) {
+    }
+    exports.splitOnLast = splitOnLast;
+    function splitCase(t) {
         return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
-    };
-    exports.humanize = function (s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(s)); };
-    exports.queryString = function (url) {
+    }
+    function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(s)); }
+    exports.humanize = humanize;
+    function queryString(url) {
         if (!url || url.indexOf('?') === -1)
             return {};
-        var pairs = exports.splitOnFirst(url, '?')[1].split('&');
+        var pairs = splitOnFirst(url, '?')[1].split('&');
         var map = {};
         for (var i = 0; i < pairs.length; ++i) {
             var p = pairs[i].split('=');
@@ -1010,8 +1020,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 : null;
         }
         return map;
-    };
-    exports.combinePaths = function () {
+    }
+    exports.queryString = queryString;
+    function combinePaths() {
         var paths = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             paths[_i] = arguments[_i];
@@ -1036,8 +1047,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         if (parts[0] === "")
             combinedPaths.unshift("");
         return combinedPaths.join("/") || (combinedPaths.length ? "/" : ".");
-    };
-    exports.createPath = function (route, args) {
+    }
+    exports.combinePaths = combinePaths;
+    function createPath(route, args) {
         var argKeys = {};
         for (var k in args) {
             argKeys[k.toLowerCase()] = k;
@@ -1060,12 +1072,14 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             url += p;
         }
         return url;
-    };
-    exports.createUrl = function (route, args) {
-        var url = exports.createPath(route, args);
-        return exports.appendQueryString(url, args);
-    };
-    exports.appendQueryString = function (url, args) {
+    }
+    exports.createPath = createPath;
+    function createUrl(route, args) {
+        var url = createPath(route, args);
+        return appendQueryString(url, args);
+    }
+    exports.createUrl = createUrl;
+    function appendQueryString(url, args) {
         for (var k in args) {
             if (args.hasOwnProperty(k)) {
                 url += url.indexOf("?") >= 0 ? "&" : "?";
@@ -1073,16 +1087,17 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             }
         }
         return url;
-    };
-    var qsValue = function (arg) {
+    }
+    exports.appendQueryString = appendQueryString;
+    function qsValue(arg) {
         if (arg == null)
             return "";
         if (typeof Uint8Array != "undefined" && arg instanceof Uint8Array)
-            return exports.bytesToBase64(arg);
+            return bytesToBase64(arg);
         return encodeURIComponent(arg) || "";
-    };
+    }
     //from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
-    exports.bytesToBase64 = function (aBytes) {
+    function bytesToBase64(aBytes) {
         var eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
         for (var nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
             nMod3 = nIdx % 3;
@@ -1095,8 +1110,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return eqLen === 0
             ? sB64Enc
             : sB64Enc.substring(0, sB64Enc.length - eqLen) + (eqLen === 1 ? "=" : "==");
-    };
-    var uint6ToB64 = function (nUint6) {
+    }
+    exports.bytesToBase64 = bytesToBase64;
+    function uint6ToB64(nUint6) {
         return nUint6 < 26 ?
             nUint6 + 65
             : nUint6 < 52 ?
@@ -1105,37 +1121,39 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     nUint6 - 4
                     : nUint6 === 62 ? 43
                         : nUint6 === 63 ? 47 : 65;
-    };
-    var _btoa = typeof btoa == 'function'
-        ? btoa
-        : function (str) { return new Buffer(str).toString('base64'); };
+    }
+    function _btoa(str) {
+        return typeof btoa == 'function'
+            ? btoa(str)
+            : new Buffer(str).toString('base64');
+    }
     //from: http://stackoverflow.com/a/30106551/85785
     JsonServiceClient.toBase64 = function (str) {
         return _btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
             return String.fromCharCode(new Number('0x' + p1).valueOf());
         }));
     };
-    exports.stripQuotes = function (s) {
-        return s && s[0] == '"' && s[s.length] == '"' ? s.slice(1, -1) : s;
-    };
-    exports.tryDecode = function (s) {
+    function stripQuotes(s) { return s && s[0] == '"' && s[s.length] == '"' ? s.slice(1, -1) : s; }
+    exports.stripQuotes = stripQuotes;
+    function tryDecode(s) {
         try {
             return decodeURIComponent(s);
         }
         catch (e) {
             return s;
         }
-    };
-    exports.parseCookie = function (setCookie) {
+    }
+    exports.tryDecode = tryDecode;
+    function parseCookie(setCookie) {
         if (!setCookie)
             return null;
         var to = null;
         var pairs = setCookie.split(/; */);
         for (var i = 0; i < pairs.length; i++) {
             var pair = pairs[i];
-            var parts = exports.splitOnFirst(pair, '=');
+            var parts = splitOnFirst(pair, '=');
             var name = parts[0].trim();
-            var value = parts.length > 1 ? exports.tryDecode(exports.stripQuotes(parts[1].trim())) : null;
+            var value = parts.length > 1 ? tryDecode(stripQuotes(parts[1].trim())) : null;
             if (i == 0) {
                 to = { name: name, value: value, path: "/" };
             }
@@ -1160,16 +1178,18 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             }
         }
         return to;
-    };
-    exports.normalizeKey = function (key) { return key.toLowerCase().replace(/_/g, ''); };
-    var isArray = function (o) { return Object.prototype.toString.call(o) === '[object Array]'; };
-    exports.normalize = function (dto, deep) {
+    }
+    exports.parseCookie = parseCookie;
+    function normalizeKey(key) { return key.toLowerCase().replace(/_/g, ''); }
+    exports.normalizeKey = normalizeKey;
+    function isArray(o) { return Object.prototype.toString.call(o) === '[object Array]'; }
+    function normalize(dto, deep) {
         if (isArray(dto)) {
             if (!deep)
                 return dto;
             var to = [];
             for (var i = 0; i < dto.length; i++) {
-                to[i] = exports.normalize(dto[i], deep);
+                to[i] = normalize(dto[i], deep);
             }
             return to;
         }
@@ -1177,20 +1197,22 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             return dto;
         var o = {};
         for (var k in dto) {
-            o[exports.normalizeKey(k)] = deep ? exports.normalize(dto[k], deep) : dto[k];
+            o[normalizeKey(k)] = deep ? normalize(dto[k], deep) : dto[k];
         }
         return o;
-    };
-    exports.getField = function (o, name) {
+    }
+    exports.normalize = normalize;
+    function getField(o, name) {
         return o == null || name == null ? null :
             o[name] ||
-                o[Object.keys(o).filter(function (k) { return exports.normalizeKey(k) === exports.normalizeKey(name); })[0] || ''];
-    };
-    exports.parseResponseStatus = function (json, defaultMsg) {
+                o[Object.keys(o).filter(function (k) { return normalizeKey(k) === normalizeKey(name); })[0] || ''];
+    }
+    exports.getField = getField;
+    function parseResponseStatus(json, defaultMsg) {
         if (defaultMsg === void 0) { defaultMsg = null; }
         try {
             var err = JSON.parse(json);
-            return exports.sanitize(err.ResponseStatus || err.responseStatus);
+            return sanitize(err.ResponseStatus || err.responseStatus);
         }
         catch (e) {
             return {
@@ -1198,7 +1220,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 __error: { error: e, json: json }
             };
         }
-    };
+    }
+    exports.parseResponseStatus = parseResponseStatus;
     function toFormData(o) {
         if (typeof window == "undefined")
             return;
@@ -1229,7 +1252,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         var responseStatus = this.responseStatus || this.ResponseStatus;
         if (responseStatus == null)
             return undefined;
-        var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
+        var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
         return !status.errors || status.errors.length == 0
             ? status.message || status.errorCode
             : undefined;
@@ -1239,8 +1262,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         var responseStatus = this.responseStatus || this.ResponseStatus;
         if (responseStatus == null)
             return undefined;
-        var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
-        var names = exports.toVarNames(fieldNames);
+        var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
+        var names = toVarNames(fieldNames);
         if (names && !(status.errors == null || status.errors.length == 0)) {
             var lowerFieldsNames = names.map(function (x) { return (x || '').toLowerCase(); });
             for (var _i = 0, _a = status.errors; _i < _a.length; _i++) {
@@ -1265,7 +1288,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         var responseStatus = this.responseStatus || this.ResponseStatus;
         if (responseStatus == null)
             return undefined;
-        var status = responseStatus.ErrorCode ? exports.sanitize(responseStatus) : responseStatus;
+        var status = responseStatus.ErrorCode ? sanitize(responseStatus) : responseStatus;
         if (status.errors == null || status.errors.length == 0)
             return undefined;
         var field = status.errors.find(function (x) { return (x.fieldName || '').toLowerCase() == fieldName.toLowerCase(); });
@@ -1274,32 +1297,45 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             : undefined;
     }
     exports.errorResponse = errorResponse;
-    exports.toDate = function (s) { return !s ? null : typeof s.getMonth === 'function' ? s :
-        s[0] == '/' ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) : new Date(s); };
-    exports.toDateFmt = function (s) { return exports.dateFmt(exports.toDate(s)); };
-    exports.padInt = function (n) { return n < 10 ? '0' + n : n; };
-    exports.dateFmt = function (d) {
+    function toDate(s) {
+        return !s ? null
+            : typeof s.getMonth === 'function'
+                ? s
+                : s[0] == '/'
+                    ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]))
+                    : new Date(s);
+    }
+    exports.toDate = toDate;
+    function toDateFmt(s) { return dateFmt(toDate(s)); }
+    exports.toDateFmt = toDateFmt;
+    function padInt(n) { return n < 10 ? '0' + n : n; }
+    exports.padInt = padInt;
+    function dateFmt(d) {
         if (d === void 0) { d = new Date(); }
-        return d.getFullYear() + '/' + exports.padInt(d.getMonth() + 1) + '/' + exports.padInt(d.getDate());
-    };
-    exports.dateFmtHM = function (d) {
+        return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate());
+    }
+    exports.dateFmt = dateFmt;
+    function dateFmtHM(d) {
         if (d === void 0) { d = new Date(); }
-        return d.getFullYear() + '/' + exports.padInt(d.getMonth() + 1) + '/' + exports.padInt(d.getDate()) + ' ' + exports.padInt(d.getHours()) + ":" + exports.padInt(d.getMinutes());
-    };
-    exports.timeFmt12 = function (d) {
+        return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes());
+    }
+    exports.dateFmtHM = dateFmtHM;
+    function timeFmt12(d) {
         if (d === void 0) { d = new Date(); }
-        return exports.padInt((d.getHours() + 24) % 12 || 12) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
-    };
-    exports.toLocalISOString = function (d) {
+        return padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM");
+    }
+    exports.timeFmt12 = timeFmt12;
+    function toLocalISOString(d) {
         if (d === void 0) { d = new Date(); }
-        return d.getFullYear() + "-" + exports.padInt(d.getMonth() + 1) + "-" + exports.padInt(d.getDate()) + "T" + exports.padInt(d.getHours()) + ":" + exports.padInt(d.getMinutes()) + ":" + exports.padInt(d.getSeconds());
-    };
-    var bsAlert = function (msg) { return '<div class="alert alert-danger">' + msg + '</div>'; };
-    var attr = function (e, name) { return e.getAttribute(name); };
-    var sattr = function (e, name, value) { return e.setAttribute(name, value); };
-    var rattr = function (e, name) { return e.removeAttribute(name); };
-    var keyAliases = { className: 'class', htmlFor: 'for' };
+        return d.getFullYear() + "-" + padInt(d.getMonth() + 1) + "-" + padInt(d.getDate()) + "T" + padInt(d.getHours()) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds());
+    }
+    exports.toLocalISOString = toLocalISOString;
+    function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
+    function attr(e, name) { return e.getAttribute(name); }
+    function sattr(e, name, value) { return e.setAttribute(name, value); }
+    function rattr(e, name) { return e.removeAttribute(name); }
     function createElement(tagName, options, attrs) {
+        var keyAliases = { className: 'class', htmlFor: 'for' };
         var el = document.createElement(tagName);
         if (attrs) {
             for (var key in attrs) {
@@ -1337,21 +1373,27 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             el = el.parentElement;
         return el;
     }
-    var hasClass = function (el, cls) {
-        return !el ? false : el.classList ? el.classList.contains(cls)
-            : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
-    };
-    var addClass = function (el, cls) {
-        return !el ? null : el.classList ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
-            ? el.className = (el.className + " " + cls).trim() : null;
+    function hasClass(el, cls) {
+        return !el ? false
+            : el.classList
+                ? el.classList.contains(cls)
+                : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
+    }
+    function addClass(el, cls) {
+        return !el ? null
+            : el.classList
+                ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
+                ? el.className = (el.className + " " + cls).trim() : null;
         var _a;
-    };
-    var remClass = function (el, cls) {
-        return !el ? null : el.classList ? el.classList.remove(cls)
-            : hasClass(el, cls)
-                ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ')
-                : null;
-    };
+    }
+    function remClass(el, cls) {
+        return !el ? null
+            : el.classList
+                ? el.classList.remove(cls)
+                : hasClass(el, cls)
+                    ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ')
+                    : null;
+    }
     // init generic behavior to bootstrap elements
     function bootstrap(el) {
         var els = (el || document).querySelectorAll('[data-invalid]');
@@ -1435,25 +1477,25 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         };
     }
     exports.bootstrapForm = bootstrapForm;
-    var validation = {
-        overrideMessages: false,
-        messages: {
-            NotEmpty: "Required",
-            NotNull: "Required",
-            Email: "Invalid email",
-            AlreadyExists: "Already exists"
-        },
-        errorFilter: function (errorMsg, errorCode, type) {
-            return this.overrideMessages
-                ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
-                : errorMsg || splitCase(errorCode);
-        }
-    };
     function applyErrors(f, status, opt) {
+        var validation = {
+            overrideMessages: false,
+            messages: {
+                NotEmpty: "Required",
+                NotNull: "Required",
+                Email: "Invalid email",
+                AlreadyExists: "Already exists"
+            },
+            errorFilter: function (errorMsg, errorCode, type) {
+                return this.overrideMessages
+                    ? this.messages[errorCode] || errorMsg || splitCase(errorCode)
+                    : errorMsg || splitCase(errorCode);
+            }
+        };
         clearErrors(f);
         if (!status)
             return;
-        status = exports.sanitize(status);
+        status = sanitize(status);
         addClass(f, "has-errors");
         var bs4 = opt && opt.type === "bootstrap-v4";
         var v = __assign({}, validation, opt);
@@ -1555,15 +1597,18 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         });
         $('.is-valid').forEach(function (el) { return remClass(el, 'is-valid'); });
     }
-    var Types = {
-        MultiPart: 'multipart/form-data',
-        UrlEncoded: 'application/x-www-form-urlencoded',
-        Json: 'application/json',
-    };
-    exports.toVarNames = function (names) { return !names ? [] :
-        isArray(names)
-            ? names
-            : names.split(',').map(function (s) { return s.trim(); }); };
+    var Types = /** @class */ (function () {
+        function Types() {
+        }
+        return Types;
+    }());
+    function toVarNames(names) {
+        return !names ? [] :
+            isArray(names)
+                ? names
+                : names.split(',').map(function (s) { return s.trim(); });
+    }
+    exports.toVarNames = toVarNames;
     function formSubmit(options) {
         if (options === void 0) { options = {}; }
         var f = this;
@@ -1597,7 +1642,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (!r.ok) {
                 return r.json()
                     .catch(function (e) { throw new Error("The request failed with " + (r.statusText || r.status)); })
-                    .then(function (o) { throw Object.assign.apply(Object, [new ErrorResponse()].concat(exports.sanitize(o))); });
+                    .then(function (o) { throw Object.assign.apply(Object, [new ErrorResponse()].concat(sanitize(o))); });
             }
             handleHeaderBehaviors(f, r);
             return fromResponse(r);
@@ -1706,7 +1751,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return contentType === Types.MultiPart
             ? new FormData(form)
             : contentType == Types.Json
-                ? JSON.stringify(exports.serializeToObject(form))
+                ? JSON.stringify(serializeToObject(form))
                 : serializeToUrlEncoded(form);
     }
     exports.serializeForm = serializeForm;
@@ -1729,9 +1774,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         }
         return state;
     }
-    exports.serializeToObject = function (form) {
+    function serializeToObject(form) {
         return formEntries(form, {}, function (to, name, value) { return to[name] = value; });
-    };
+    }
+    exports.serializeToObject = serializeToObject;
     function serializeToUrlEncoded(form) {
         var to = formEntries(form, [], function (s, name, value) {
             return typeof value == 'string'
@@ -1741,9 +1787,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return to.join('&').replace(/%20/g, '+');
     }
     exports.serializeToUrlEncoded = serializeToUrlEncoded;
-    exports.serializeToFormData = function (form) {
+    function serializeToFormData(form) {
         return formEntries(form, new FormData(), function (to, name, value) { return to.append(name, value); });
-    };
+    }
+    exports.serializeToFormData = serializeToFormData;
     function triggerEvent(el, name, data) {
         if (data === void 0) { data = null; }
         if (document.createEvent) {
@@ -1762,7 +1809,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         if (!model)
             return;
         var toggleCase = function (s) { return !s ? s :
-            s[0] === s[0].toUpperCase() ? exports.toCamelCase(s) : s[0] === s[0].toLowerCase() ? exports.toPascalCase(s) : s; };
+            s[0] === s[0].toUpperCase() ? toCamelCase(s) : s[0] === s[0].toLowerCase() ? toPascalCase(s) : s; };
         for (var key in model) {
             var val = model[key];
             if (typeof val == 'undefined' || val === null)
@@ -1792,7 +1839,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     input.value = val.toString() || val;
                     break;
                 case 'date':
-                    var d = exports.toDate(val);
+                    var d = toDate(val);
                     if (d)
                         input.value = d.toISOString().split('T')[0];
                     break;
@@ -1852,10 +1899,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             : null;
     }
     exports.activeClass = activeClass;
-    exports.BootstrapColors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'];
+    function bootstrapColors() { return ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark']; }
+    exports.BootstrapColors = bootstrapColors();
     function btnColorClass(props) {
-        for (var _i = 0, BootstrapColors_1 = exports.BootstrapColors; _i < BootstrapColors_1.length; _i++) {
-            var color = BootstrapColors_1[_i];
+        for (var _i = 0, _a = bootstrapColors(); _i < _a.length; _i++) {
+            var color = _a[_i];
             if (props[color]) {
                 return 'btn-' + color;
             }
@@ -1866,10 +1914,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return null;
     }
     exports.btnColorClass = btnColorClass;
-    exports.BootstrapSizes = ['xs', 'sm', 'md', 'lg'];
+    function bootstrapSizes() { return ['xs', 'sm', 'md', 'lg']; }
+    exports.BootstrapSizes = bootstrapSizes();
     function btnSizeClass(props) {
-        for (var _i = 0, BootstrapSizes_1 = exports.BootstrapSizes; _i < BootstrapSizes_1.length; _i++) {
-            var size = BootstrapSizes_1[_i];
+        for (var _i = 0, _a = bootstrapSizes(); _i < _a.length; _i++) {
+            var size = _a[_i];
             if (props[size]) {
                 return 'btn-' + size;
             }
@@ -2061,22 +2110,22 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         var minutes = 0;
         var seconds = 0;
         var ms = 0.0;
-        var t = exports.splitOnFirst(xsd.substring(1), 'T');
+        var t = splitOnFirst(xsd.substring(1), 'T');
         var hasTime = t.length == 2;
-        var d = exports.splitOnFirst(t[0], 'D');
+        var d = splitOnFirst(t[0], 'D');
         if (d.length == 2) {
             days = parseInt(d[0], 10) || 0;
         }
         if (hasTime) {
-            var h = exports.splitOnFirst(t[1], 'H');
+            var h = splitOnFirst(t[1], 'H');
             if (h.length == 2) {
                 hours = parseInt(h[0], 10) || 0;
             }
-            var m = exports.splitOnFirst(h[h.length - 1], 'M');
+            var m = splitOnFirst(h[h.length - 1], 'M');
             if (m.length == 2) {
                 minutes = parseInt(m[0], 10) || 0;
             }
-            var s = exports.splitOnFirst(m[m.length - 1], 'S');
+            var s = splitOnFirst(m[m.length - 1], 'S');
             if (s.length == 2) {
                 ms = parseFloat(s[0]);
             }
@@ -2125,7 +2174,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if ((days | 0) > 0) {
                 sb += (days | 0) + ":";
             }
-            sb += exports.padInt(hours | 0) + ":" + exports.padInt(min | 0) + ":";
+            sb += padInt(hours | 0) + ":" + padInt(min | 0) + ":";
             if (remainingSecs > 0) {
                 var secFmt = remainingSecs.toFixed(7);
                 secFmt = trimEnd(trimEnd(secFmt, '0'), '.');
