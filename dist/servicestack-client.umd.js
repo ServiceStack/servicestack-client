@@ -1427,8 +1427,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             var x = attr(el, evtData);
             if (!x) {
                 var elParent = el.closest("[" + evtData + "]");
-                if (elParent)
+                if (elParent) {
                     x = attr(elParent, evtData);
+                    el = elParent;
+                }
             }
             if (!x)
                 return;
@@ -1438,13 +1440,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 var data = x.substring(pos + 1);
                 var fn = handlers[cmd];
                 if (fn) {
-                    fn.apply(evt.target, data.split(','));
+                    fn.apply(el, data.split(','));
                 }
             }
             else {
                 var fn = handlers[x];
                 if (fn) {
-                    fn.apply(evt.target, [].slice.call(arguments));
+                    fn.apply(el, [].slice.call(arguments));
                 }
             }
         });

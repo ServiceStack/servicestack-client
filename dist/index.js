@@ -1417,8 +1417,10 @@ function handleEvent(handlers, el, type) {
         var x = attr(el, evtData);
         if (!x) {
             var elParent = el.closest("[" + evtData + "]");
-            if (elParent)
+            if (elParent) {
                 x = attr(elParent, evtData);
+                el = elParent;
+            }
         }
         if (!x)
             return;
@@ -1428,13 +1430,13 @@ function handleEvent(handlers, el, type) {
             var data = x.substring(pos + 1);
             var fn = handlers[cmd];
             if (fn) {
-                fn.apply(evt.target, data.split(','));
+                fn.apply(el, data.split(','));
             }
         }
         else {
             var fn = handlers[x];
             if (fn) {
-                fn.apply(evt.target, [].slice.call(arguments));
+                fn.apply(el, [].slice.call(arguments));
             }
         }
     });

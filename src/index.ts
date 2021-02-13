@@ -1653,12 +1653,14 @@ function handleEvent(handlers:any,el:Node=document,type:string)
 {
     el.addEventListener(type, function(evt) {
         const evtData = `data-${type}`;
-        const el = evt.target as Element;
+        let el = evt.target as Element;
         let x = attr(el,evtData);
         if (!x) {
             let elParent = el.closest(`[${evtData}]`);
-            if (elParent)
+            if (elParent) {
                 x = attr(elParent,evtData);
+                el = elParent;
+            }
         }
         if (!x) return;
 
@@ -1668,12 +1670,12 @@ function handleEvent(handlers:any,el:Node=document,type:string)
             const data = x.substring(pos + 1);
             const fn = handlers[cmd];
             if (fn) {
-                fn.apply(evt.target, data.split(','));
+                fn.apply(el, data.split(','));
             }
         } else {
             const fn = handlers[x];
             if (fn) {
-                fn.apply(evt.target, [].slice.call(arguments));
+                fn.apply(el, [].slice.call(arguments));
             }
         }
     });
