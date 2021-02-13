@@ -1003,6 +1003,48 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             : [s];
     }
     exports.splitOnLast = splitOnLast;
+    function leftPart(strVal, needle) {
+        if (strVal == null)
+            return null;
+        var pos = strVal.indexOf(needle);
+        return pos == -1
+            ? strVal
+            : strVal.substring(0, pos);
+    }
+    exports.leftPart = leftPart;
+    function rightPart(strVal, needle) {
+        if (strVal == null)
+            return null;
+        var pos = strVal.indexOf(needle);
+        return pos == -1
+            ? strVal
+            : strVal.substring(pos + needle.length);
+    }
+    exports.rightPart = rightPart;
+    function lastLeftPart(strVal, needle) {
+        if (strVal == null)
+            return null;
+        var pos = strVal.lastIndexOf(needle);
+        return pos == -1
+            ? strVal
+            : strVal.substring(0, pos);
+    }
+    exports.lastLeftPart = lastLeftPart;
+    function lastRightPart(strVal, needle) {
+        if (strVal == null)
+            return null;
+        var pos = strVal.lastIndexOf(needle);
+        return pos == -1
+            ? strVal
+            : strVal.substring(pos + needle.length);
+    }
+    exports.lastRightPart = lastRightPart;
+    function onlyProps(obj, keys) {
+        var to = {};
+        keys.forEach(function (key) { return to[key] = obj[key]; });
+        return to;
+    }
+    exports.onlyProps = onlyProps;
     function splitCase(t) {
         return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
     }

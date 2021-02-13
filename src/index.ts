@@ -1240,13 +1240,45 @@ export function splitOnFirst(s: string, c: string): string[] {
     var pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
 }
-
 export function splitOnLast(s: string, c: string): string[] {
     if (!s) return [s];
     var pos = s.lastIndexOf(c);
     return pos >= 0
         ? [s.substring(0, pos), s.substring(pos + 1)]
         : [s];
+}
+export function leftPart(strVal:string, needle:string) {
+    if (strVal == null) return null;
+    var pos = strVal.indexOf(needle);
+    return pos == -1
+        ? strVal
+        : strVal.substring(0, pos);
+}
+export function rightPart(strVal:string, needle:string) {
+    if (strVal == null) return null;
+    var pos = strVal.indexOf(needle);
+    return pos == -1
+        ? strVal
+        : strVal.substring(pos + needle.length);
+}
+export function lastLeftPart(strVal:string, needle:string) {
+    if (strVal == null) return null;
+    var pos = strVal.lastIndexOf(needle);
+    return pos == -1
+        ? strVal
+        : strVal.substring(0, pos);
+}
+export function lastRightPart(strVal:string, needle:string) {
+    if (strVal == null) return null;
+    var pos = strVal.lastIndexOf(needle);
+    return pos == -1
+        ? strVal
+        : strVal.substring(pos + needle.length);
+}
+export function onlyProps(obj:{[index:string]:any}, keys:string[]) {
+    let to:{[index:string]:any} = {};
+    keys.forEach(key => to[key] = obj[key]);
+    return to;
 }
 
 function splitCase(t: string) {
