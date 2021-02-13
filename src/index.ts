@@ -118,13 +118,21 @@ export interface ServerEventJoin extends ServerEventCommand { }
 export interface ServerEventLeave extends ServerEventCommand { }
 export interface ServerEventUpdate extends ServerEventCommand { }
 
-const TypeMap = {
-    onConnect: "ServerEventConnect",
-    onHeartbeat: "ServerEventHeartbeat",
-    onJoin: "ServerEventJoin",
-    onLeave: "ServerEventLeave",
-    onUpdate: "ServerEventUpdate"
-};
+function eventMessageType(evt:string) {
+    switch (evt) {
+        case 'onConnect': 
+            return 'ServerEventConnect';
+        case 'onHeartbeat': 
+            return 'ServerEventHeartbeat';
+        case 'onJoin': 
+            return 'ServerEventJoin';
+        case 'onLeave': 
+            return 'ServerEventLeave';
+        case 'onUpdate': 
+            return 'ServerEventUpdate';
+    }
+    return null;
+}
 
 export interface IReconnectServerEventsOptions {
     url?: string;
@@ -250,7 +258,7 @@ export class ServerEventsClient {
 
         const eventId = parseInt((e as any).lastEventId);
         const data = e.data;
-        const type = TypeMap[cmd] || "ServerEventMessage";
+        const type = eventMessageType(cmd) || "ServerEventMessage";
         const request:ServerEventMessage = { eventId, data, type,
             channel, selector, json, body, op, target:tokens[0], cssSelector, meta:{} };
 
@@ -351,7 +359,7 @@ export class ServerEventsClient {
         var r = opt.receivers && opt.receivers[op];
         this.invokeReceiver(r, cmd, el, request, op);
 
-        if (!TypeMap[cmd])
+        if (!eventMessageType(cmd))
         {
             var fn = opt.handlers["onMessage"];
             if (fn) {
@@ -1625,8 +1633,6 @@ if (typeof window != "undefined" && (window as any).Element !== undefined) { // 
   }
 }
 
-const EVENTS = 'click dblclick change focus blur focusin focusout select keydown keypress keyup hover toggle input'.split(' ');
-
 function handleEvent(handlers:any,el:Node=document,type:string)
 {
     el.addEventListener(type, function(evt) {
@@ -1664,8 +1670,9 @@ export interface IBindHandlersOptions
 export function bindHandlers(handlers:any,el:Document|Element=document,opt:IBindHandlersOptions=null) {
     if (opt && opt.events) {
         opt.events.forEach(evt => handleEvent(handlers, el, evt));
-    } else {
-        EVENTS.forEach(evt => {
+    } else {        
+        ['click','dblclick','change','focus','blur','focusin','focusout','select','keydown','keypress','keyup','hover','toggle','input']
+        .forEach(evt => {
             if (el.querySelector(`[data-${evt}]`)) {
                 handleEvent(handlers, el, evt);
             }

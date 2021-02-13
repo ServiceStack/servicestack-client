@@ -82,13 +82,21 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return SingletonInstanceResolver;
     }());
     exports.SingletonInstanceResolver = SingletonInstanceResolver;
-    var TypeMap = {
-        onConnect: "ServerEventConnect",
-        onHeartbeat: "ServerEventHeartbeat",
-        onJoin: "ServerEventJoin",
-        onLeave: "ServerEventLeave",
-        onUpdate: "ServerEventUpdate"
-    };
+    function eventMessageType(evt) {
+        switch (evt) {
+            case 'onConnect':
+                return 'ServerEventConnect';
+            case 'onHeartbeat':
+                return 'ServerEventHeartbeat';
+            case 'onJoin':
+                return 'ServerEventJoin';
+            case 'onLeave':
+                return 'ServerEventLeave';
+            case 'onUpdate':
+                return 'ServerEventUpdate';
+        }
+        return null;
+    }
     /**
      * EventSource
      */
@@ -140,7 +148,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 var el = els && els[0];
                 var eventId = parseInt(e.lastEventId);
                 var data = e.data;
-                var type = TypeMap[cmd] || "ServerEventMessage";
+                var type = eventMessageType(cmd) || "ServerEventMessage";
                 var request = { eventId: eventId, data: data, type: type,
                     channel: channel, selector: selector, json: json, body: body, op: op, target: tokens[0], cssSelector: cssSelector, meta: {} };
                 var mergedBody = typeof body == "object"
@@ -235,7 +243,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                 //Named Receiver
                 var r = opt.receivers && opt.receivers[op];
                 _this.invokeReceiver(r, cmd, el, request, op);
-                if (!TypeMap[cmd]) {
+                if (!eventMessageType(cmd)) {
                     var fn = opt.handlers["onMessage"];
                     if (fn) {
                         fn.call(el || document.body, mergedBody);
@@ -1369,7 +1377,6 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             };
         }
     }
-    var EVENTS = 'click dblclick change focus blur focusin focusout select keydown keypress keyup hover toggle input'.split(' ');
     function handleEvent(handlers, el, type) {
         if (el === void 0) { el = document; }
         el.addEventListener(type, function (evt) {
@@ -1407,7 +1414,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             opt.events.forEach(function (evt) { return handleEvent(handlers, el, evt); });
         }
         else {
-            EVENTS.forEach(function (evt) {
+            ['click', 'dblclick', 'change', 'focus', 'blur', 'focusin', 'focusout', 'select', 'keydown', 'keypress', 'keyup', 'hover', 'toggle', 'input']
+                .forEach(function (evt) {
                 if (el.querySelector("[data-" + evt + "]")) {
                     handleEvent(handlers, el, evt);
                 }
