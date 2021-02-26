@@ -1641,11 +1641,12 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         });
         $('.is-valid').forEach(function (el) { return remClass(el, 'is-valid'); });
     }
-    var Types = /** @class */ (function () {
-        function Types() {
-        }
-        return Types;
-    }());
+    var Types;
+    (function (Types) {
+        Types["MultiPart"] = "multipart/form-data";
+        Types["UrlEncoded"] = "application/x-www-form-urlencoded";
+        Types["Json"] = "application/json";
+    })(Types || (Types = {}));
     function toVarNames(names) {
         return !names ? [] :
             isArray(names)

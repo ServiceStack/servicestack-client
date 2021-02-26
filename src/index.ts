@@ -1887,10 +1887,10 @@ function clearErrors(f: HTMLFormElement) {
   $('.is-valid').forEach(el => remClass(el,'is-valid'));
 }
 
-class Types {
-  static MultiPart: 'multipart/form-data';
-  static UrlEncoded: 'application/x-www-form-urlencoded';
-  static Json: 'application/json';
+enum Types {
+  MultiPart = 'multipart/form-data',
+  UrlEncoded = 'application/x-www-form-urlencoded',
+  Json = 'application/json'
 }
 
 export function toVarNames(names:string[]|string|null) { return !names ? [] :
