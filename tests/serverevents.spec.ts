@@ -97,7 +97,7 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
-const SERVER_EVENTS_URL = 'http://chat.servicestack.net';
+const SERVER_EVENTS_URL = 'http://chat.netcore.io';
 //const SERVER_EVENTS_URL = 'http://localhost:1337';
 
 describe ('ServerEventsClient Tests', () => {

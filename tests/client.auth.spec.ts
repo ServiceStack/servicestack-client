@@ -6,7 +6,7 @@ import {
     Authenticate,AuthenticateResponse,
     TestAuth, TestAuthResponse,
     CreateJwt,CreateJwtResponse,
-    CreateRefreshJwt,CreateRefreshJwtResponse,
+    CreateRefreshJwt,CreateRefreshJwtResponse, Secured, InvalidateLastAccessToken,
 } from "./dtos/test.dtos";
 import * as chai from "chai";
 import { 
@@ -136,13 +136,15 @@ describe ('JsonServiceClient Auth Tests', () => {
         expect(count).eq(1);
     })
 
-    it ("Can use refreshToken to fetch new token after expired token", async () => {
+    it ("Can use refreshToken to fetch new token after expired token not using Token Cookies", async () => {
 
         let count = 0;
         var authClient = new JsonServiceClient(TEST_URL);
         client.userName = "test";
         client.password = "test";
-        var authResponse = await client.post(new Authenticate());
+        var request = new Authenticate();
+        request.useTokenCookie = false;
+        var authResponse = await client.post(request);
 
         client.refreshToken = authResponse.refreshToken;
         client.setCredentials(null,null);
@@ -157,7 +159,7 @@ describe ('JsonServiceClient Auth Tests', () => {
         expect(client.bearerToken).not.eq(expiredJwt.token);
     })
 
-    it ("Can use refreshToken to fetch new token after expired token with useTokenCookie", async () => {
+    it ("Can use refreshToken to fetch new token after expired token with explicit useTokenCookie", async () => {
 
         let count = 0;
         var client = new JsonServiceClient(TEST_URL);
@@ -211,6 +213,26 @@ describe ('JsonServiceClient Auth Tests', () => {
             expect(status.errorCode).eq("Unauthorized");
             expect(status.message).eq("Invalid Username or Password");
         }
+    })
+
+    it ('Does fetch AccessToken using RefreshTokenCookies', async () => {
+        var client = new JsonServiceClient(TEST_URL);
+        var authResponse = await client.post(new Authenticate({ 
+            provider:"credentials", 
+            userName:"Test", 
+            password:"test" 
+        }));
+
+        expect(client.useTokenCookie).eq(true);
+
+        var request = new Secured({ name:"test" });
+        var response = await client.post(request);
+        expect(response.result).eq(request.name);
+
+        await client.post(new InvalidateLastAccessToken());
+
+        response = await client.post(request);
+        expect(response.result).eq(request.name);
     })
 
     it ("Invalid RefreshToken throws RefreshTokenException ErrorResponse", async () => {

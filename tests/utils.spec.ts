@@ -80,7 +80,7 @@ describe ('Util Tests', () => {
         expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName])).undefined;
         expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, [fieldName.toUpperCase()])).undefined;
         expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, ['AnotherFieldName',fieldName.toUpperCase()])).undefined;
-        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, 'AnotherFieldName',fieldName.toUpperCase())).undefined;
+        expect(errorResponseExcept.call({ responseStatus: { message, errorCode, errors } }, `AnotherFieldName,${fieldName.toUpperCase()}`)).undefined;
     })
 
     it ('errorResponseExcept returns first unspecified error or message summary if no field match found', () => {

@@ -1,16 +1,16 @@
 /* Options:
-Date: 2018-03-28 20:12:56
-Version: 5.00
+Date: 2021-02-28 11:58:07
+Version: 5.105
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
 
 //GlobalNamespace: 
-//MakePropertiesOptional: True
+//MakePropertiesOptional: False
 //AddServiceStackTypes: True
 //AddResponseStatus: False
 //AddImplicitVersion: 
 //AddDescriptionAsComments: True
-IncludeTypes: IReturn`1,IReturnVoid,IPost,IMeta,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,CreateRefreshJwt,CreateRefreshJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText
+IncludeTypes: IReturn`1,IReturnVoid,IPost,IMeta,ResponseStatus,ResponseError,Authenticate,AuthenticateResponse,Hello,HelloResponse,HelloTypes,ReturnString,ReturnBytes,ReturnStream,TestAuth,TestAuthResponse,HelloReturnVoid,ThrowValidation,ThrowValidationResponse,EchoTypes,CreateJwt,CreateJwtResponse,CreateRefreshJwt,CreateRefreshJwtResponse,AuthUserSession,IAuthTokens,SendJson,SendRaw,SendText,Secured,SecuredResponse,InvalidateLastAccessToken,EmptyResponse,IHasSessionId,IHasBearerToken
 //ExcludeTypes: 
 //DefaultImports: 
 */
@@ -18,17 +18,22 @@ IncludeTypes: IReturn`1,IReturnVoid,IPost,IMeta,ResponseStatus,ResponseError,Aut
 
 export interface IReturn<T>
 {
-    createResponse() : T;
+    createResponse(): T;
 }
 
 export interface IReturnVoid
 {
-    createResponse() : void;
+    createResponse(): void;
 }
 
-export interface IMeta
+export interface IHasSessionId
 {
-    meta?: { [index:string]: string; };
+    sessionId: string;
+}
+
+export interface IHasBearerToken
+{
+    bearerToken: string;
 }
 
 export interface IPost
@@ -38,310 +43,426 @@ export interface IPost
 // @DataContract
 export class ResponseError
 {
-    // @DataMember(Order=1, EmitDefaultValue=false)
-    errorCode: string;
+    // @DataMember(Order=1)
+    public errorCode: string;
 
-    // @DataMember(Order=2, EmitDefaultValue=false)
-    fieldName: string;
+    // @DataMember(Order=2)
+    public fieldName: string;
 
-    // @DataMember(Order=3, EmitDefaultValue=false)
-    message: string;
+    // @DataMember(Order=3)
+    public message: string;
 
-    // @DataMember(Order=4, EmitDefaultValue=false)
-    meta: { [index:string]: string; };
+    // @DataMember(Order=4)
+    public meta: { [index: string]: string; };
+
+    public constructor(init?: Partial<ResponseError>) { (Object as any).assign(this, init); }
 }
 
 // @DataContract
 export class ResponseStatus
 {
     // @DataMember(Order=1)
-    errorCode: string;
+    public errorCode: string;
 
     // @DataMember(Order=2)
-    message: string;
+    public message: string;
 
     // @DataMember(Order=3)
-    stackTrace: string;
+    public stackTrace: string;
 
     // @DataMember(Order=4)
-    errors: ResponseError[];
+    public errors: ResponseError[];
 
     // @DataMember(Order=5)
-    meta: { [index:string]: string; };
+    public meta: { [index: string]: string; };
+
+    public constructor(init?: Partial<ResponseStatus>) { (Object as any).assign(this, init); }
 }
 
 export interface IAuthTokens
 {
-    provider?: string;
-    userId?: string;
-    accessToken?: string;
-    accessTokenSecret?: string;
-    refreshToken?: string;
+    provider: string;
+    userId: string;
+    accessToken: string;
+    accessTokenSecret: string;
+    refreshToken: string;
     refreshTokenExpiry?: string;
-    requestToken?: string;
-    requestTokenSecret?: string;
-    items?: { [index:string]: string; };
+    requestToken: string;
+    requestTokenSecret: string;
+    items: { [index: string]: string; };
 }
 
 // @DataContract
 export class AuthUserSession
 {
     // @DataMember(Order=1)
-    referrerUrl: string;
+    public referrerUrl: string;
 
     // @DataMember(Order=2)
-    id: string;
+    public id: string;
 
     // @DataMember(Order=3)
-    userAuthId: string;
+    public userAuthId: string;
 
     // @DataMember(Order=4)
-    userAuthName: string;
+    public userAuthName: string;
 
     // @DataMember(Order=5)
-    userName: string;
+    public userName: string;
 
     // @DataMember(Order=6)
-    twitterUserId: string;
+    public twitterUserId: string;
 
     // @DataMember(Order=7)
-    twitterScreenName: string;
+    public twitterScreenName: string;
 
     // @DataMember(Order=8)
-    facebookUserId: string;
+    public facebookUserId: string;
 
     // @DataMember(Order=9)
-    facebookUserName: string;
+    public facebookUserName: string;
 
     // @DataMember(Order=10)
-    firstName: string;
+    public firstName: string;
 
     // @DataMember(Order=11)
-    lastName: string;
+    public lastName: string;
 
     // @DataMember(Order=12)
-    displayName: string;
+    public displayName: string;
 
     // @DataMember(Order=13)
-    company: string;
+    public company: string;
 
     // @DataMember(Order=14)
-    email: string;
+    public email: string;
 
     // @DataMember(Order=15)
-    primaryEmail: string;
+    public primaryEmail: string;
 
     // @DataMember(Order=16)
-    phoneNumber: string;
+    public phoneNumber: string;
 
     // @DataMember(Order=17)
-    birthDate: string;
+    public birthDate?: string;
 
     // @DataMember(Order=18)
-    birthDateRaw: string;
+    public birthDateRaw: string;
 
     // @DataMember(Order=19)
-    address: string;
+    public address: string;
 
     // @DataMember(Order=20)
-    address2: string;
+    public address2: string;
 
     // @DataMember(Order=21)
-    city: string;
+    public city: string;
 
     // @DataMember(Order=22)
-    state: string;
+    public state: string;
 
     // @DataMember(Order=23)
-    country: string;
+    public country: string;
 
     // @DataMember(Order=24)
-    culture: string;
+    public culture: string;
 
     // @DataMember(Order=25)
-    fullName: string;
+    public fullName: string;
 
     // @DataMember(Order=26)
-    gender: string;
+    public gender: string;
 
     // @DataMember(Order=27)
-    language: string;
+    public language: string;
 
     // @DataMember(Order=28)
-    mailAddress: string;
+    public mailAddress: string;
 
     // @DataMember(Order=29)
-    nickname: string;
+    public nickname: string;
 
     // @DataMember(Order=30)
-    postalCode: string;
+    public postalCode: string;
 
     // @DataMember(Order=31)
-    timeZone: string;
+    public timeZone: string;
 
     // @DataMember(Order=32)
-    requestTokenSecret: string;
+    public requestTokenSecret: string;
 
     // @DataMember(Order=33)
-    createdAt: string;
+    public createdAt: string;
 
     // @DataMember(Order=34)
-    lastModified: string;
+    public lastModified: string;
 
     // @DataMember(Order=35)
-    roles: string[];
+    public roles: string[];
 
     // @DataMember(Order=36)
-    permissions: string[];
+    public permissions: string[];
 
     // @DataMember(Order=37)
-    isAuthenticated: boolean;
+    public isAuthenticated: boolean;
 
     // @DataMember(Order=38)
-    fromToken: boolean;
+    public fromToken: boolean;
 
     // @DataMember(Order=39)
-    profileUrl: string;
+    public profileUrl: string;
 
     // @DataMember(Order=40)
-    sequence: string;
+    public sequence: string;
 
     // @DataMember(Order=41)
-    tag: number;
+    public tag: number;
 
     // @DataMember(Order=42)
-    authProvider: string;
+    public authProvider: string;
 
     // @DataMember(Order=43)
-    providerOAuthAccess: IAuthTokens[];
+    public providerOAuthAccess: IAuthTokens[];
 
     // @DataMember(Order=44)
-    meta: { [index:string]: string; };
+    public meta: { [index: string]: string; };
+
+    // @DataMember(Order=45)
+    public audiences: string[];
+
+    // @DataMember(Order=46)
+    public scopes: string[];
+
+    // @DataMember(Order=47)
+    public dns: string;
+
+    // @DataMember(Order=48)
+    public rsa: string;
+
+    // @DataMember(Order=49)
+    public sid: string;
+
+    // @DataMember(Order=50)
+    public hash: string;
+
+    // @DataMember(Order=51)
+    public homePhone: string;
+
+    // @DataMember(Order=52)
+    public mobilePhone: string;
+
+    // @DataMember(Order=53)
+    public webpage: string;
+
+    // @DataMember(Order=54)
+    public emailConfirmed?: boolean;
+
+    // @DataMember(Order=55)
+    public phoneNumberConfirmed?: boolean;
+
+    // @DataMember(Order=56)
+    public twoFactorEnabled?: boolean;
+
+    // @DataMember(Order=57)
+    public securityStamp: string;
+
+    // @DataMember(Order=58)
+    public type: string;
+
+    public constructor(init?: Partial<AuthUserSession>) { (Object as any).assign(this, init); }
 }
 
 export class ThrowValidationResponse
 {
-    responseStatus: ResponseStatus;
-    age: number;
-    required: string;
-    email: string;
+    public age: number;
+    public required: string;
+    public email: string;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<ThrowValidationResponse>) { (Object as any).assign(this, init); }
+}
+
+export class SecuredResponse
+{
+    public result: string;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<SecuredResponse>) { (Object as any).assign(this, init); }
 }
 
 export class CreateJwtResponse
 {
-    token: string;
-    responseStatus: ResponseStatus;
+    public token: string;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<CreateJwtResponse>) { (Object as any).assign(this, init); }
 }
 
 export class CreateRefreshJwtResponse
 {
-    token: string;
-    responseStatus: ResponseStatus;
+    public token: string;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<CreateRefreshJwtResponse>) { (Object as any).assign(this, init); }
+}
+
+// @DataContract
+export class EmptyResponse
+{
+    // @DataMember(Order=1)
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<EmptyResponse>) { (Object as any).assign(this, init); }
 }
 
 export class HelloResponse
 {
-    result: string;
+    public result: string;
+
+    public constructor(init?: Partial<HelloResponse>) { (Object as any).assign(this, init); }
 }
 
 // @Route("/hellotypes/{Name}")
 export class HelloTypes implements IReturn<HelloTypes>
 {
-    string: string;
-    bool: boolean;
-    int: number;
-    createResponse() { return new HelloTypes(); }
-    getTypeName() { return "HelloTypes"; }
+    public string: string;
+    public bool: boolean;
+    public int: number;
+
+    public constructor(init?: Partial<HelloTypes>) { (Object as any).assign(this, init); }
+    public createResponse() { return new HelloTypes(); }
+    public getTypeName() { return 'HelloTypes'; }
 }
 
 export class TestAuthResponse
 {
-    userId: string;
-    sessionId: string;
-    userName: string;
-    displayName: string;
-    responseStatus: ResponseStatus;
+    public userId: string;
+    public sessionId: string;
+    public userName: string;
+    public displayName: string;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<TestAuthResponse>) { (Object as any).assign(this, init); }
 }
 
 // @Route("/echo/types")
 export class EchoTypes implements IReturn<EchoTypes>
 {
-    byte: number;
-    short: number;
-    int: number;
-    long: number;
-    uShort: number;
-    uInt: number;
-    uLong: number;
-    float: number;
-    double: number;
-    decimal: number;
-    string: string;
-    dateTime: string;
-    timeSpan: string;
-    dateTimeOffset: string;
-    guid: string;
-    char: string;
-    createResponse() { return new EchoTypes(); }
-    getTypeName() { return "EchoTypes"; }
+    public byte: number;
+    public short: number;
+    public int: number;
+    public long: number;
+    public uShort: number;
+    public uInt: number;
+    public uLong: number;
+    public float: number;
+    public double: number;
+    public decimal: number;
+    public string: string;
+    public dateTime: string;
+    public timeSpan: string;
+    public dateTimeOffset: string;
+    public guid: string;
+    public char: string;
+
+    public constructor(init?: Partial<EchoTypes>) { (Object as any).assign(this, init); }
+    public createResponse() { return new EchoTypes(); }
+    public getTypeName() { return 'EchoTypes'; }
 }
 
 // @DataContract
-export class AuthenticateResponse
+export class AuthenticateResponse implements IHasSessionId, IHasBearerToken
 {
     // @DataMember(Order=1)
-    userId: string;
+    public userId: string;
 
     // @DataMember(Order=2)
-    sessionId: string;
+    public sessionId: string;
 
     // @DataMember(Order=3)
-    userName: string;
+    public userName: string;
 
     // @DataMember(Order=4)
-    displayName: string;
+    public displayName: string;
 
     // @DataMember(Order=5)
-    referrerUrl: string;
+    public referrerUrl: string;
 
     // @DataMember(Order=6)
-    bearerToken: string;
+    public bearerToken: string;
 
     // @DataMember(Order=7)
-    refreshToken: string;
+    public refreshToken: string;
 
     // @DataMember(Order=8)
-    responseStatus: ResponseStatus;
+    public profileUrl: string;
 
     // @DataMember(Order=9)
-    meta: { [index:string]: string; };
+    public roles: string[];
+
+    // @DataMember(Order=10)
+    public permissions: string[];
+
+    // @DataMember(Order=11)
+    public responseStatus: ResponseStatus;
+
+    // @DataMember(Order=12)
+    public meta: { [index: string]: string; };
+
+    public constructor(init?: Partial<AuthenticateResponse>) { (Object as any).assign(this, init); }
 }
 
 // @Route("/throwvalidation")
 export class ThrowValidation implements IReturn<ThrowValidationResponse>
 {
-    age: number;
-    required: string;
-    email: string;
-    createResponse() { return new ThrowValidationResponse(); }
-    getTypeName() { return "ThrowValidation"; }
+    public age: number;
+    public required: string;
+    public email: string;
+
+    public constructor(init?: Partial<ThrowValidation>) { (Object as any).assign(this, init); }
+    public createResponse() { return new ThrowValidationResponse(); }
+    public getTypeName() { return 'ThrowValidation'; }
+}
+
+// @Route("/secured")
+// @ValidateRequest(Validator="IsAuthenticated")
+export class Secured implements IReturn<SecuredResponse>
+{
+    public name: string;
+
+    public constructor(init?: Partial<Secured>) { (Object as any).assign(this, init); }
+    public createResponse() { return new SecuredResponse(); }
+    public getTypeName() { return 'Secured'; }
 }
 
 // @Route("/jwt")
-export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>, IMeta
+export class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse>
 {
-    jwtExpiry: string;
-    createResponse() { return new CreateJwtResponse(); }
-    getTypeName() { return "CreateJwt"; }
+    public jwtExpiry?: string;
+
+    public constructor(init?: Partial<CreateJwt>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new CreateJwtResponse(); }
+    public getTypeName() { return 'CreateJwt'; }
 }
 
 // @Route("/jwt-refresh")
 export class CreateRefreshJwt implements IReturn<CreateRefreshJwtResponse>
 {
-    userAuthId: string;
-    jwtExpiry: string;
-    createResponse() { return new CreateRefreshJwtResponse(); }
-    getTypeName() { return "CreateRefreshJwt"; }
+    public userAuthId: string;
+    public jwtExpiry?: string;
+
+    public constructor(init?: Partial<CreateRefreshJwt>) { (Object as any).assign(this, init); }
+    public createResponse() { return new CreateRefreshJwtResponse(); }
+    public getTypeName() { return 'CreateRefreshJwt'; }
+}
+
+// @Route("/jwt-invalidate")
+export class InvalidateLastAccessToken implements IReturn<EmptyResponse>
+{
+
+    public constructor(init?: Partial<InvalidateLastAccessToken>) { (Object as any).assign(this, init); }
+    public createResponse() { return new EmptyResponse(); }
+    public getTypeName() { return 'InvalidateLastAccessToken'; }
 }
 
 // @Route("/hello")
@@ -349,140 +470,162 @@ export class CreateRefreshJwt implements IReturn<CreateRefreshJwtResponse>
 export class Hello implements IReturn<HelloResponse>
 {
     // @Required()
-    name: string;
+    public name: string;
 
-    title: string;
-    createResponse() { return new HelloResponse(); }
-    getTypeName() { return "Hello"; }
+    public title: string;
+
+    public constructor(init?: Partial<Hello>) { (Object as any).assign(this, init); }
+    public createResponse() { return new HelloResponse(); }
+    public getTypeName() { return 'Hello'; }
 }
 
 export class HelloReturnVoid implements IReturnVoid
 {
-    id: number;
-    createResponse() {}
-    getTypeName() { return "HelloReturnVoid"; }
+    public id: number;
+
+    public constructor(init?: Partial<HelloReturnVoid>) { (Object as any).assign(this, init); }
+    public createResponse() {}
+    public getTypeName() { return 'HelloReturnVoid'; }
 }
 
 // @Route("/return/string")
 export class ReturnString implements IReturn<string>
 {
-    data: string;
-    createResponse() { return ""; }
-    getTypeName() { return "ReturnString"; }
+    public data: string;
+
+    public constructor(init?: Partial<ReturnString>) { (Object as any).assign(this, init); }
+    public createResponse() { return ''; }
+    public getTypeName() { return 'ReturnString'; }
 }
 
 // @Route("/return/bytes")
 export class ReturnBytes implements IReturn<Uint8Array>
 {
-    data: Uint8Array;
-    createResponse() { return new Uint8Array(0); }
-    getTypeName() { return "ReturnBytes"; }
+    public data: Uint8Array;
+
+    public constructor(init?: Partial<ReturnBytes>) { (Object as any).assign(this, init); }
+    public createResponse() { return new Uint8Array(0); }
+    public getTypeName() { return 'ReturnBytes'; }
 }
 
 // @Route("/return/stream")
 export class ReturnStream implements IReturn<Blob>
 {
-    data: Uint8Array;
-    createResponse() { return new Blob(); }
-    getTypeName() { return "ReturnStream"; }
+    public data: Uint8Array;
+
+    public constructor(init?: Partial<ReturnStream>) { (Object as any).assign(this, init); }
+    public createResponse() { return new Blob(); }
+    public getTypeName() { return 'ReturnStream'; }
 }
 
 // @Route("/sendjson")
 export class SendJson implements IReturn<string>
 {
-    id: number;
-    name: string;
-    createResponse() { return ""; }
-    getTypeName() { return "SendJson"; }
+    public id: number;
+    public name: string;
+
+    public constructor(init?: Partial<SendJson>) { (Object as any).assign(this, init); }
+    public createResponse() { return ''; }
+    public getTypeName() { return 'SendJson'; }
 }
 
 // @Route("/sendtext")
 export class SendText implements IReturn<string>
 {
-    id: number;
-    name: string;
-    contentType: string;
-    createResponse() { return ""; }
-    getTypeName() { return "SendText"; }
+    public id: number;
+    public name: string;
+    public contentType: string;
+
+    public constructor(init?: Partial<SendText>) { (Object as any).assign(this, init); }
+    public createResponse() { return ''; }
+    public getTypeName() { return 'SendText'; }
 }
 
 // @Route("/sendraw")
 export class SendRaw implements IReturn<Uint8Array>
 {
-    id: number;
-    name: string;
-    contentType: string;
-    createResponse() { return new Uint8Array(0); }
-    getTypeName() { return "SendRaw"; }
+    public id: number;
+    public name: string;
+    public contentType: string;
+
+    public constructor(init?: Partial<SendRaw>) { (Object as any).assign(this, init); }
+    public createResponse() { return new Uint8Array(0); }
+    public getTypeName() { return 'SendRaw'; }
 }
 
 // @Route("/testauth")
 export class TestAuth implements IReturn<TestAuthResponse>
 {
-    createResponse() { return new TestAuthResponse(); }
-    getTypeName() { return "TestAuth"; }
+
+    public constructor(init?: Partial<TestAuth>) { (Object as any).assign(this, init); }
+    public createResponse() { return new TestAuthResponse(); }
+    public getTypeName() { return 'TestAuth'; }
 }
 
 // @Route("/auth")
 // @Route("/auth/{provider}")
-// @Route("/authenticate")
-// @Route("/authenticate/{provider}")
 // @DataContract
-export class Authenticate implements IReturn<AuthenticateResponse>, IPost, IMeta
+export class Authenticate implements IReturn<AuthenticateResponse>, IPost
 {
     // @DataMember(Order=1)
-    provider: string;
+    public provider: string;
 
     // @DataMember(Order=2)
-    state: string;
+    public state: string;
 
     // @DataMember(Order=3)
-    oauth_token: string;
+    public oauth_token: string;
 
     // @DataMember(Order=4)
-    oauth_verifier: string;
+    public oauth_verifier: string;
 
     // @DataMember(Order=5)
-    userName: string;
+    public userName: string;
 
     // @DataMember(Order=6)
-    password: string;
+    public password: string;
 
     // @DataMember(Order=7)
-    rememberMe: boolean;
-
-    // @DataMember(Order=8)
-    continue: string;
+    public rememberMe?: boolean;
 
     // @DataMember(Order=9)
-    nonce: string;
+    public errorView: string;
 
     // @DataMember(Order=10)
-    uri: string;
+    public nonce: string;
 
     // @DataMember(Order=11)
-    response: string;
+    public uri: string;
 
     // @DataMember(Order=12)
-    qop: string;
+    public response: string;
 
     // @DataMember(Order=13)
-    nc: string;
+    public qop: string;
 
     // @DataMember(Order=14)
-    cnonce: string;
+    public nc: string;
 
     // @DataMember(Order=15)
-    useTokenCookie: boolean;
+    public cnonce: string;
 
     // @DataMember(Order=16)
-    accessToken: string;
+    public useTokenCookie?: boolean;
 
     // @DataMember(Order=17)
-    accessTokenSecret: string;
+    public accessToken: string;
 
     // @DataMember(Order=18)
-    meta: { [index:string]: string; };
-    createResponse() { return new AuthenticateResponse(); }
-    getTypeName() { return "Authenticate"; }
+    public accessTokenSecret: string;
+
+    // @DataMember(Order=19)
+    public scope: string;
+
+    // @DataMember(Order=20)
+    public meta: { [index: string]: string; };
+
+    public constructor(init?: Partial<Authenticate>) { (Object as any).assign(this, init); }
+    public createResponse() { return new AuthenticateResponse(); }
+    public getTypeName() { return 'Authenticate'; }
 }
+

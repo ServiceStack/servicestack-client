@@ -976,8 +976,11 @@ export class JsonServiceClient {
         if (this.manageCookies) {
             var setCookies = [];
             res.headers.forEach((v,k) => {
-                if ("set-cookie" == k.toLowerCase())
-                    setCookies.push(v);
+                switch (k.toLowerCase()) {
+                    case "set-cookie":
+                        setCookies.push(v);
+                        break;
+                }
             });
             setCookies.forEach(x => {
                 var cookie = parseCookie(x);
@@ -985,6 +988,15 @@ export class JsonServiceClient {
                     this.cookies[cookie.name] = cookie;
             });
         }
+        
+        res.headers.forEach((v,k) => {
+            switch (k.toLowerCase()) {
+                case "x-cookies":
+                    if (v.split(',').indexOf('ss-reftok') >= 0)
+                        this.useTokenCookie = true;
+                    break;
+                }
+        });
 
         if (this.responseFilter != null)
             this.responseFilter(res);
@@ -1106,8 +1118,8 @@ export class JsonServiceClient {
             .catch(res => {
 
                 if (res.status === 401) {
-                    if (this.refreshToken) {
-                        const jwtReq = new GetAccessToken({ refreshToken:this.refreshToken, useTokenCookie: this.useTokenCookie });
+                    if (this.refreshToken || this.useTokenCookie || this.cookies['ss-reftok'] != null) {
+                        const jwtReq = new GetAccessToken({ refreshToken:this.refreshToken, useTokenCookie: !!this.useTokenCookie });
                         let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq);
 
                         if (this.useTokenCookie) {
@@ -1398,12 +1410,12 @@ interface NodeBuffer extends Uint8Array {
 }
 interface Buffer extends NodeBuffer { }
 declare var Buffer: {
-    new (str: string, encoding?: string): Buffer;
+    from (str: string, encoding?: string): Buffer;
 }
 function _btoa(str:string) {
     return typeof btoa == 'function'
         ? btoa(str)
-        : new Buffer(str).toString('base64');
+        : Buffer.from(str).toString('base64');
 }
 
 //from: http://stackoverflow.com/a/30106551/85785
