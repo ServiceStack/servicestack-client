@@ -8,7 +8,7 @@ import {
     PostRawToChannel,
     PostObjectToChannel, CustomType, SetterType,
     ResetServerEvents
-} from './dtos/chat.dtos';
+} from './dtos/test.dtos';
 
 export class TestNamedReceiver {
     static FooMethodReceived: CustomType;

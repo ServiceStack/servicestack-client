@@ -21,7 +21,7 @@ import {
     PostRawToChannel,
     PostObjectToChannel, CustomType, SetterType,
     ResetServerEvents
-} from './dtos/chat.dtos';
+} from './dtos/test.dtos';
 import { TechStackDetails } from "./dtos/techstacks.dtos";
 import {
     TestNamedReceiver, TestGlobalReceiver, TestJavaScriptReceiver
@@ -98,10 +98,10 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
-const SERVER_EVENTS_URL = 'https://chat.netcore.io';
-//const SERVER_EVENTS_URL = 'http://localhost:1337';
+const SERVER_EVENTS_URL = 'http://test.servicestack.net';
+//const SERVER_EVENTS_URL = 'http://localhost:5000';
 
-describe ('ServerEventsClient Tests', () => {
+describe.only ('ServerEventsClient Tests', () => {
 
     it ('Can connect to ServerEventsStream', done => {
         var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {

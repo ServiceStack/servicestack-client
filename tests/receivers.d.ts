@@ -1,5 +1,5 @@
 import { ServerEventMessage, ServerEventReceiver } from '../src/index';
-import { ChatMessage, CustomType, SetterType } from './dtos/chat.dtos';
+import { ChatMessage, CustomType, SetterType } from './dtos/test.dtos';
 export declare class TestNamedReceiver {
     static FooMethodReceived: CustomType;
     static BarMethodReceived: CustomType;
