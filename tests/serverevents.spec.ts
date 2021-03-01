@@ -22,6 +22,7 @@ import {
     PostObjectToChannel, CustomType, SetterType,
     ResetServerEvents
 } from './dtos/chat.dtos';
+import { TechStackDetails } from "./dtos/techstacks.dtos";
 import {
     TestNamedReceiver, TestGlobalReceiver, TestJavaScriptReceiver
 } from "./receivers"
@@ -97,7 +98,7 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
-const SERVER_EVENTS_URL = 'http://chat.netcore.io';
+const SERVER_EVENTS_URL = 'https://chat.netcore.io';
 //const SERVER_EVENTS_URL = 'http://localhost:1337';
 
 describe ('ServerEventsClient Tests', () => {
@@ -303,7 +304,7 @@ describe ('ServerEventsClient Tests', () => {
     })
 
     it ('Does send multiple heartbeats', function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         
         var heartbeats:ServerEventHeartbeat[] = [];
 
@@ -443,7 +444,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('Does send message to named receiver', done => {
+    it ('Does send message to named receiver', function(done) {
+        this.timeout(10000);
+        
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -580,7 +583,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('Does send raw string messages', done => {
+    it ('Does send raw string messages', function(done) {
+        this.timeout(10000);
+
         var msgs1:ServerEventMessage[] = [];
 
         var states = [];
@@ -751,7 +756,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('Does receive all join and leave messages', done => {
+    it ('Does receive all join and leave messages', function(done) {
+        this.timeout(10000);
+
         var joinA:ServerEventJoin[] = [];
         var joinB:ServerEventJoin[] = [];
         var joinAB:ServerEventJoin[] = [];
@@ -877,7 +884,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('Can subscribe to channels whilst connected', done => {
+    it ('Can subscribe to channels whilst connected', function(done) {
+        this.timeout(10000);
+
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];
 
@@ -948,7 +957,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('Can unsubscribe from channels whilst connected', done => {
+    it ('Can unsubscribe from channels whilst connected', function(done) {
+        this.timeout(10000);
+
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];
 

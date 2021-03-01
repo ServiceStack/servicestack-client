@@ -759,8 +759,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (this.manageCookies) {
                 var setCookies = [];
                 res.headers.forEach(function (v, k) {
-                    if ("set-cookie" == k.toLowerCase())
-                        setCookies.push(v);
+                    switch (k.toLowerCase()) {
+                        case "set-cookie":
+                            setCookies.push(v);
+                            break;
+                    }
                 });
                 setCookies.forEach(function (x) {
                     var cookie = parseCookie(x);
@@ -768,6 +771,14 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                         _this.cookies[cookie.name] = cookie;
                 });
             }
+            res.headers.forEach(function (v, k) {
+                switch (k.toLowerCase()) {
+                    case "x-cookies":
+                        if (v.split(',').indexOf('ss-reftok') >= 0)
+                            _this.useTokenCookie = true;
+                        break;
+                }
+            });
             if (this.responseFilter != null)
                 this.responseFilter(res);
             var x = request && typeof request != "string" && typeof request.createResponse == 'function'
@@ -867,8 +878,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             })
                 .catch(function (res) {
                 if (res.status === 401) {
-                    if (_this.refreshToken) {
-                        var jwtReq_1 = new GetAccessToken({ refreshToken: _this.refreshToken, useTokenCookie: _this.useTokenCookie });
+                    if (_this.refreshToken || _this.useTokenCookie || _this.cookies['ss-reftok'] != null) {
+                        var jwtReq_1 = new GetAccessToken({ refreshToken: _this.refreshToken, useTokenCookie: !!_this.useTokenCookie });
                         var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq_1);
                         if (_this.useTokenCookie) {
                             _this.bearerToken = null;
@@ -1167,7 +1178,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     function _btoa(str) {
         return typeof btoa == 'function'
             ? btoa(str)
-            : new Buffer(str).toString('base64');
+            : Buffer.from(str).toString('base64');
     }
     //from: http://stackoverflow.com/a/30106551/85785
     JsonServiceClient.toBase64 = function (str) {
