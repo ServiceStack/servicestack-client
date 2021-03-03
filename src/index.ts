@@ -2469,3 +2469,6 @@ function timeFmt(time:number, asXsd:boolean) {
 }
 export function toXsdDuration(time:number) { return timeFmt(time,true); }
 export function toTimeSpanFmt(time:number) { return timeFmt(time,false); }
+
+export function flatMap(f:Function, xs:any[]) { return xs.reduce((r, x) => r.concat(f(x)), []); }
+export function uniq(xs:string[]) { return Array.from(new Set(xs)).sort((x,y) => x > y ? 1 : -1); }

@@ -1,3 +1,7 @@
+#temp
+deno/
+deno-tests/
+
 # Logs
 logs
 *.log

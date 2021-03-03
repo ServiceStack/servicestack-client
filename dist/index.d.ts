@@ -490,3 +490,5 @@ export declare function classNames(...args: any[]): string;
 export declare function fromXsdDuration(xsd: string): number;
 export declare function toXsdDuration(time: number): string;
 export declare function toTimeSpanFmt(time: number): string;
+export declare function flatMap(f: Function, xs: any[]): any;
+export declare function uniq(xs: string[]): string[];

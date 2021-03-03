@@ -2246,4 +2246,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     exports.toXsdDuration = toXsdDuration;
     function toTimeSpanFmt(time) { return timeFmt(time, false); }
     exports.toTimeSpanFmt = toTimeSpanFmt;
+    function flatMap(f, xs) { return xs.reduce(function (r, x) { return r.concat(f(x)); }, []); }
+    exports.flatMap = flatMap;
+    function uniq(xs) { return Array.from(new Set(xs)).sort(function (x, y) { return x > y ? 1 : -1; }); }
+    exports.uniq = uniq;
 });
