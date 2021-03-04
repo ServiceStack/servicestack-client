@@ -2472,3 +2472,20 @@ export function toTimeSpanFmt(time:number) { return timeFmt(time,false); }
 
 export function flatMap(f:Function, xs:any[]) { return xs.reduce((r, x) => r.concat(f(x)), []); }
 export function uniq(xs:string[]) { return Array.from(new Set(xs)).sort((x,y) => x > y ? 1 : -1); }
+export function enc(o:any) {
+    return o == null ? null : typeof o == 'string'
+        ? o.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&#34;')
+        : `${o}`;
+}
+export function htmlAttrs(o:any) {
+    let sb = [];
+    Object.keys(o).forEach(k => {
+        if (sb.length > 0)
+            sb.push(' ');
+        sb.push(k);
+        sb.push('="')
+        sb.push(enc(o[k]));
+        sb.push('"');
+    })
+    return sb.join('');
+}

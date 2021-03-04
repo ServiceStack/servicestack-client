@@ -492,3 +492,5 @@ export declare function toXsdDuration(time: number): string;
 export declare function toTimeSpanFmt(time: number): string;
 export declare function flatMap(f: Function, xs: any[]): any;
 export declare function uniq(xs: string[]): string[];
+export declare function enc(o: any): string;
+export declare function htmlAttrs(o: any): string;

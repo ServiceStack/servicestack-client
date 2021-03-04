@@ -2250,4 +2250,23 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     exports.flatMap = flatMap;
     function uniq(xs) { return Array.from(new Set(xs)).sort(function (x, y) { return x > y ? 1 : -1; }); }
     exports.uniq = uniq;
+    function enc(o) {
+        return o == null ? null : typeof o == 'string'
+            ? o.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&#34;')
+            : "" + o;
+    }
+    exports.enc = enc;
+    function htmlAttrs(o) {
+        var sb = [];
+        Object.keys(o).forEach(function (k) {
+            if (sb.length > 0)
+                sb.push(' ');
+            sb.push(k);
+            sb.push('="');
+            sb.push(enc(o[k]));
+            sb.push('"');
+        });
+        return sb.join('');
+    }
+    exports.htmlAttrs = htmlAttrs;
 });
