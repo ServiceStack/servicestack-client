@@ -2499,6 +2499,10 @@ export function indexOfAny(str:string, needles:string[]) {
     return -1;
 }
 
+export function isNullOrEmpty(o:any) {
+    return (o === null || o === undefined || o === "");
+}
+
 export class StringBuffer {
     buffer_ = '';
     constructor(opt_a1?:any, ...var_args:any[]) {
@@ -2525,7 +2529,7 @@ export class StringBuffer {
 export class JSV {
     public static ESCAPE_CHARS = ['"', ':', ',', '{', '}', '[', ']', '\r', '\n'];
 
-    public static escapeString(str:string){
+    public static encodeString(str:string){
         if (str == null) return null;
         if (str === '') return '""';
         if (str.indexOf('"'))
@@ -2535,15 +2539,11 @@ export class JSV {
             : str;
     }
 
-    public static isEmpty(o:any) {
-        return (o === null || o === undefined || o === "");
-    }
-
-    public static serializeArray(array:any[]) {
+    public static encodeArray(array:any[]) {
         let value, sb = new StringBuffer();
         for (let i=0, len=array.length; i<len; i++) {
             value = array[i];
-            if (JSV.isEmpty(value) || typeof value === 'function') continue;
+            if (isNullOrEmpty(value) || typeof value === 'function') continue;
             if (sb.getLength() > 0)
                 sb.append(',');
     
@@ -2552,16 +2552,16 @@ export class JSV {
         return `[${sb.toString()}]`;
     }
 
-    public static serializeObject(obj:any) {
+    public static encodeObject(obj:any) {
         let value, sb = new StringBuffer();
         for (let key in obj) {
             value = obj[key];
-            if (!obj.hasOwnProperty(key) || JSV.isEmpty(value) || typeof value === 'function') continue;
+            if (!obj.hasOwnProperty(key) || isNullOrEmpty(value) || typeof value === 'function') continue;
 
             if (sb.getLength() > 0)
                 sb.append(',');
 
-            sb.append(JSV.escapeString(key));
+            sb.append(JSV.encodeString(key));
             sb.append(':');
             sb.append(JSV.stringify(value));
         }
@@ -2576,20 +2576,20 @@ export class JSV {
         if (typeOf === 'object') {
             var ctorStr = obj.constructor.toString().toLowerCase();
             if (ctorStr.indexOf('string') >= 0)
-                return JSV.escapeString(obj);
+                return JSV.encodeString(obj);
             if (ctorStr.indexOf('boolean') >= 0)
                 return obj ? 'true' : 'false';
             if (ctorStr.indexOf('number') >= 0)
                 return obj;
             if (ctorStr.indexOf('date') >= 0)
-                return JSV.escapeString(toLocalISOString(obj));
+                return JSV.encodeString(toLocalISOString(obj));
             if (ctorStr.indexOf('array') >= 0)
-                return JSV.serializeArray(obj);
-            return JSV.serializeObject(obj);
+                return JSV.encodeArray(obj);
+            return JSV.encodeObject(obj);
         }
         switch(typeOf) {
             case 'string':
-                return JSV.escapeString(obj);
+                return JSV.encodeString(obj);
             case 'boolean':
                 return obj ? 'true' : 'false';
             case 'number':

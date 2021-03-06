@@ -2268,6 +2268,10 @@ function indexOfAny(str, needles) {
     return -1;
 }
 exports.indexOfAny = indexOfAny;
+function isNullOrEmpty(o) {
+    return (o === null || o === undefined || o === "");
+}
+exports.isNullOrEmpty = isNullOrEmpty;
 var StringBuffer = /** @class */ (function () {
     function StringBuffer(opt_a1) {
         var var_args = [];
@@ -2303,7 +2307,7 @@ exports.StringBuffer = StringBuffer;
 var JSV = /** @class */ (function () {
     function JSV() {
     }
-    JSV.escapeString = function (str) {
+    JSV.encodeString = function (str) {
         if (str == null)
             return null;
         if (str === '')
@@ -2314,14 +2318,11 @@ var JSV = /** @class */ (function () {
             ? '"' + str + '"'
             : str;
     };
-    JSV.isEmpty = function (o) {
-        return (o === null || o === undefined || o === "");
-    };
-    JSV.serializeArray = function (array) {
+    JSV.encodeArray = function (array) {
         var value, sb = new StringBuffer();
         for (var i = 0, len = array.length; i < len; i++) {
             value = array[i];
-            if (JSV.isEmpty(value) || typeof value === 'function')
+            if (isNullOrEmpty(value) || typeof value === 'function')
                 continue;
             if (sb.getLength() > 0)
                 sb.append(',');
@@ -2329,15 +2330,15 @@ var JSV = /** @class */ (function () {
         }
         return "[" + sb.toString() + "]";
     };
-    JSV.serializeObject = function (obj) {
+    JSV.encodeObject = function (obj) {
         var value, sb = new StringBuffer();
         for (var key in obj) {
             value = obj[key];
-            if (!obj.hasOwnProperty(key) || JSV.isEmpty(value) || typeof value === 'function')
+            if (!obj.hasOwnProperty(key) || isNullOrEmpty(value) || typeof value === 'function')
                 continue;
             if (sb.getLength() > 0)
                 sb.append(',');
-            sb.append(JSV.escapeString(key));
+            sb.append(JSV.encodeString(key));
             sb.append(':');
             sb.append(JSV.stringify(value));
         }
@@ -2352,20 +2353,20 @@ var JSV = /** @class */ (function () {
         if (typeOf === 'object') {
             var ctorStr = obj.constructor.toString().toLowerCase();
             if (ctorStr.indexOf('string') >= 0)
-                return JSV.escapeString(obj);
+                return JSV.encodeString(obj);
             if (ctorStr.indexOf('boolean') >= 0)
                 return obj ? 'true' : 'false';
             if (ctorStr.indexOf('number') >= 0)
                 return obj;
             if (ctorStr.indexOf('date') >= 0)
-                return JSV.escapeString(toLocalISOString(obj));
+                return JSV.encodeString(toLocalISOString(obj));
             if (ctorStr.indexOf('array') >= 0)
-                return JSV.serializeArray(obj);
-            return JSV.serializeObject(obj);
+                return JSV.encodeArray(obj);
+            return JSV.encodeObject(obj);
         }
         switch (typeOf) {
             case 'string':
-                return JSV.escapeString(obj);
+                return JSV.encodeString(obj);
             case 'boolean':
                 return obj ? 'true' : 'false';
             case 'number':

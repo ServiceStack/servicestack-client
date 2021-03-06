@@ -495,6 +495,7 @@ export declare function uniq(xs: string[]): string[];
 export declare function enc(o: any): string;
 export declare function htmlAttrs(o: any): string;
 export declare function indexOfAny(str: string, needles: string[]): number;
+export declare function isNullOrEmpty(o: any): boolean;
 export declare class StringBuffer {
     buffer_: string;
     constructor(opt_a1?: any, ...var_args: any[]);
@@ -506,9 +507,8 @@ export declare class StringBuffer {
 }
 export declare class JSV {
     static ESCAPE_CHARS: string[];
-    static escapeString(str: string): string;
-    static isEmpty(o: any): boolean;
-    static serializeArray(array: any[]): string;
-    static serializeObject(obj: any): string;
+    static encodeString(str: string): string;
+    static encodeArray(array: any[]): string;
+    static encodeObject(obj: any): string;
     static stringify(obj: any): any;
 }
