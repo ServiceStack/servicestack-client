@@ -101,7 +101,7 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
 const SERVER_EVENTS_URL = 'http://test.servicestack.net';
 //const SERVER_EVENTS_URL = 'http://localhost:5000';
 
-describe.only ('ServerEventsClient Tests', () => {
+describe ('ServerEventsClient Tests', () => {
 
     it ('Can connect to ServerEventsStream', done => {
         var client = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {

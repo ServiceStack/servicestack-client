@@ -2489,3 +2489,113 @@ export function htmlAttrs(o:any) {
     })
     return sb.join('');
 }
+
+export function indexOfAny(str:string, needles:string[]) {
+    for (var i = 0, len = needles.length; i < len; i++) {
+        let pos = str.indexOf(needles[i]);
+        if (pos >= 0) 
+            return pos;
+    }
+    return -1;
+}
+
+export class StringBuffer {
+    buffer_ = '';
+    constructor(opt_a1?:any, ...var_args:any[]) {
+        if (opt_a1 != null) 
+            this.append.apply(this, arguments);
+    }
+    set(s:string) {
+        this.buffer_ = '' + s;
+    }
+    append(a1:any, opt_a2?:any, ...var_args:any[]) {
+        this.buffer_ += String(a1);
+        if (opt_a2 != null) {
+          for (let i = 1; i < arguments.length; i++) {
+            this.buffer_ += arguments[i];
+          }
+        }
+        return this;
+    }
+    clear() { this.buffer_ = ''; }
+    getLength() { return this.buffer_.length; }
+    toString() { return this.buffer_; }
+}
+
+export class JSV {
+    public static ESCAPE_CHARS = ['"', ':', ',', '{', '}', '[', ']', '\r', '\n'];
+
+    public static escapeString(str:string){
+        if (str == null) return null;
+        if (str === '') return '""';
+        if (str.indexOf('"'))
+            str = str.replace(/"/g,'""');
+        return indexOfAny(str, JSV.ESCAPE_CHARS) >= 0
+            ? '"' + str + '"'
+            : str;
+    }
+
+    public static isEmpty(o:any) {
+        return (o === null || o === undefined || o === "");
+    }
+
+    public static serializeArray(array:any[]) {
+        let value, sb = new StringBuffer();
+        for (let i=0, len=array.length; i<len; i++) {
+            value = array[i];
+            if (JSV.isEmpty(value) || typeof value === 'function') continue;
+            if (sb.getLength() > 0)
+                sb.append(',');
+    
+            sb.append(JSV.stringify(value));
+        }
+        return `[${sb.toString()}]`;
+    }
+
+    public static serializeObject(obj:any) {
+        let value, sb = new StringBuffer();
+        for (let key in obj) {
+            value = obj[key];
+            if (!obj.hasOwnProperty(key) || JSV.isEmpty(value) || typeof value === 'function') continue;
+
+            if (sb.getLength() > 0)
+                sb.append(',');
+
+            sb.append(JSV.escapeString(key));
+            sb.append(':');
+            sb.append(JSV.stringify(value));
+        }
+        return `{${sb.toString()}}`;
+    }
+
+    public static stringify(obj:any) {
+        if (obj === null || obj === undefined) return null;
+        var typeOf = typeof(obj);
+        if (typeOf === 'function' || typeOf === 'symbol') return null;
+    
+        if (typeOf === 'object') {
+            var ctorStr = obj.constructor.toString().toLowerCase();
+            if (ctorStr.indexOf('string') >= 0)
+                return JSV.escapeString(obj);
+            if (ctorStr.indexOf('boolean') >= 0)
+                return obj ? 'true' : 'false';
+            if (ctorStr.indexOf('number') >= 0)
+                return obj;
+            if (ctorStr.indexOf('date') >= 0)
+                return JSV.escapeString(toLocalISOString(obj));
+            if (ctorStr.indexOf('array') >= 0)
+                return JSV.serializeArray(obj);
+            return JSV.serializeObject(obj);
+        }
+        switch(typeOf) {
+            case 'string':
+                return JSV.escapeString(obj);
+            case 'boolean':
+                return obj ? 'true' : 'false';
+            case 'number':
+            default:
+                return obj;
+        }
+    }
+}
+

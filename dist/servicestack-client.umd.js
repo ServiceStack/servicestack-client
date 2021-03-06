@@ -2269,4 +2269,122 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return sb.join('');
     }
     exports.htmlAttrs = htmlAttrs;
+    function indexOfAny(str, needles) {
+        for (var i = 0, len = needles.length; i < len; i++) {
+            var pos = str.indexOf(needles[i]);
+            if (pos >= 0)
+                return pos;
+        }
+        return -1;
+    }
+    exports.indexOfAny = indexOfAny;
+    var StringBuffer = /** @class */ (function () {
+        function StringBuffer(opt_a1) {
+            var var_args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                var_args[_i - 1] = arguments[_i];
+            }
+            this.buffer_ = '';
+            if (opt_a1 != null)
+                this.append.apply(this, arguments);
+        }
+        StringBuffer.prototype.set = function (s) {
+            this.buffer_ = '' + s;
+        };
+        StringBuffer.prototype.append = function (a1, opt_a2) {
+            var var_args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                var_args[_i - 2] = arguments[_i];
+            }
+            this.buffer_ += String(a1);
+            if (opt_a2 != null) {
+                for (var i = 1; i < arguments.length; i++) {
+                    this.buffer_ += arguments[i];
+                }
+            }
+            return this;
+        };
+        StringBuffer.prototype.clear = function () { this.buffer_ = ''; };
+        StringBuffer.prototype.getLength = function () { return this.buffer_.length; };
+        StringBuffer.prototype.toString = function () { return this.buffer_; };
+        return StringBuffer;
+    }());
+    exports.StringBuffer = StringBuffer;
+    var JSV = /** @class */ (function () {
+        function JSV() {
+        }
+        JSV.escapeString = function (str) {
+            if (str == null)
+                return null;
+            if (str === '')
+                return '""';
+            if (str.indexOf('"'))
+                str = str.replace(/"/g, '""');
+            return indexOfAny(str, JSV.ESCAPE_CHARS) >= 0
+                ? '"' + str + '"'
+                : str;
+        };
+        JSV.isEmpty = function (o) {
+            return (o === null || o === undefined || o === "");
+        };
+        JSV.serializeArray = function (array) {
+            var value, sb = new StringBuffer();
+            for (var i = 0, len = array.length; i < len; i++) {
+                value = array[i];
+                if (JSV.isEmpty(value) || typeof value === 'function')
+                    continue;
+                if (sb.getLength() > 0)
+                    sb.append(',');
+                sb.append(JSV.stringify(value));
+            }
+            return "[" + sb.toString() + "]";
+        };
+        JSV.serializeObject = function (obj) {
+            var value, sb = new StringBuffer();
+            for (var key in obj) {
+                value = obj[key];
+                if (!obj.hasOwnProperty(key) || JSV.isEmpty(value) || typeof value === 'function')
+                    continue;
+                if (sb.getLength() > 0)
+                    sb.append(',');
+                sb.append(JSV.escapeString(key));
+                sb.append(':');
+                sb.append(JSV.stringify(value));
+            }
+            return "{" + sb.toString() + "}";
+        };
+        JSV.stringify = function (obj) {
+            if (obj === null || obj === undefined)
+                return null;
+            var typeOf = typeof (obj);
+            if (typeOf === 'function' || typeOf === 'symbol')
+                return null;
+            if (typeOf === 'object') {
+                var ctorStr = obj.constructor.toString().toLowerCase();
+                if (ctorStr.indexOf('string') >= 0)
+                    return JSV.escapeString(obj);
+                if (ctorStr.indexOf('boolean') >= 0)
+                    return obj ? 'true' : 'false';
+                if (ctorStr.indexOf('number') >= 0)
+                    return obj;
+                if (ctorStr.indexOf('date') >= 0)
+                    return JSV.escapeString(toLocalISOString(obj));
+                if (ctorStr.indexOf('array') >= 0)
+                    return JSV.serializeArray(obj);
+                return JSV.serializeObject(obj);
+            }
+            switch (typeOf) {
+                case 'string':
+                    return JSV.escapeString(obj);
+                case 'boolean':
+                    return obj ? 'true' : 'false';
+                case 'number':
+                default:
+                    return obj;
+            }
+        };
+        JSV.ESCAPE_CHARS = ['"', ':', ',', '{', '}', '[', ']', '\r', '\n'];
+        return JSV;
+    }());
+    exports.JSV = JSV;
 });

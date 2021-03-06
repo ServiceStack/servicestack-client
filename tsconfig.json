@@ -18,7 +18,9 @@
     "./tests/client.spec.ts",
     "./tests/client.auth.spec.ts",
     "./tests/serverevents.spec.ts",
+    "./tests/stringbuffer.spec.ts",
     "./tests/utils.spec.ts",
+    "./tests/jsv.spec.ts",
     "./tests/issues.spec.ts"
    ]
 }
