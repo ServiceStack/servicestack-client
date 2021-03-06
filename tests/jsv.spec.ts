@@ -12,6 +12,7 @@ describe ('JSV Tests', () => {
         expect(JSV.stringify({ Id: 1234, Name: "TEST", Obj: [{Id: 1, Key: "Value" }] })).eq('{Id:1234,Name:TEST,Obj:[{Id:1,Key:Value}]}');
         expect(JSV.stringify({Float: 1.1, Double: 2.2, Decimal: 3.3})).eq('{Float:1.1,Double:2.2,Decimal:3.3}');
         expect(JSV.stringify("https://url.com")).eq('"https://url.com"');
+        expect(JSV.stringify("1,2,3")).eq('"1,2,3"');
     })
 
 })
