@@ -521,15 +521,15 @@ export declare class JSV {
     static encodeObject(obj: any): string;
     static stringify(obj: any): any;
 }
+export declare function uniqueKeys(rows: any[]): string[];
+export declare function alignLeft(str: string, len: number, pad?: string): string;
+export declare function alignCenter(str: string, len: number, pad?: string): string;
+export declare function alignRight(str: string, len: number, pad?: string): string;
+export declare function alignAuto(obj: any, len: number, pad?: string): string;
 export declare class Inspect {
     static vars(obj: any): void;
     static dump(obj: any): string;
     static printDump(obj: any): void;
     static dumpTable(rows: any[]): string;
     static printDumpTable(rows: any[]): void;
-    static allKeys(rows: any[]): string[];
-    static alignLeft(str: string, len: number, pad?: string): string;
-    static alignCenter(str: string, len: number, pad?: string): string;
-    static alignRight(str: string, len: number, pad?: string): string;
-    static alignAuto(obj: any, len: number, pad?: string): string;
 }

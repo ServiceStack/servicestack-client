@@ -2656,6 +2656,45 @@ export class JSV {
     }
 }
 
+export function uniqueKeys(rows:any[]) : string[] {
+    var to = [];
+    rows.forEach(o => Object.keys(o).forEach(k => {
+        if (to.indexOf(k) === -1) {
+            to.push(k);
+        }
+    }));
+    return to;
+} 
+export function alignLeft(str:string, len:number, pad:string = ' ') : string {
+    if (len < 0) return '';
+    let aLen = len + 1 - str.length;
+    if (aLen <= 0) return str;
+    return pad + str + pad.repeat(len + 1 - str.length);
+}
+export function alignCenter(str:string, len:number, pad:string = ' ') : string {
+    if (len < 0) return '';
+    if (!str) str = '';
+    let nLen = str.length;
+    let half = Math.floor(len / 2 - nLen / 2);
+    let odds = Math.abs((nLen % 2) - (len % 2));
+    return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
+}
+export function alignRight(str:string, len:number, pad:string = ' ') : string {
+    if (len < 0) return '';
+    let aLen = len + 1 - str.length;
+    if (aLen <= 0) return str;
+    return pad.repeat(len + 1 - str.length) + str + pad;
+}
+export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
+    let str = `${obj}`;
+    if (str.length <= len) {
+    return  typeof obj === "number"
+        ? alignRight(str, len, pad)
+        : alignLeft(str, len, pad);
+    }
+    return str;
+}
+
 //requires Node
 declare var process: any;
 declare function require(name:string);
@@ -2688,7 +2727,7 @@ export class Inspect {
   
     static dumpTable(rows:any[]) {
         let mapRows = rows;
-        let keys = Inspect.allKeys(mapRows);
+        let keys = uniqueKeys(mapRows);
         let colSizes:{[index:string]:number} = {};
 
         keys.forEach(k => {
@@ -2707,19 +2746,19 @@ export class Inspect {
 
         // sum + ' padding ' + |
         let colSizesLength = Object.keys(colSizes).length;
-        let rowWidth = Object.values(colSizes).reduce((p, c) => p + c, 0) +
+        let rowWidth = Object.keys(colSizes).map(k => colSizes[k]).reduce((p, c) => p + c, 0) +
             (colSizesLength * 2) +
             (colSizesLength + 1);
         let sb:string[] = [];
         sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
         let head = '|';
-        keys.forEach(k => head += Inspect.alignCenter(k, colSizes[k]) + '|');
+        keys.forEach(k => head += alignCenter(k, colSizes[k]) + '|');
         sb.push(head);
         sb.push(`|${'-'.repeat(rowWidth - 2)}|`);
 
         mapRows.forEach(row => {
             let to = '|';
-            keys.forEach(k => to += '' + Inspect.alignAuto(row[k], colSizes[k]) + '|');
+            keys.forEach(k => to += '' + alignAuto(row[k], colSizes[k]) + '|');
             sb.push(to);
         });
         sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
@@ -2728,47 +2767,4 @@ export class Inspect {
     }
   
     static printDumpTable(rows:any[]) { console.log(Inspect.dumpTable(rows)); }
-  
-    static allKeys(rows:any[]) : string[] {
-        var to = [];
-        rows.forEach(o => Object.keys(o).forEach(k => {
-            if (to.indexOf(k) === -1) {
-                to.push(k);
-            }
-        }));
-        return to;
-    }
-
-    static alignLeft(str:string, len:number, pad:string = ' ') : string {
-        if (len < 0) return '';
-        let aLen = len + 1 - str.length;
-        if (aLen <= 0) return str;
-        return pad + str + pad.repeat(len + 1 - str.length);
-    }
-  
-    static alignCenter(str:string, len:number, pad:string = ' ') : string {
-        if (len < 0) return '';
-        if (!str) str = '';
-        let nLen = str.length;
-        let half = Math.floor(len / 2 - nLen / 2);
-        let odds = Math.abs((nLen % 2) - (len % 2));
-        return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
-    }
-  
-    static alignRight(str:string, len:number, pad:string = ' ') : string {
-        if (len < 0) return '';
-        let aLen = len + 1 - str.length;
-        if (aLen <= 0) return str;
-        return pad.repeat(len + 1 - str.length) + str + pad;
-    }
-  
-    static alignAuto(obj:any, len:number, pad:string = ' ') : string {
-        let str = `${obj}`;
-        if (str.length <= len) {
-        return  typeof obj === "number"
-            ? Inspect.alignRight(str, len, pad)
-            : Inspect.alignLeft(str, len, pad);
-        }
-        return str;
-    }
 }

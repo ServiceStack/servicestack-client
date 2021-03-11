@@ -1175,10 +1175,15 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     : nUint6 === 62 ? 43
                         : nUint6 === 63 ? 47 : 65;
     }
-    function _btoa(str) {
+    function _btoa(base64) {
         return typeof btoa == 'function'
-            ? btoa(str)
-            : Buffer.from(str).toString('base64');
+            ? btoa(base64)
+            : Buffer.from(base64).toString('base64');
+    }
+    function _atob(base64) {
+        return typeof atob == 'function'
+            ? atob(base64)
+            : Buffer.from(base64, 'base64').toString();
     }
     //from: http://stackoverflow.com/a/30106551/85785
     JsonServiceClient.toBase64 = function (str) {
@@ -2282,6 +2287,58 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return (o === null || o === undefined || o === "");
     }
     exports.isNullOrEmpty = isNullOrEmpty;
+    // From .NET DateTime (WCF JSON or ISO Date) to JS Date
+    function fromDateTime(dateTime) {
+        return toDate(dateTime);
+    }
+    exports.fromDateTime = fromDateTime;
+    // From JS Date to .NET DateTime (WCF JSON Date)
+    function toDateTime(date) {
+        return "/Date(" + date.getTime() + ")/";
+    }
+    exports.toDateTime = toDateTime;
+    // From .NET TimeSpan (XSD Duration) to JS String
+    function fromTimeSpan(xsdDuration) {
+        return xsdDuration;
+    }
+    exports.fromTimeSpan = fromTimeSpan;
+    // From JS String to .NET TimeSpan (XSD Duration)
+    function toTimeSpan(xsdDuration) {
+        return xsdDuration;
+    }
+    exports.toTimeSpan = toTimeSpan;
+    // From .NET Guid to JS String
+    function fromGuid(xsdDuration) {
+        return xsdDuration;
+    }
+    exports.fromGuid = fromGuid;
+    // From JS String to .NET Guid
+    function toGuid(xsdDuration) {
+        return xsdDuration;
+    }
+    exports.toGuid = toGuid;
+    // From .NET byte[] (Base64 String) to JVM signed byte[]
+    function fromByteArray(base64) {
+        var binaryStr = _atob(base64);
+        var len = binaryStr.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binaryStr.charCodeAt(i);
+        }
+        return bytes;
+    }
+    exports.fromByteArray = fromByteArray;
+    // From JS Uint8Array to .NET byte[] (Base64 String)
+    function toByteArray(bytes) {
+        var str = String.fromCharCode.apply(null, bytes);
+        return _btoa(str);
+    }
+    exports.toByteArray = toByteArray;
+    // From JS String to Base64 String
+    function toBase64String(source) {
+        return JsonServiceClient.toBase64(source);
+    }
+    exports.toBase64String = toBase64String;
     var StringBuffer = /** @class */ (function () {
         function StringBuffer(opt_a1) {
             var var_args = [];
@@ -2388,4 +2445,122 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
         return JSV;
     }());
     exports.JSV = JSV;
+    function uniqueKeys(rows) {
+        var to = [];
+        rows.forEach(function (o) { return Object.keys(o).forEach(function (k) {
+            if (to.indexOf(k) === -1) {
+                to.push(k);
+            }
+        }); });
+        return to;
+    }
+    exports.uniqueKeys = uniqueKeys;
+    function alignLeft(str, len, pad) {
+        if (pad === void 0) { pad = ' '; }
+        if (len < 0)
+            return '';
+        var aLen = len + 1 - str.length;
+        if (aLen <= 0)
+            return str;
+        return pad + str + pad.repeat(len + 1 - str.length);
+    }
+    exports.alignLeft = alignLeft;
+    function alignCenter(str, len, pad) {
+        if (pad === void 0) { pad = ' '; }
+        if (len < 0)
+            return '';
+        if (!str)
+            str = '';
+        var nLen = str.length;
+        var half = Math.floor(len / 2 - nLen / 2);
+        var odds = Math.abs((nLen % 2) - (len % 2));
+        return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
+    }
+    exports.alignCenter = alignCenter;
+    function alignRight(str, len, pad) {
+        if (pad === void 0) { pad = ' '; }
+        if (len < 0)
+            return '';
+        var aLen = len + 1 - str.length;
+        if (aLen <= 0)
+            return str;
+        return pad.repeat(len + 1 - str.length) + str + pad;
+    }
+    exports.alignRight = alignRight;
+    function alignAuto(obj, len, pad) {
+        if (pad === void 0) { pad = ' '; }
+        var str = "" + obj;
+        if (str.length <= len) {
+            return typeof obj === "number"
+                ? alignRight(str, len, pad)
+                : alignLeft(str, len, pad);
+        }
+        return str;
+    }
+    exports.alignAuto = alignAuto;
+    var Inspect = /** @class */ (function () {
+        function Inspect() {
+        }
+        Inspect.vars = function (obj) {
+            //requires Node
+            if (typeof process === 'undefined' || typeof require !== 'function')
+                return;
+            var inspectVarsPath = process.env.INSPECT_VARS;
+            if (!inspectVarsPath || !obj)
+                return;
+            var fs = require('fs');
+            var varsPath = inspectVarsPath.replace(/\\/g, '/');
+            if (varsPath.indexOf('/') >= 0) {
+                var dir = require('path').dirname(varsPath);
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir);
+                }
+            }
+            fs.writeFileSync(varsPath, JSON.stringify(obj));
+        };
+        Inspect.dump = function (obj) {
+            var to = JSON.stringify(obj, null, 4);
+            return to.replace(/"/g, '');
+        };
+        Inspect.printDump = function (obj) { console.log(Inspect.dump(obj)); };
+        Inspect.dumpTable = function (rows) {
+            var mapRows = rows;
+            var keys = uniqueKeys(mapRows);
+            var colSizes = {};
+            keys.forEach(function (k) {
+                var max = k.length;
+                mapRows.forEach(function (row) {
+                    var col = row[k];
+                    if (col != null) {
+                        var valSize = ("" + col).length;
+                        if (valSize > max) {
+                            max = valSize;
+                        }
+                    }
+                });
+                colSizes[k] = max;
+            });
+            // sum + ' padding ' + |
+            var colSizesLength = Object.keys(colSizes).length;
+            var rowWidth = Object.keys(colSizes).map(function (k) { return colSizes[k]; }).reduce(function (p, c) { return p + c; }, 0) +
+                (colSizesLength * 2) +
+                (colSizesLength + 1);
+            var sb = [];
+            sb.push("+" + '-'.repeat(rowWidth - 2) + "+");
+            var head = '|';
+            keys.forEach(function (k) { return head += alignCenter(k, colSizes[k]) + '|'; });
+            sb.push(head);
+            sb.push("|" + '-'.repeat(rowWidth - 2) + "|");
+            mapRows.forEach(function (row) {
+                var to = '|';
+                keys.forEach(function (k) { return to += '' + alignAuto(row[k], colSizes[k]) + '|'; });
+                sb.push(to);
+            });
+            sb.push("+" + '-'.repeat(rowWidth - 2) + "+");
+            return sb.join('\n');
+        };
+        Inspect.printDumpTable = function (rows) { console.log(Inspect.dumpTable(rows)); };
+        return Inspect;
+    }());
+    exports.Inspect = Inspect;
 });
