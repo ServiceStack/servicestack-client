@@ -22,6 +22,7 @@
     "./tests/utils.spec.ts",
     "./tests/jsv.spec.ts",
     "./tests/inspect.spec.ts",
+    "./tests/serialization.spec.ts",
     "./tests/issues.spec.ts"
    ]
 }

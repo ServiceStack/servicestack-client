@@ -641,7 +641,7 @@ export declare class AllCollectionTypes implements IReturn<AllCollectionTypes> {
     stringList: string[];
     floatArray: number[];
     doubleList: number[];
-    byteArray: Uint8Array;
+    byteArray: string;
     charArray: string[];
     decimalList: number[];
     pocoArray: Poco[];
@@ -1067,35 +1067,35 @@ export declare class ImageAsStream implements IReturn<Blob> {
     createResponse(): Blob;
     getTypeName(): string;
 }
-export declare class ImageAsBytes implements IReturn<Uint8Array> {
+export declare class ImageAsBytes implements IReturn<string> {
     format: string;
     constructor(init?: Partial<ImageAsBytes>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
-export declare class ImageAsCustomResult implements IReturn<Uint8Array> {
+export declare class ImageAsCustomResult implements IReturn<string> {
     format: string;
     constructor(init?: Partial<ImageAsCustomResult>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
-export declare class ImageWriteToResponse implements IReturn<Uint8Array> {
+export declare class ImageWriteToResponse implements IReturn<string> {
     format: string;
     constructor(init?: Partial<ImageWriteToResponse>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
-export declare class ImageAsFile implements IReturn<Uint8Array> {
+export declare class ImageAsFile implements IReturn<string> {
     format: string;
     constructor(init?: Partial<ImageAsFile>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
 export declare class ImageAsRedirect {
     format: string;
     constructor(init?: Partial<ImageAsRedirect>);
 }
-export declare class HelloImage implements IReturn<Uint8Array> {
+export declare class HelloImage implements IReturn<string> {
     name: string;
     format: string;
     width?: number;
@@ -1105,7 +1105,7 @@ export declare class HelloImage implements IReturn<Uint8Array> {
     foreground: string;
     background: string;
     constructor(init?: Partial<HelloImage>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
 export declare class Secured implements IReturn<SecuredResponse> {
@@ -1418,14 +1418,14 @@ export declare class ReturnString implements IReturn<string> {
     createResponse(): string;
     getTypeName(): string;
 }
-export declare class ReturnBytes implements IReturn<Uint8Array> {
-    data: Uint8Array;
+export declare class ReturnBytes implements IReturn<string> {
+    data: string;
     constructor(init?: Partial<ReturnBytes>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
 export declare class ReturnStream implements IReturn<Blob> {
-    data: Uint8Array;
+    data: string;
     constructor(init?: Partial<ReturnStream>);
     createResponse(): Blob;
     getTypeName(): string;
@@ -1455,12 +1455,12 @@ export declare class SendText implements IReturn<string> {
     createResponse(): string;
     getTypeName(): string;
 }
-export declare class SendRaw implements IReturn<Uint8Array> {
+export declare class SendRaw implements IReturn<string> {
     id: number;
     name: string;
     contentType: string;
     constructor(init?: Partial<SendRaw>);
-    createResponse(): Uint8Array;
+    createResponse(): string;
     getTypeName(): string;
 }
 export declare class SendDefault implements IReturn<SendVerbResponse> {

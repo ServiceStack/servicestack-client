@@ -496,6 +496,15 @@ export declare function enc(o: any): string;
 export declare function htmlAttrs(o: any): string;
 export declare function indexOfAny(str: string, needles: string[]): number;
 export declare function isNullOrEmpty(o: any): boolean;
+export declare function fromDateTime(dateTime: string): Date;
+export declare function toDateTime(date: Date): string;
+export declare function fromTimeSpan(xsdDuration: string): string;
+export declare function toTimeSpan(xsdDuration: string): string;
+export declare function fromGuid(xsdDuration: string): string;
+export declare function toGuid(xsdDuration: string): string;
+export declare function fromByteArray(base64: string): Uint8Array;
+export declare function toByteArray(bytes: Uint8Array): string;
+export declare function toBase64String(source: string): string;
 export declare class StringBuffer {
     buffer_: string;
     constructor(opt_a1?: any, ...var_args: any[]);

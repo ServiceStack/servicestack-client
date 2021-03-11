@@ -1412,10 +1412,15 @@ interface Buffer extends NodeBuffer { }
 declare var Buffer: {
     from (str: string, encoding?: string): Buffer;
 }
-function _btoa(str:string) {
+function _btoa(base64:string) {
     return typeof btoa == 'function'
-        ? btoa(str)
-        : Buffer.from(str).toString('base64');
+        ? btoa(base64)
+        : Buffer.from(base64).toString('base64');
+}
+function _atob(base64:string) {
+    return typeof atob == 'function'
+        ? atob(base64)
+        : Buffer.from(base64, 'base64').toString();
 }
 
 //from: http://stackoverflow.com/a/30106551/85785
@@ -2503,6 +2508,58 @@ export function isNullOrEmpty(o:any) {
     return (o === null || o === undefined || o === "");
 }
 
+// From .NET DateTime (WCF JSON or ISO Date) to JS Date
+export function fromDateTime(dateTime:string) {
+    return toDate(dateTime);
+}
+
+// From JS Date to .NET DateTime (WCF JSON Date)
+export function toDateTime(date:Date) {
+    return `\/Date(${date.getTime()})\/`;
+}
+
+// From .NET TimeSpan (XSD Duration) to JS String
+export function fromTimeSpan(xsdDuration:string) {
+    return xsdDuration;
+}
+
+// From JS String to .NET TimeSpan (XSD Duration)
+export function toTimeSpan(xsdDuration:string) {
+    return xsdDuration;
+}
+
+// From .NET Guid to JS String
+export function fromGuid(xsdDuration:string) {
+    return xsdDuration;
+}
+
+// From JS String to .NET Guid
+export function toGuid(xsdDuration:string) {
+    return xsdDuration;
+}
+
+// From .NET byte[] (Base64 String) to JVM signed byte[]
+export function fromByteArray(base64:string) : Uint8Array {
+    var binaryStr = _atob(base64);
+    var len = binaryStr.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+    }
+    return bytes;
+}
+
+// From JS Uint8Array to .NET byte[] (Base64 String)
+export function toByteArray(bytes:Uint8Array) : string {
+    var str = String.fromCharCode.apply(null, bytes);
+    return _btoa(str);
+}
+
+// From JS String to Base64 String
+export function toBase64String(source:string) : string {
+    return JsonServiceClient.toBase64(source);
+}
+
 export class StringBuffer {
     buffer_ = '';
     constructor(opt_a1?:any, ...var_args:any[]) {
@@ -2653,21 +2710,16 @@ export class Inspect {
         let rowWidth = Object.values(colSizes).reduce((p, c) => p + c, 0) +
             (colSizesLength * 2) +
             (colSizesLength + 1);
-        console.log(rowWidth, Object.values(colSizes), Object.values(colSizes).reduce((p, c) => p + c, 0));
         let sb:string[] = [];
         sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
         let head = '|';
-        keys.forEach(k => {
-            head += Inspect.alignCenter(k, colSizes[k]) + '|';
-        });
+        keys.forEach(k => head += Inspect.alignCenter(k, colSizes[k]) + '|');
         sb.push(head);
         sb.push(`|${'-'.repeat(rowWidth - 2)}|`);
 
         mapRows.forEach(row => {
             let to = '|';
-            keys.forEach(k => {
-                to += '' + Inspect.alignAuto(row[k], colSizes[k]) + '|';
-            });
+            keys.forEach(k => to += '' + Inspect.alignAuto(row[k], colSizes[k]) + '|');
             sb.push(to);
         });
         sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
@@ -2700,7 +2752,6 @@ export class Inspect {
         let nLen = str.length;
         let half = Math.floor(len / 2 - nLen / 2);
         let odds = Math.abs((nLen % 2) - (len % 2));
-        len = str.length;
         return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
     }
   

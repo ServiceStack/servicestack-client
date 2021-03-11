@@ -1,5 +1,5 @@
 /* Options:
-Date: 2021-03-11 06:06:51
+Date: 2021-03-11 14:32:31
 Version: 5.105
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -1107,7 +1107,7 @@ export class AllCollectionTypes implements IReturn<AllCollectionTypes>
     public stringList: string[];
     public floatArray: number[];
     public doubleList: number[];
-    public byteArray: Uint8Array;
+    public byteArray: string;
     public charArray: string[];
     public decimalList: number[];
     public pocoArray: Poco[];
@@ -1788,42 +1788,42 @@ export class ImageAsStream implements IReturn<Blob>
 }
 
 // @Route("/image-bytes")
-export class ImageAsBytes implements IReturn<Uint8Array>
+export class ImageAsBytes implements IReturn<string>
 {
     public format: string;
 
     public constructor(init?: Partial<ImageAsBytes>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'ImageAsBytes'; }
 }
 
 // @Route("/image-custom")
-export class ImageAsCustomResult implements IReturn<Uint8Array>
+export class ImageAsCustomResult implements IReturn<string>
 {
     public format: string;
 
     public constructor(init?: Partial<ImageAsCustomResult>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'ImageAsCustomResult'; }
 }
 
 // @Route("/image-response")
-export class ImageWriteToResponse implements IReturn<Uint8Array>
+export class ImageWriteToResponse implements IReturn<string>
 {
     public format: string;
 
     public constructor(init?: Partial<ImageWriteToResponse>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'ImageWriteToResponse'; }
 }
 
 // @Route("/image-file")
-export class ImageAsFile implements IReturn<Uint8Array>
+export class ImageAsFile implements IReturn<string>
 {
     public format: string;
 
     public constructor(init?: Partial<ImageAsFile>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'ImageAsFile'; }
 }
 
@@ -1836,7 +1836,7 @@ export class ImageAsRedirect
 }
 
 // @Route("/hello-image/{Name}")
-export class HelloImage implements IReturn<Uint8Array>
+export class HelloImage implements IReturn<string>
 {
     public name: string;
     public format: string;
@@ -1848,7 +1848,7 @@ export class HelloImage implements IReturn<Uint8Array>
     public background: string;
 
     public constructor(init?: Partial<HelloImage>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'HelloImage'; }
 }
 
@@ -2344,19 +2344,19 @@ export class ReturnString implements IReturn<string>
 }
 
 // @Route("/return/bytes")
-export class ReturnBytes implements IReturn<Uint8Array>
+export class ReturnBytes implements IReturn<string>
 {
-    public data: Uint8Array;
+    public data: string;
 
     public constructor(init?: Partial<ReturnBytes>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'ReturnBytes'; }
 }
 
 // @Route("/return/stream")
 export class ReturnStream implements IReturn<Blob>
 {
-    public data: Uint8Array;
+    public data: string;
 
     public constructor(init?: Partial<ReturnStream>) { (Object as any).assign(this, init); }
     public createResponse() { return new Blob(); }
@@ -2405,14 +2405,14 @@ export class SendText implements IReturn<string>
 }
 
 // @Route("/sendraw")
-export class SendRaw implements IReturn<Uint8Array>
+export class SendRaw implements IReturn<string>
 {
     public id: number;
     public name: string;
     public contentType: string;
 
     public constructor(init?: Partial<SendRaw>) { (Object as any).assign(this, init); }
-    public createResponse() { return new Uint8Array(0); }
+    public createResponse() { return ''; }
     public getTypeName() { return 'SendRaw'; }
 }
 
