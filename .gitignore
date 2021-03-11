@@ -1,6 +1,7 @@
 #temp
 deno/
 deno-tests/
+.gistrun/
 
 # Logs
 logs

@@ -2599,3 +2599,125 @@ export class JSV {
     }
 }
 
+//requires Node
+declare var process: any;
+declare function require(name:string);
+
+export class Inspect {
+    static vars(obj:any) {
+        //requires Node
+        if (typeof process === 'undefined' || typeof require !== 'function') return;
+        let inspectVarsPath = process.env.INSPECT_VARS;
+        if (!inspectVarsPath || !obj)
+            return;
+
+        let fs = require('fs');
+        let varsPath = inspectVarsPath.replace(/\\/g,'/');
+        if (varsPath.indexOf('/') >= 0) {
+            let dir = require('path').dirname(varsPath)
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+            }
+        }
+        fs.writeFileSync(varsPath,JSON.stringify(obj));
+    }
+  
+    static dump(obj:any) {
+        let to = JSON.stringify(obj, null, 4);
+        return to.replace(/"/g,'');
+    }
+  
+    static printDump(obj:any) { console.log(Inspect.dump(obj)); }
+  
+    static dumpTable(rows:any[]) {
+        let mapRows = rows;
+        let keys = Inspect.allKeys(mapRows);
+        let colSizes:{[index:string]:number} = {};
+
+        keys.forEach(k => {
+            let max = k.length;
+            mapRows.forEach(row => {
+                var col = row[k];
+                if (col != null) {
+                    let valSize = `${col}`.length;
+                    if (valSize > max) {
+                        max = valSize;
+                    }
+                }
+            });
+            colSizes[k] = max;
+        });
+
+        // sum + ' padding ' + |
+        let colSizesLength = Object.keys(colSizes).length;
+        let rowWidth = Object.values(colSizes).reduce((p, c) => p + c, 0) +
+            (colSizesLength * 2) +
+            (colSizesLength + 1);
+        console.log(rowWidth, Object.values(colSizes), Object.values(colSizes).reduce((p, c) => p + c, 0));
+        let sb:string[] = [];
+        sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
+        let head = '|';
+        keys.forEach(k => {
+            head += Inspect.alignCenter(k, colSizes[k]) + '|';
+        });
+        sb.push(head);
+        sb.push(`|${'-'.repeat(rowWidth - 2)}|`);
+
+        mapRows.forEach(row => {
+            let to = '|';
+            keys.forEach(k => {
+                to += '' + Inspect.alignAuto(row[k], colSizes[k]) + '|';
+            });
+            sb.push(to);
+        });
+        sb.push(`+${'-'.repeat(rowWidth - 2)}+`);
+
+        return sb.join('\n');
+    }
+  
+    static printDumpTable(rows:any[]) { console.log(Inspect.dumpTable(rows)); }
+  
+    static allKeys(rows:any[]) : string[] {
+        var to = [];
+        rows.forEach(o => Object.keys(o).forEach(k => {
+            if (to.indexOf(k) === -1) {
+                to.push(k);
+            }
+        }));
+        return to;
+    }
+
+    static alignLeft(str:string, len:number, pad:string = ' ') : string {
+        if (len < 0) return '';
+        let aLen = len + 1 - str.length;
+        if (aLen <= 0) return str;
+        return pad + str + pad.repeat(len + 1 - str.length);
+    }
+  
+    static alignCenter(str:string, len:number, pad:string = ' ') : string {
+        if (len < 0) return '';
+        if (!str) str = '';
+        let nLen = str.length;
+        let half = Math.floor(len / 2 - nLen / 2);
+        let odds = Math.abs((nLen % 2) - (len % 2));
+        len = str.length;
+        return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
+    }
+  
+    static alignRight(str:string, len:number, pad:string = ' ') : string {
+        if (len < 0) return '';
+        let aLen = len + 1 - str.length;
+        if (aLen <= 0) return str;
+        return pad.repeat(len + 1 - str.length) + str + pad;
+    }
+  
+    static alignAuto(obj:any, len:number, pad:string = ' ') : string {
+        let str = `${obj}`;
+        if (str.length <= len) {
+        return  typeof obj === "number"
+            ? Inspect.alignRight(str, len, pad)
+            : Inspect.alignLeft(str, len, pad);
+        }
+        return str;
+    }
+}

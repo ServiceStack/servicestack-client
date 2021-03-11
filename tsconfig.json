@@ -9,7 +9,7 @@
     "target": "es5",
     "module": "commonjs",
     "experimentalDecorators": true,
-    "lib": ["es2015","dom","dom.iterable"]
+    "lib": ["es2017","dom","dom.iterable"]
   },
   "files": [
     "./src/index.ts",
@@ -21,6 +21,7 @@
     "./tests/stringbuffer.spec.ts",
     "./tests/utils.spec.ts",
     "./tests/jsv.spec.ts",
+    "./tests/inspect.spec.ts",
     "./tests/issues.spec.ts"
    ]
 }
