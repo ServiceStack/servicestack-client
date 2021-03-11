@@ -1,5 +1,5 @@
 /* Options:
-Date: 2021-03-01 10:41:00
+Date: 2021-03-11 06:06:51
 Version: 5.105
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://test.servicestack.net
@@ -24,6 +24,18 @@ export interface IReturn<T>
 export interface IReturnVoid
 {
     createResponse(): void;
+}
+
+export interface ICreateDb<Table>
+{
+}
+
+export interface IUpdateDb<Table>
+{
+}
+
+export interface IPatchDb<Table>
+{
 }
 
 export interface IHasSessionId
@@ -53,6 +65,10 @@ export interface IDelete
 }
 
 export interface IPatch
+{
+}
+
+export interface IDeleteDb<Table>
 {
 }
 
@@ -109,6 +125,14 @@ export class SetterType
     public name: string;
 
     public constructor(init?: Partial<SetterType>) { (Object as any).assign(this, init); }
+}
+
+export class Item
+{
+    public name: string;
+    public description: string;
+
+    public constructor(init?: Partial<Item>) { (Object as any).assign(this, init); }
 }
 
 export interface IAuthTokens
@@ -374,14 +398,59 @@ export enum EnumType
 {
     Value1 = 'Value1',
     Value2 = 'Value2',
+    Value3 = 'Value3',
+}
+
+// @Flags()
+export enum EnumTypeFlags
+{
+    Value1 = 0,
+    Value2 = 1,
+    Value3 = 2,
+}
+
+export enum EnumWithValues
+{
+    None = 'None',
+    Value1 = 'Member 1',
+    Value2 = 'Value2',
 }
 
 // @Flags()
 export enum EnumFlags
 {
-    Value1 = 1,
-    Value2 = 2,
-    Value3 = 4,
+    Value0 = 'Value0',
+    Value1 = 'Value 1',
+    Value2 = 'Value2',
+    Value3 = 'Value3',
+    Value123 = 'Value123',
+}
+
+export enum EnumAsInt
+{
+    Value1 = 1000,
+    Value2 = 2000,
+    Value3 = 3000,
+}
+
+export enum EnumStyle
+{
+    lower = 'lower',
+    UPPER = 'UPPER',
+    PascalCase = 'PascalCase',
+    camelCase = 'camelCase',
+    camelUPPER = 'camelUPPER',
+    PascalUPPER = 'PascalUPPER',
+}
+
+export enum EnumStyleMembers
+{
+    Lower = 'lower',
+    Upper = 'UPPER',
+    PascalCase = 'PascalCase',
+    CamelCase = 'camelCase',
+    CamelUpper = 'camelUPPER',
+    PascalUpper = 'PascalUPPER',
 }
 
 export class KeyValuePair<TKey, TValue>
@@ -432,6 +501,13 @@ export class AllTypesBase
     public constructor(init?: Partial<AllTypesBase>) { (Object as any).assign(this, init); }
 }
 
+export class Poco
+{
+    public name: string;
+
+    public constructor(init?: Partial<Poco>) { (Object as any).assign(this, init); }
+}
+
 export class HelloBase
 {
     public id: number;
@@ -446,26 +522,12 @@ export class HelloResponseBase
     public constructor(init?: Partial<HelloResponseBase>) { (Object as any).assign(this, init); }
 }
 
-export class Poco
-{
-    public name: string;
-
-    public constructor(init?: Partial<Poco>) { (Object as any).assign(this, init); }
-}
-
 export class HelloBase_1<T>
 {
     public items: T[];
     public counts: number[];
 
     public constructor(init?: Partial<HelloBase_1<T>>) { (Object as any).assign(this, init); }
-}
-
-export class Item
-{
-    public value: string;
-
-    public constructor(init?: Partial<Item>) { (Object as any).assign(this, init); }
 }
 
 export class HelloWithReturnResponse
@@ -624,6 +686,83 @@ export class QueryBase
     public constructor(init?: Partial<QueryBase>) { (Object as any).assign(this, init); }
 }
 
+export class QueryDb_2<From, Into> extends QueryBase
+{
+
+    public constructor(init?: Partial<QueryDb_2<From, Into>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class QueryDbTenant_2<From, Into> extends QueryDb_2<From, Into>
+{
+
+    public constructor(init?: Partial<QueryDbTenant_2<From, Into>>) { super(init); (Object as any).assign(this, init); }
+}
+
+// @DataContract
+export class AuditBase
+{
+    // @DataMember(Order=1)
+    public createdDate: string;
+
+    // @DataMember(Order=2)
+    // @Required()
+    public createdBy: string;
+
+    // @DataMember(Order=3)
+    public modifiedDate: string;
+
+    // @DataMember(Order=4)
+    // @Required()
+    public modifiedBy: string;
+
+    // @DataMember(Order=5)
+    public deletedDate?: string;
+
+    // @DataMember(Order=6)
+    public deletedBy: string;
+
+    public constructor(init?: Partial<AuditBase>) { (Object as any).assign(this, init); }
+}
+
+export enum LivingStatus
+{
+    Alive = 'Alive',
+    Dead = 'Dead',
+}
+
+export class RockstarAuditTenant extends AuditBase
+{
+    public tenantId: number;
+    public id: number;
+    public firstName: string;
+    public lastName: string;
+    public age?: number;
+    public dateOfBirth: string;
+    public dateDied?: string;
+    public livingStatus: LivingStatus;
+
+    public constructor(init?: Partial<RockstarAuditTenant>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class RockstarBase
+{
+    public firstName: string;
+    public lastName: string;
+    public age?: number;
+    public dateOfBirth: string;
+    public dateDied?: string;
+    public livingStatus: LivingStatus;
+
+    public constructor(init?: Partial<RockstarBase>) { (Object as any).assign(this, init); }
+}
+
+export class RockstarAuto extends RockstarBase
+{
+    public id: number;
+
+    public constructor(init?: Partial<RockstarAuto>) { super(init); (Object as any).assign(this, init); }
+}
+
 export class QueryDb_1<T> extends QueryBase
 {
 
@@ -636,12 +775,6 @@ export class OnlyDefinedInGenericType
     public name: string;
 
     public constructor(init?: Partial<OnlyDefinedInGenericType>) { (Object as any).assign(this, init); }
-}
-
-export class QueryDb_2<From, Into> extends QueryBase
-{
-
-    public constructor(init?: Partial<QueryDb_2<From, Into>>) { super(init); (Object as any).assign(this, init); }
 }
 
 export class OnlyDefinedInGenericTypeFrom
@@ -658,6 +791,75 @@ export class OnlyDefinedInGenericTypeInto
     public name: string;
 
     public constructor(init?: Partial<OnlyDefinedInGenericTypeInto>) { (Object as any).assign(this, init); }
+}
+
+export class RockstarAudit extends RockstarBase
+{
+    public id: number;
+    public createdDate: string;
+    public createdBy: string;
+    public createdInfo: string;
+    public modifiedDate: string;
+    public modifiedBy: string;
+    public modifiedInfo: string;
+
+    public constructor(init?: Partial<RockstarAudit>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class CreateAuditBase<Table, TResponse> implements ICreateDb<Table>
+{
+
+    public constructor(init?: Partial<CreateAuditBase<Table, TResponse>>) { (Object as any).assign(this, init); }
+}
+
+export class CreateAuditTenantBase<Table, TResponse> extends CreateAuditBase<Table, TResponse>
+{
+
+    public constructor(init?: Partial<CreateAuditTenantBase<Table, TResponse>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class UpdateAuditBase<Table, TResponse> implements IUpdateDb<Table>
+{
+
+    public constructor(init?: Partial<UpdateAuditBase<Table, TResponse>>) { (Object as any).assign(this, init); }
+}
+
+export class UpdateAuditTenantBase<Table, TResponse> extends UpdateAuditBase<Table, TResponse>
+{
+
+    public constructor(init?: Partial<UpdateAuditTenantBase<Table, TResponse>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class PatchAuditBase<Table, TResponse> implements IPatchDb<Table>
+{
+
+    public constructor(init?: Partial<PatchAuditBase<Table, TResponse>>) { (Object as any).assign(this, init); }
+}
+
+export class PatchAuditTenantBase<Table, TResponse> extends PatchAuditBase<Table, TResponse>
+{
+
+    public constructor(init?: Partial<PatchAuditTenantBase<Table, TResponse>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class SoftDeleteAuditBase<Table, TResponse> implements IUpdateDb<Table>
+{
+
+    public constructor(init?: Partial<SoftDeleteAuditBase<Table, TResponse>>) { (Object as any).assign(this, init); }
+}
+
+export class SoftDeleteAuditTenantBase<Table, TResponse> extends SoftDeleteAuditBase<Table, TResponse>
+{
+
+    public constructor(init?: Partial<SoftDeleteAuditTenantBase<Table, TResponse>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class RockstarVersion extends RockstarBase
+{
+    public id: number;
+    public rowVersion: number;
+
+    public constructor(init?: Partial<RockstarVersion>) { super(init); (Object as any).assign(this, init); }
 }
 
 export class TypesGroup
@@ -724,6 +926,24 @@ export class CustomHttpErrorResponse
     public responseStatus: ResponseStatus;
 
     public constructor(init?: Partial<CustomHttpErrorResponse>) { (Object as any).assign(this, init); }
+}
+
+export class QueryResponseAlt<T>
+{
+    public offset: number;
+    public total: number;
+    public results: T[];
+    public meta: { [index: string]: string; };
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<QueryResponseAlt<T>>) { (Object as any).assign(this, init); }
+}
+
+export class Items
+{
+    public results: Item[];
+
+    public constructor(init?: Partial<Items>) { (Object as any).assign(this, init); }
 }
 
 export class ThrowTypeResponse
@@ -879,18 +1099,25 @@ export class AllTypes implements IReturn<AllTypes>
     public getTypeName() { return 'AllTypes'; }
 }
 
-export class AllCollectionTypes
+export class AllCollectionTypes implements IReturn<AllCollectionTypes>
 {
     public intArray: number[];
     public intList: number[];
     public stringArray: string[];
     public stringList: string[];
+    public floatArray: number[];
+    public doubleList: number[];
+    public byteArray: Uint8Array;
+    public charArray: string[];
+    public decimalList: number[];
     public pocoArray: Poco[];
     public pocoList: Poco[];
     public pocoLookup: { [index: string]: Poco[]; };
     public pocoLookupMap: { [index: string]: { [index:string]: Poco; }[]; };
 
     public constructor(init?: Partial<AllCollectionTypes>) { (Object as any).assign(this, init); }
+    public createResponse() { return new AllCollectionTypes(); }
+    public getTypeName() { return 'AllCollectionTypes'; }
 }
 
 export class HelloAllTypesResponse
@@ -1305,6 +1532,41 @@ export class QueryResponse<T>
     public constructor(init?: Partial<QueryResponse<T>>) { (Object as any).assign(this, init); }
 }
 
+export class RockstarWithIdResponse
+{
+    public id: number;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<RockstarWithIdResponse>) { (Object as any).assign(this, init); }
+}
+
+export class RockstarWithIdAndResultResponse
+{
+    public id: number;
+    public result: RockstarAuto;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<RockstarWithIdAndResultResponse>) { (Object as any).assign(this, init); }
+}
+
+export class RockstarWithIdAndCountResponse
+{
+    public id: number;
+    public count: number;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<RockstarWithIdAndCountResponse>) { (Object as any).assign(this, init); }
+}
+
+export class RockstarWithIdAndRowVersionResponse
+{
+    public id: number;
+    public rowVersion: number;
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<RockstarWithIdAndRowVersionResponse>) { (Object as any).assign(this, init); }
+}
+
 // @Route("/channels/{Channel}/raw")
 export class PostRawToChannel implements IReturnVoid
 {
@@ -1394,6 +1656,31 @@ export class CustomHttpError implements IReturn<CustomHttpErrorResponse>
     public constructor(init?: Partial<CustomHttpError>) { (Object as any).assign(this, init); }
     public createResponse() { return new CustomHttpErrorResponse(); }
     public getTypeName() { return 'CustomHttpError'; }
+}
+
+export class AltQueryItems implements IReturn<QueryResponseAlt<Item>>
+{
+    public name: string;
+
+    public constructor(init?: Partial<AltQueryItems>) { (Object as any).assign(this, init); }
+    public createResponse() { return new QueryResponseAlt<Item>(); }
+    public getTypeName() { return 'AltQueryItems'; }
+}
+
+export class GetItems implements IReturn<Items>
+{
+
+    public constructor(init?: Partial<GetItems>) { (Object as any).assign(this, init); }
+    public createResponse() { return new Items(); }
+    public getTypeName() { return 'GetItems'; }
+}
+
+export class GetNakedItems implements IReturn<Item[]>
+{
+
+    public constructor(init?: Partial<GetNakedItems>) { (Object as any).assign(this, init); }
+    public createResponse() { return new Array<Item>(); }
+    public getTypeName() { return 'GetNakedItems'; }
 }
 
 export class DummyTypes
@@ -1739,10 +2026,37 @@ export class HelloArray implements IReturn<ArrayResult[]>
 export class HelloWithEnum
 {
     public enumProp: EnumType;
+    public enumTypeFlags: EnumTypeFlags;
+    public enumWithValues: EnumWithValues;
     public nullableEnumProp?: EnumType;
     public enumFlags: EnumFlags;
+    public enumAsInt: EnumAsInt;
+    public enumStyle: EnumStyle;
+    public enumStyleMembers: EnumStyleMembers;
 
     public constructor(init?: Partial<HelloWithEnum>) { (Object as any).assign(this, init); }
+}
+
+export class HelloWithEnumList
+{
+    public enumProp: EnumType[];
+    public enumWithValues: EnumWithValues[];
+    public nullableEnumProp: EnumType[];
+    public enumFlags: EnumFlags[];
+    public enumStyle: EnumStyle[];
+
+    public constructor(init?: Partial<HelloWithEnumList>) { (Object as any).assign(this, init); }
+}
+
+export class HelloWithEnumMap
+{
+    public enumProp: { [index: string]: EnumType; };
+    public enumWithValues: { [index: string]: EnumWithValues; };
+    public nullableEnumProp: { [index: string]: EnumType; };
+    public enumFlags: { [index: string]: EnumFlags; };
+    public enumStyle: { [index: string]: EnumStyle; };
+
+    public constructor(init?: Partial<HelloWithEnumMap>) { (Object as any).assign(this, init); }
 }
 
 export class RestrictedAttributes
@@ -2406,6 +2720,25 @@ export class GetAccessToken implements IReturn<GetAccessTokenResponse>, IPost
     public getTypeName() { return 'GetAccessToken'; }
 }
 
+export class QueryRockstarAudit extends QueryDbTenant_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>>
+{
+    public id?: number;
+
+    public constructor(init?: Partial<QueryRockstarAudit>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new QueryResponse<RockstarAuto>(); }
+    public getTypeName() { return 'QueryRockstarAudit'; }
+}
+
+export class QueryRockstarAuditSubOr extends QueryDb_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>>
+{
+    public firstNameStartsWith: string;
+    public ageOlderThan?: number;
+
+    public constructor(init?: Partial<QueryRockstarAuditSubOr>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new QueryResponse<RockstarAuto>(); }
+    public getTypeName() { return 'QueryRockstarAuditSubOr'; }
+}
+
 export class QueryPocoBase extends QueryDb_1<OnlyDefinedInGenericType> implements IReturn<QueryResponse<OnlyDefinedInGenericType>>
 {
     public id: number;
@@ -2431,5 +2764,89 @@ export class QueryRockstars extends QueryDb_1<Rockstar> implements IReturn<Query
     public constructor(init?: Partial<QueryRockstars>) { super(init); (Object as any).assign(this, init); }
     public createResponse() { return new QueryResponse<Rockstar>(); }
     public getTypeName() { return 'QueryRockstars'; }
+}
+
+export class CreateRockstarAudit extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit>
+{
+
+    public constructor(init?: Partial<CreateRockstarAudit>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdResponse(); }
+    public getTypeName() { return 'CreateRockstarAudit'; }
+}
+
+export class CreateRockstarAuditTenant extends CreateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId
+{
+    public sessionId: string;
+    public firstName: string;
+    public lastName: string;
+    public age?: number;
+    public dateOfBirth: string;
+    public dateDied?: string;
+    public livingStatus: LivingStatus;
+
+    public constructor(init?: Partial<CreateRockstarAuditTenant>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndResultResponse(); }
+    public getTypeName() { return 'CreateRockstarAuditTenant'; }
+}
+
+export class UpdateRockstarAuditTenant extends UpdateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId
+{
+    public sessionId: string;
+    public id: number;
+    public firstName: string;
+    public livingStatus?: LivingStatus;
+
+    public constructor(init?: Partial<UpdateRockstarAuditTenant>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndResultResponse(); }
+    public getTypeName() { return 'UpdateRockstarAuditTenant'; }
+}
+
+export class PatchRockstarAuditTenant extends PatchAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId
+{
+    public sessionId: string;
+    public id: number;
+    public firstName: string;
+    public livingStatus?: LivingStatus;
+
+    public constructor(init?: Partial<PatchRockstarAuditTenant>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndResultResponse(); }
+    public getTypeName() { return 'PatchRockstarAuditTenant'; }
+}
+
+export class SoftDeleteAuditTenant extends SoftDeleteAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>
+{
+    public id: number;
+
+    public constructor(init?: Partial<SoftDeleteAuditTenant>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndResultResponse(); }
+    public getTypeName() { return 'SoftDeleteAuditTenant'; }
+}
+
+export class CreateRockstarAuditMqToken extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit>, IHasBearerToken
+{
+    public bearerToken: string;
+
+    public constructor(init?: Partial<CreateRockstarAuditMqToken>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdResponse(); }
+    public getTypeName() { return 'CreateRockstarAuditMqToken'; }
+}
+
+export class RealDeleteAuditTenant implements IReturn<RockstarWithIdAndCountResponse>, IDeleteDb<RockstarAuditTenant>, IHasSessionId
+{
+    public sessionId: string;
+    public id: number;
+    public age?: number;
+
+    public constructor(init?: Partial<RealDeleteAuditTenant>) { (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndCountResponse(); }
+    public getTypeName() { return 'RealDeleteAuditTenant'; }
+}
+
+export class CreateRockstarVersion extends RockstarBase implements IReturn<RockstarWithIdAndRowVersionResponse>, ICreateDb<RockstarVersion>
+{
+
+    public constructor(init?: Partial<CreateRockstarVersion>) { super(init); (Object as any).assign(this, init); }
+    public createResponse() { return new RockstarWithIdAndRowVersionResponse(); }
+    public getTypeName() { return 'CreateRockstarVersion'; }
 }
 

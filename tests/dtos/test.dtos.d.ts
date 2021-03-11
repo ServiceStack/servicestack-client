@@ -4,6 +4,12 @@ export interface IReturn<T> {
 export interface IReturnVoid {
     createResponse(): void;
 }
+export interface ICreateDb<Table> {
+}
+export interface IUpdateDb<Table> {
+}
+export interface IPatchDb<Table> {
+}
 export interface IHasSessionId {
     sessionId: string;
 }
@@ -19,6 +25,8 @@ export interface IPut {
 export interface IDelete {
 }
 export interface IPatch {
+}
+export interface IDeleteDb<Table> {
 }
 export declare class ResponseError {
     errorCode: string;
@@ -48,6 +56,11 @@ export declare class SetterType {
     id: number;
     name: string;
     constructor(init?: Partial<SetterType>);
+}
+export declare class Item {
+    name: string;
+    description: string;
+    constructor(init?: Partial<Item>);
 }
 export interface IAuthTokens {
     provider: string;
@@ -162,11 +175,45 @@ export declare class ArrayResult {
 export declare enum EnumType {
     Value1 = "Value1",
     Value2 = "Value2",
+    Value3 = "Value3",
+}
+export declare enum EnumTypeFlags {
+    Value1 = 0,
+    Value2 = 1,
+    Value3 = 2,
+}
+export declare enum EnumWithValues {
+    None = "None",
+    Value1 = "Member 1",
+    Value2 = "Value2",
 }
 export declare enum EnumFlags {
-    Value1 = 1,
-    Value2 = 2,
-    Value3 = 4,
+    Value0 = "Value0",
+    Value1 = "Value 1",
+    Value2 = "Value2",
+    Value3 = "Value3",
+    Value123 = "Value123",
+}
+export declare enum EnumAsInt {
+    Value1 = 1000,
+    Value2 = 2000,
+    Value3 = 3000,
+}
+export declare enum EnumStyle {
+    lower = "lower",
+    UPPER = "UPPER",
+    PascalCase = "PascalCase",
+    camelCase = "camelCase",
+    camelUPPER = "camelUPPER",
+    PascalUPPER = "PascalUPPER",
+}
+export declare enum EnumStyleMembers {
+    Lower = "lower",
+    Upper = "UPPER",
+    PascalCase = "PascalCase",
+    CamelCase = "camelCase",
+    CamelUpper = "camelUPPER",
+    PascalUpper = "PascalUPPER",
 }
 export declare class KeyValuePair<TKey, TValue> {
     key: TKey;
@@ -211,6 +258,10 @@ export declare class AllTypesBase {
     subType: SubType;
     constructor(init?: Partial<AllTypesBase>);
 }
+export declare class Poco {
+    name: string;
+    constructor(init?: Partial<Poco>);
+}
 export declare class HelloBase {
     id: number;
     constructor(init?: Partial<HelloBase>);
@@ -219,18 +270,10 @@ export declare class HelloResponseBase {
     refId: number;
     constructor(init?: Partial<HelloResponseBase>);
 }
-export declare class Poco {
-    name: string;
-    constructor(init?: Partial<Poco>);
-}
 export declare class HelloBase_1<T> {
     items: T[];
     counts: number[];
     constructor(init?: Partial<HelloBase_1<T>>);
-}
-export declare class Item {
-    value: string;
-    constructor(init?: Partial<Item>);
 }
 export declare class HelloWithReturnResponse {
     result: string;
@@ -323,6 +366,49 @@ export declare class QueryBase {
     };
     constructor(init?: Partial<QueryBase>);
 }
+export declare class QueryDb_2<From, Into> extends QueryBase {
+    constructor(init?: Partial<QueryDb_2<From, Into>>);
+}
+export declare class QueryDbTenant_2<From, Into> extends QueryDb_2<From, Into> {
+    constructor(init?: Partial<QueryDbTenant_2<From, Into>>);
+}
+export declare class AuditBase {
+    createdDate: string;
+    createdBy: string;
+    modifiedDate: string;
+    modifiedBy: string;
+    deletedDate?: string;
+    deletedBy: string;
+    constructor(init?: Partial<AuditBase>);
+}
+export declare enum LivingStatus {
+    Alive = "Alive",
+    Dead = "Dead",
+}
+export declare class RockstarAuditTenant extends AuditBase {
+    tenantId: number;
+    id: number;
+    firstName: string;
+    lastName: string;
+    age?: number;
+    dateOfBirth: string;
+    dateDied?: string;
+    livingStatus: LivingStatus;
+    constructor(init?: Partial<RockstarAuditTenant>);
+}
+export declare class RockstarBase {
+    firstName: string;
+    lastName: string;
+    age?: number;
+    dateOfBirth: string;
+    dateDied?: string;
+    livingStatus: LivingStatus;
+    constructor(init?: Partial<RockstarBase>);
+}
+export declare class RockstarAuto extends RockstarBase {
+    id: number;
+    constructor(init?: Partial<RockstarAuto>);
+}
 export declare class QueryDb_1<T> extends QueryBase {
     constructor(init?: Partial<QueryDb_1<T>>);
 }
@@ -330,9 +416,6 @@ export declare class OnlyDefinedInGenericType {
     id: number;
     name: string;
     constructor(init?: Partial<OnlyDefinedInGenericType>);
-}
-export declare class QueryDb_2<From, Into> extends QueryBase {
-    constructor(init?: Partial<QueryDb_2<From, Into>>);
 }
 export declare class OnlyDefinedInGenericTypeFrom {
     id: number;
@@ -343,6 +426,45 @@ export declare class OnlyDefinedInGenericTypeInto {
     id: number;
     name: string;
     constructor(init?: Partial<OnlyDefinedInGenericTypeInto>);
+}
+export declare class RockstarAudit extends RockstarBase {
+    id: number;
+    createdDate: string;
+    createdBy: string;
+    createdInfo: string;
+    modifiedDate: string;
+    modifiedBy: string;
+    modifiedInfo: string;
+    constructor(init?: Partial<RockstarAudit>);
+}
+export declare class CreateAuditBase<Table, TResponse> implements ICreateDb<Table> {
+    constructor(init?: Partial<CreateAuditBase<Table, TResponse>>);
+}
+export declare class CreateAuditTenantBase<Table, TResponse> extends CreateAuditBase<Table, TResponse> {
+    constructor(init?: Partial<CreateAuditTenantBase<Table, TResponse>>);
+}
+export declare class UpdateAuditBase<Table, TResponse> implements IUpdateDb<Table> {
+    constructor(init?: Partial<UpdateAuditBase<Table, TResponse>>);
+}
+export declare class UpdateAuditTenantBase<Table, TResponse> extends UpdateAuditBase<Table, TResponse> {
+    constructor(init?: Partial<UpdateAuditTenantBase<Table, TResponse>>);
+}
+export declare class PatchAuditBase<Table, TResponse> implements IPatchDb<Table> {
+    constructor(init?: Partial<PatchAuditBase<Table, TResponse>>);
+}
+export declare class PatchAuditTenantBase<Table, TResponse> extends PatchAuditBase<Table, TResponse> {
+    constructor(init?: Partial<PatchAuditTenantBase<Table, TResponse>>);
+}
+export declare class SoftDeleteAuditBase<Table, TResponse> implements IUpdateDb<Table> {
+    constructor(init?: Partial<SoftDeleteAuditBase<Table, TResponse>>);
+}
+export declare class SoftDeleteAuditTenantBase<Table, TResponse> extends SoftDeleteAuditBase<Table, TResponse> {
+    constructor(init?: Partial<SoftDeleteAuditTenantBase<Table, TResponse>>);
+}
+export declare class RockstarVersion extends RockstarBase {
+    id: number;
+    rowVersion: number;
+    constructor(init?: Partial<RockstarVersion>);
 }
 export declare class TypesGroup {
     constructor(init?: Partial<TypesGroup>);
@@ -394,6 +516,20 @@ export declare class CustomHttpErrorResponse {
     custom: string;
     responseStatus: ResponseStatus;
     constructor(init?: Partial<CustomHttpErrorResponse>);
+}
+export declare class QueryResponseAlt<T> {
+    offset: number;
+    total: number;
+    results: T[];
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<QueryResponseAlt<T>>);
+}
+export declare class Items {
+    results: Item[];
+    constructor(init?: Partial<Items>);
 }
 export declare class ThrowTypeResponse {
     responseStatus: ResponseStatus;
@@ -498,11 +634,16 @@ export declare class AllTypes implements IReturn<AllTypes> {
     createResponse(): AllTypes;
     getTypeName(): string;
 }
-export declare class AllCollectionTypes {
+export declare class AllCollectionTypes implements IReturn<AllCollectionTypes> {
     intArray: number[];
     intList: number[];
     stringArray: string[];
     stringList: string[];
+    floatArray: number[];
+    doubleList: number[];
+    byteArray: Uint8Array;
+    charArray: string[];
+    decimalList: number[];
     pocoArray: Poco[];
     pocoList: Poco[];
     pocoLookup: {
@@ -514,6 +655,8 @@ export declare class AllCollectionTypes {
         }[];
     };
     constructor(init?: Partial<AllCollectionTypes>);
+    createResponse(): AllCollectionTypes;
+    getTypeName(): string;
 }
 export declare class HelloAllTypesResponse {
     result: string;
@@ -763,6 +906,29 @@ export declare class QueryResponse<T> {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<QueryResponse<T>>);
 }
+export declare class RockstarWithIdResponse {
+    id: number;
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<RockstarWithIdResponse>);
+}
+export declare class RockstarWithIdAndResultResponse {
+    id: number;
+    result: RockstarAuto;
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<RockstarWithIdAndResultResponse>);
+}
+export declare class RockstarWithIdAndCountResponse {
+    id: number;
+    count: number;
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<RockstarWithIdAndCountResponse>);
+}
+export declare class RockstarWithIdAndRowVersionResponse {
+    id: number;
+    rowVersion: number;
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<RockstarWithIdAndRowVersionResponse>);
+}
 export declare class PostRawToChannel implements IReturnVoid {
     from: string;
     toUserId: string;
@@ -821,6 +987,22 @@ export declare class CustomHttpError implements IReturn<CustomHttpErrorResponse>
     statusDescription: string;
     constructor(init?: Partial<CustomHttpError>);
     createResponse(): CustomHttpErrorResponse;
+    getTypeName(): string;
+}
+export declare class AltQueryItems implements IReturn<QueryResponseAlt<Item>> {
+    name: string;
+    constructor(init?: Partial<AltQueryItems>);
+    createResponse(): QueryResponseAlt<Item>;
+    getTypeName(): string;
+}
+export declare class GetItems implements IReturn<Items> {
+    constructor(init?: Partial<GetItems>);
+    createResponse(): Items;
+    getTypeName(): string;
+}
+export declare class GetNakedItems implements IReturn<Item[]> {
+    constructor(init?: Partial<GetNakedItems>);
+    createResponse(): Item[];
     getTypeName(): string;
 }
 export declare class DummyTypes {
@@ -1028,9 +1210,40 @@ export declare class HelloArray implements IReturn<ArrayResult[]> {
 }
 export declare class HelloWithEnum {
     enumProp: EnumType;
+    enumTypeFlags: EnumTypeFlags;
+    enumWithValues: EnumWithValues;
     nullableEnumProp?: EnumType;
     enumFlags: EnumFlags;
+    enumAsInt: EnumAsInt;
+    enumStyle: EnumStyle;
+    enumStyleMembers: EnumStyleMembers;
     constructor(init?: Partial<HelloWithEnum>);
+}
+export declare class HelloWithEnumList {
+    enumProp: EnumType[];
+    enumWithValues: EnumWithValues[];
+    nullableEnumProp: EnumType[];
+    enumFlags: EnumFlags[];
+    enumStyle: EnumStyle[];
+    constructor(init?: Partial<HelloWithEnumList>);
+}
+export declare class HelloWithEnumMap {
+    enumProp: {
+        [index: string]: EnumType;
+    };
+    enumWithValues: {
+        [index: string]: EnumWithValues;
+    };
+    nullableEnumProp: {
+        [index: string]: EnumType;
+    };
+    enumFlags: {
+        [index: string]: EnumFlags;
+    };
+    enumStyle: {
+        [index: string]: EnumStyle;
+    };
+    constructor(init?: Partial<HelloWithEnumMap>);
 }
 export declare class RestrictedAttributes {
     id: number;
@@ -1407,6 +1620,19 @@ export declare class GetAccessToken implements IReturn<GetAccessTokenResponse>, 
     createResponse(): GetAccessTokenResponse;
     getTypeName(): string;
 }
+export declare class QueryRockstarAudit extends QueryDbTenant_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>> {
+    id?: number;
+    constructor(init?: Partial<QueryRockstarAudit>);
+    createResponse(): QueryResponse<RockstarAuto>;
+    getTypeName(): string;
+}
+export declare class QueryRockstarAuditSubOr extends QueryDb_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>> {
+    firstNameStartsWith: string;
+    ageOlderThan?: number;
+    constructor(init?: Partial<QueryRockstarAuditSubOr>);
+    createResponse(): QueryResponse<RockstarAuto>;
+    getTypeName(): string;
+}
 export declare class QueryPocoBase extends QueryDb_1<OnlyDefinedInGenericType> implements IReturn<QueryResponse<OnlyDefinedInGenericType>> {
     id: number;
     constructor(init?: Partial<QueryPocoBase>);
@@ -1422,5 +1648,65 @@ export declare class QueryPocoIntoBase extends QueryDb_2<OnlyDefinedInGenericTyp
 export declare class QueryRockstars extends QueryDb_1<Rockstar> implements IReturn<QueryResponse<Rockstar>> {
     constructor(init?: Partial<QueryRockstars>);
     createResponse(): QueryResponse<Rockstar>;
+    getTypeName(): string;
+}
+export declare class CreateRockstarAudit extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit> {
+    constructor(init?: Partial<CreateRockstarAudit>);
+    createResponse(): RockstarWithIdResponse;
+    getTypeName(): string;
+}
+export declare class CreateRockstarAuditTenant extends CreateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
+    sessionId: string;
+    firstName: string;
+    lastName: string;
+    age?: number;
+    dateOfBirth: string;
+    dateDied?: string;
+    livingStatus: LivingStatus;
+    constructor(init?: Partial<CreateRockstarAuditTenant>);
+    createResponse(): RockstarWithIdAndResultResponse;
+    getTypeName(): string;
+}
+export declare class UpdateRockstarAuditTenant extends UpdateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
+    sessionId: string;
+    id: number;
+    firstName: string;
+    livingStatus?: LivingStatus;
+    constructor(init?: Partial<UpdateRockstarAuditTenant>);
+    createResponse(): RockstarWithIdAndResultResponse;
+    getTypeName(): string;
+}
+export declare class PatchRockstarAuditTenant extends PatchAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
+    sessionId: string;
+    id: number;
+    firstName: string;
+    livingStatus?: LivingStatus;
+    constructor(init?: Partial<PatchRockstarAuditTenant>);
+    createResponse(): RockstarWithIdAndResultResponse;
+    getTypeName(): string;
+}
+export declare class SoftDeleteAuditTenant extends SoftDeleteAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse> {
+    id: number;
+    constructor(init?: Partial<SoftDeleteAuditTenant>);
+    createResponse(): RockstarWithIdAndResultResponse;
+    getTypeName(): string;
+}
+export declare class CreateRockstarAuditMqToken extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit>, IHasBearerToken {
+    bearerToken: string;
+    constructor(init?: Partial<CreateRockstarAuditMqToken>);
+    createResponse(): RockstarWithIdResponse;
+    getTypeName(): string;
+}
+export declare class RealDeleteAuditTenant implements IReturn<RockstarWithIdAndCountResponse>, IDeleteDb<RockstarAuditTenant>, IHasSessionId {
+    sessionId: string;
+    id: number;
+    age?: number;
+    constructor(init?: Partial<RealDeleteAuditTenant>);
+    createResponse(): RockstarWithIdAndCountResponse;
+    getTypeName(): string;
+}
+export declare class CreateRockstarVersion extends RockstarBase implements IReturn<RockstarWithIdAndRowVersionResponse>, ICreateDb<RockstarVersion> {
+    constructor(init?: Partial<CreateRockstarVersion>);
+    createResponse(): RockstarWithIdAndRowVersionResponse;
     getTypeName(): string;
 }
