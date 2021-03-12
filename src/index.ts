@@ -1259,33 +1259,37 @@ export function splitOnLast(s: string, c: string): string[] {
         ? [s.substring(0, pos), s.substring(pos + 1)]
         : [s];
 }
-export function leftPart(strVal:string, needle:string) {
-    if (strVal == null) return null;
-    var pos = strVal.indexOf(needle);
+export function leftPart(s:string, needle:string) {
+    if (s == null) return null;
+    var pos = s.indexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(0, pos);
+        ? s
+        : s.substring(0, pos);
 }
-export function rightPart(strVal:string, needle:string) {
-    if (strVal == null) return null;
-    var pos = strVal.indexOf(needle);
+export function rightPart(s:string, needle:string) {
+    if (s == null) return null;
+    var pos = s.indexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(pos + needle.length);
+        ? s
+        : s.substring(pos + needle.length);
 }
-export function lastLeftPart(strVal:string, needle:string) {
-    if (strVal == null) return null;
-    var pos = strVal.lastIndexOf(needle);
+export function lastLeftPart(s:string, needle:string) {
+    if (s == null) return null;
+    var pos = s.lastIndexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(0, pos);
+        ? s
+        : s.substring(0, pos);
 }
-export function lastRightPart(strVal:string, needle:string) {
-    if (strVal == null) return null;
-    var pos = strVal.lastIndexOf(needle);
+export function lastRightPart(s:string, needle:string) {
+    if (s == null) return null;
+    var pos = s.lastIndexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(pos + needle.length);
+        ? s
+        : s.substring(pos + needle.length);
+}
+export function chop(str:string, len:number=1) {
+    len = Math.abs(len);
+    return str ? len < str.length ? str.substring(0, str.length - len) : '' : str;
 }
 export function onlyProps(obj:{[index:string]:any}, keys:string[]) {
     let to:{[index:string]:any} = {};

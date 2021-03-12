@@ -347,10 +347,11 @@ export declare function nameOf(o: any): any;
 export declare function css(selector: string | NodeListOf<Element>, name: string, value: string): void;
 export declare function splitOnFirst(s: string, c: string): string[];
 export declare function splitOnLast(s: string, c: string): string[];
-export declare function leftPart(strVal: string, needle: string): string;
-export declare function rightPart(strVal: string, needle: string): string;
-export declare function lastLeftPart(strVal: string, needle: string): string;
-export declare function lastRightPart(strVal: string, needle: string): string;
+export declare function leftPart(s: string, needle: string): string;
+export declare function rightPart(s: string, needle: string): string;
+export declare function lastLeftPart(s: string, needle: string): string;
+export declare function lastRightPart(s: string, needle: string): string;
+export declare function chop(str: string, len?: number): string;
 export declare function onlyProps(obj: {
     [index: string]: any;
 }, keys: string[]): {

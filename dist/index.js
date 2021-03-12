@@ -1004,42 +1004,48 @@ function splitOnLast(s, c) {
         : [s];
 }
 exports.splitOnLast = splitOnLast;
-function leftPart(strVal, needle) {
-    if (strVal == null)
+function leftPart(s, needle) {
+    if (s == null)
         return null;
-    var pos = strVal.indexOf(needle);
+    var pos = s.indexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(0, pos);
+        ? s
+        : s.substring(0, pos);
 }
 exports.leftPart = leftPart;
-function rightPart(strVal, needle) {
-    if (strVal == null)
+function rightPart(s, needle) {
+    if (s == null)
         return null;
-    var pos = strVal.indexOf(needle);
+    var pos = s.indexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(pos + needle.length);
+        ? s
+        : s.substring(pos + needle.length);
 }
 exports.rightPart = rightPart;
-function lastLeftPart(strVal, needle) {
-    if (strVal == null)
+function lastLeftPart(s, needle) {
+    if (s == null)
         return null;
-    var pos = strVal.lastIndexOf(needle);
+    var pos = s.lastIndexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(0, pos);
+        ? s
+        : s.substring(0, pos);
 }
 exports.lastLeftPart = lastLeftPart;
-function lastRightPart(strVal, needle) {
-    if (strVal == null)
+function lastRightPart(s, needle) {
+    if (s == null)
         return null;
-    var pos = strVal.lastIndexOf(needle);
+    var pos = s.lastIndexOf(needle);
     return pos == -1
-        ? strVal
-        : strVal.substring(pos + needle.length);
+        ? s
+        : s.substring(pos + needle.length);
 }
 exports.lastRightPart = lastRightPart;
+function chop(str, len) {
+    if (len === void 0) { len = 1; }
+    len = Math.abs(len);
+    return str ? len < str.length ? str.substring(0, str.length - len) : '' : str;
+}
+exports.chop = chop;
 function onlyProps(obj, keys) {
     var to = {};
     keys.forEach(function (key) { return to[key] = obj[key]; });
