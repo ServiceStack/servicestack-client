@@ -2700,21 +2700,23 @@ export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
 }
 
 //requires Node
+declare var global: any;
+declare var module: any;
 declare var process: any;
-declare function require(name:string);
 
 export class Inspect {
-    static vars(obj:any) {
-        //requires Node
-        if (typeof process === 'undefined' || typeof require !== 'function') return;
+    static vars(obj:any) {        
+        if (typeof process === 'undefined') return; //requires Node
+        let R = (global && global.require) || (module && module.require); //dynamic access to fix web ng build
+        if (typeof R !== 'function') return;
         let inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
 
-        let fs = require('fs');
+        let fs = R('fs');
         let varsPath = inspectVarsPath.replace(/\\/g,'/');
         if (varsPath.indexOf('/') >= 0) {
-            let dir = require('path').dirname(varsPath)
+            let dir = R('path').dirname(varsPath)
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }

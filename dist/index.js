@@ -2498,16 +2498,18 @@ var Inspect = /** @class */ (function () {
     function Inspect() {
     }
     Inspect.vars = function (obj) {
-        //requires Node
-        if (typeof process === 'undefined' || typeof require !== 'function')
+        if (typeof process === 'undefined')
+            return; //requires Node
+        var R = (global && global.require) || (module && module.require); //dynamic access to fix web ng build
+        if (typeof R !== 'function')
             return;
         var inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
-        var fs = require('fs');
+        var fs = R('fs');
         var varsPath = inspectVarsPath.replace(/\\/g, '/');
         if (varsPath.indexOf('/') >= 0) {
-            var dir = require('path').dirname(varsPath);
+            var dir = R('path').dirname(varsPath);
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
