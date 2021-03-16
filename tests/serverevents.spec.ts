@@ -1,6 +1,6 @@
 declare var global;
 
-if (typeof this.global == "undefined" && typeof window != "undefined") this.global = window; //browser
+if (typeof global === "undefined" && typeof window !== "undefined") global = window; //browser
 
 declare function require(name:string);
 global.EventSource = require("eventsource");
@@ -452,7 +452,10 @@ describe ('ServerEventsClient Tests', () => {
         var states = [];
         var client1 = new ServerEventsClient(SERVER_EVENTS_URL, ["*"], {
             handlers: {
-                onMessage: e => msgs1.push(e)
+                onMessage: e => {
+                    //console.log(`msg #${msgs1.length+1}:`, e);
+                    msgs1.push(e);
+                }
             },
             receivers: {
                 test: new TestNamedReceiver()
@@ -503,7 +506,7 @@ describe ('ServerEventsClient Tests', () => {
                 var request = new CustomType();
                 request.id = 4;
                 request.name = "Qux";
-                return postObject(client1, request, "test.QuxSetter");
+                return postObject(client1, request, "test.quxSetter");
             }
         }, {test: () => msgs1.length >= 4,
             fn(){
@@ -836,7 +839,9 @@ describe ('ServerEventsClient Tests', () => {
         });
     })
 
-    it ('MultiChannel Does receive all join and leave messages', done => {
+    it ('MultiChannel Does receive all join and leave messages', function (done) {
+        this.timeout(10000);
+
         var joinA:ServerEventJoin[] = [];
         var joinB:ServerEventJoin[] = [];
         var joinAB:ServerEventJoin[] = [];
@@ -958,7 +963,7 @@ describe ('ServerEventsClient Tests', () => {
     })
 
     it ('Can unsubscribe from channels whilst connected', function(done) {
-        this.timeout(10000);
+        this.timeout(15000);
 
         var msgs1:ServerEventMessage[] = [];
         var msgs2:ServerEventMessage[] = [];

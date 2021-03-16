@@ -1,4 +1,3 @@
-import 'fetch-everywhere';
 export interface IReturnVoid {
     createResponse(): any;
 }
@@ -128,7 +127,7 @@ export interface IReconnectServerEventsOptions {
 export declare enum ReadyState {
     CONNECTING = 0,
     OPEN = 1,
-    CLOSED = 2,
+    CLOSED = 2
 }
 export interface IEventSourceStatic extends EventTarget {
     new (url: string, eventSourceInitDict?: IEventSourceInit): IEventSourceStatic;
@@ -183,6 +182,7 @@ export declare class ServerEventsClient {
     withCredentials: boolean;
     constructor(baseUrl: string, channels: string[], options?: IEventSourceOptions, eventSource?: IEventSourceStatic);
     onMessage: (e: IOnMessageEvent) => void;
+    _onMessage: (e: IOnMessageEvent) => void;
     onError: (error?: any) => void;
     getEventSourceOptions(): {
         withCredentials: boolean;
@@ -330,12 +330,12 @@ export declare class JsonServiceClient {
     createUrlFromDto<T>(method: string, request: IReturn<T>): string;
     toAbsoluteUrl(relativeOrAbsoluteUrl: string): string;
     deleteCookie(name: string): void;
-    private createRequest({method, request, url, args, body});
-    private json(res);
-    private createResponse<T>(res, request);
-    private handleError(holdRes, res, type?);
+    private createRequest;
+    private json;
+    private createResponse;
+    private handleError;
     send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody<T>(method, request, body, args?);
+    private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
 }

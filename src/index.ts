@@ -1,4 +1,14 @@
-﻿import 'fetch-everywhere';
+﻿//Node globals
+import type = Mocha.utils.type;
+
+declare let process: any;
+declare let require:Function;
+function R() {
+    //node require(), dynamic access to fix web ng aot build
+    return typeof process === 'undefined' ? null : require;
+}
+let _require = R();
+if (_require) _require('cross-fetch/polyfill');
 
 export interface IReturnVoid {
     createResponse();
@@ -168,7 +178,7 @@ export interface IOnMessageEvent {
     data: string;
 }
 
-declare var EventSource: IEventSourceStatic;
+declare let EventSource: IEventSourceStatic;
 
 export interface IEventSourceOptions {
     channels?: string;
@@ -218,28 +228,43 @@ export class ServerEventsClient {
         if (!this.options.handlers)
             this.options.handlers = {};
     }
-
     onMessage = (e: IOnMessageEvent) => {
+        if (typeof document == "undefined") { //node
+            //latest node-fetch + eventsource doesn't split SSE messages properly
+            let requireSplitPos = e.data ? e.data.indexOf('\n') : -1;
+            if (requireSplitPos >= 0) {
+                let data = e.data;
+                let lastEventId = (e as any).lastEventId;
+                let e1 = Object.assign({}, { lastEventId, data:data.substring(0,requireSplitPos) }),
+                    e2 = Object.assign({}, { lastEventId, data:data.substring(requireSplitPos+1) });
+                this._onMessage(e1);
+                this._onMessage(e2);
+                return;
+            }
+        }
+        this._onMessage(e);
+    }
+    _onMessage = (e: IOnMessageEvent) => {
         if (this.stopped) return;
-        var opt = this.options;
+        let opt = this.options;
 
         if (typeof document == "undefined") {
-            var document:any = { //node
+            var document:any = { //var hoisting required (node)
                 querySelectorAll: sel => []
             };
         }
         let $ = document.querySelectorAll.bind(document);
 
-        var parts = splitOnFirst(e.data, " ");
-        var channel = null;
-        var selector = parts[0];
-        var selParts = splitOnFirst(selector, "@");
+        let parts = splitOnFirst(e.data, " ");
+        let channel = null;
+        let selector = parts[0];
+        let selParts = splitOnFirst(selector, "@");
         if (selParts.length > 1) {
             channel = selParts[0];
             selector = selParts[1];
         }
         const json = parts[1];
-        var body = null;
+        let body = null;
         try {
             body = json ? JSON.parse(json) : null;
         } catch(ignore){}
@@ -248,7 +273,7 @@ export class ServerEventsClient {
         if (parts.length <= 1)
             throw "invalid selector format: " + selector;
 
-        var op = parts[0],
+        let op = parts[0],
             target = parts[1].replace(new RegExp("%20", "g"), " ");
 
         const tokens = splitOnFirst(target, "$");
@@ -269,7 +294,7 @@ export class ServerEventsClient {
         if (opt.validate && opt.validate(request) === false)
             return;
 
-        var headers = new Headers();
+        let headers = new Headers();
         headers.set("Content-Type", "text/plain");
 
         if (op === "cmd") {
@@ -282,7 +307,7 @@ export class ServerEventsClient {
 
                 Object.assign(opt, body);
 
-                var fn = opt.handlers["onConnect"];
+                let fn = opt.handlers["onConnect"];
                 if (fn){
                     fn.call(el || document.body, this.connectionInfo, request);
                     if (this.stopped)
@@ -326,8 +351,8 @@ export class ServerEventsClient {
                 this.updateSubscriberUrl = opt.updateSubscriberUrl;
                 this.updateChannels((opt.channels || "").split(","));
             } else {
-                var isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
-                var fn = opt.handlers[cmd];
+                let isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
+                let fn = opt.handlers[cmd];
                 if (fn) {
                     if (isCmdMsg) {
                         fn.call(el || document.body, mergedBody);
@@ -336,7 +361,7 @@ export class ServerEventsClient {
                     }
                 } else {
                     if (!isCmdMsg) { //global receiver
-                        var r = opt.receivers && opt.receivers["cmd"];
+                        let r = opt.receivers && opt.receivers["cmd"];
                         this.invokeReceiver(r, cmd, el, request, "cmd");
                     }
                 }            
@@ -356,12 +381,12 @@ export class ServerEventsClient {
         }
 
         //Named Receiver
-        var r = opt.receivers && opt.receivers[op];
+        let r = opt.receivers && opt.receivers[op];
         this.invokeReceiver(r, cmd, el, request, op);
 
         if (!eventMessageType(cmd))
         {
-            var fn = opt.handlers["onMessage"];
+            let fn = opt.handlers["onMessage"];
             if (fn) {
                 fn.call(el || document.body, mergedBody);
             }
@@ -375,7 +400,7 @@ export class ServerEventsClient {
         if (this.stopped) return;
         if (!error)
             error = event;
-        var fn = this.options.onException;
+        let fn = this.options.onException;
         if (fn != null)
             fn.call(this.eventSource, error);                        
 
@@ -395,7 +420,7 @@ export class ServerEventsClient {
 
         const hold = this.eventSource;
         
-        var url = opt.url || this.eventStreamUri || hold.url;
+        let url = opt.url || this.eventStreamUri || hold.url;
         if (this.options.resolveStreamUrl != null) {
             url = this.options.resolveStreamUrl(url);
         }
@@ -406,7 +431,7 @@ export class ServerEventsClient {
         es.addEventListener('error', e => (opt.onerror || hold.onerror || this.onError)(e));
         es.addEventListener('message', opt.onmessage || hold.onmessage || this.onMessage);
 
-        var fn = this.options.onReconnect;
+        let fn = this.options.onReconnect;
         if (fn != null)
             fn.call(es, opt.error);
         
@@ -421,7 +446,7 @@ export class ServerEventsClient {
     start() {
         this.stopped = false;
         if (this.eventSource == null || this.eventSource.readyState === EventSource.CLOSED) {
-            var url = this.eventStreamUri;
+            let url = this.eventStreamUri;
             if (this.options.resolveStreamUrl != null) {
                 url = this.options.resolveStreamUrl(url);
             }
@@ -442,12 +467,12 @@ export class ServerEventsClient {
             this.eventSource.close();
         }
 
-        var opt = this.options;
+        let opt = this.options;
         if (opt && opt.heartbeat) {
             clearInterval(opt.heartbeat);
         }
         
-        var hold = this.connectionInfo;
+        let hold = this.connectionInfo;
         if (hold == null || hold.unRegisterUrl == null)
             return new Promise<void>((resolve, reject) => resolve());
 
@@ -470,8 +495,17 @@ export class ServerEventsClient {
             } else if (cmd in r) {
                 r[cmd] = request.body;
             } else {
-                var cmdLower = cmd.toLowerCase();
-                for (var k in r) {
+                let metaProp = Object.getOwnPropertyDescriptor(r, cmd);
+                if (metaProp != null) {
+                    if (metaProp.set) {
+                        metaProp.set(request.body);
+                    } else if (metaProp.writable) {
+                        r[cmd] = request.body;
+                    }
+                    return;
+                }
+                let cmdLower = cmd.toLowerCase();
+                for (let k in r) {
                     if (k.toLowerCase() == cmdLower) {
                         if (typeof r[k] == "function") {
                             r[k].call(el || r, request.body, request);
@@ -482,7 +516,7 @@ export class ServerEventsClient {
                     }
                 }
 
-                var noSuchMethod = r["noSuchMethod"];
+                let noSuchMethod = r["noSuchMethod"];
                 if (typeof noSuchMethod == "function") {
                     noSuchMethod.call(el || r, request.target, request);
                 }
@@ -535,18 +569,18 @@ export class ServerEventsClient {
     }
 
     update(subscribe:string|string[], unsubscribe:string|string[]) {
-        var sub = typeof subscribe == "string" ? subscribe.split(',') : subscribe;
-        var unsub = typeof unsubscribe == "string" ? unsubscribe.split(',') : unsubscribe;
-        var channels = [];
-        for (var i in this.channels) {
-            var c = this.channels[i];
+        let sub = typeof subscribe == "string" ? subscribe.split(',') : subscribe;
+        let unsub = typeof unsubscribe == "string" ? unsubscribe.split(',') : unsubscribe;
+        let channels = [];
+        for (let i in this.channels) {
+            let c = this.channels[i];
             if (unsub == null || unsub.indexOf(c) === -1) {
                 channels.push(c);
             }
         }
         if (sub) {
-            for (var i in sub) {
-                var c = sub[i];
+            for (let i in sub) {
+                let c = sub[i];
                 if (channels.indexOf(c) === -1) {
                     channels.push(c);
                 }
@@ -556,15 +590,15 @@ export class ServerEventsClient {
     }
 
     addListener(eventName:string, handler:((e:ServerEventMessage) => void)) {
-        var handlers = this.listeners[eventName] || (this.listeners[eventName] = []);
+        let handlers = this.listeners[eventName] || (this.listeners[eventName] = []);
         handlers.push(handler);
         return this;
     }
 
     removeListener(eventName:string, handler:((e:ServerEventMessage) => void)) {
-        var handlers = this.listeners[eventName];
+        let handlers = this.listeners[eventName];
         if (handlers) {
-            var pos = handlers.indexOf(handler);
+            let pos = handlers.indexOf(handler);
             if (pos >= 0) {
                 handlers.splice(pos, 1);
             }
@@ -573,7 +607,7 @@ export class ServerEventsClient {
     }
 
     raiseEvent(eventName:string, msg:ServerEventMessage) {
-        var handlers = this.listeners[eventName];
+        let handlers = this.listeners[eventName];
         if (handlers) {
             handlers.forEach(x => {
                 try {
@@ -641,14 +675,14 @@ export class ServerEventsClient {
     }
 
     toServerEventUser(map: { [id: string] : string; }): ServerEventUser {
-        var channels = map["channels"];
-        var to = new ServerEventUser();
+        let channels = map["channels"];
+        let to = new ServerEventUser();
         to.userId = map["userId"];
         to.displayName = map["displayName"];
         to.profileUrl = map["profileUrl"];
         to.channels = channels ? channels.split(',') : null;
 
-        for (var k in map) {
+        for (let k in map) {
             if (k == "userId" || k == "displayName" ||
                 k == "profileUrl" || k == "channels") 
                 continue;
@@ -923,9 +957,9 @@ export class JsonServiceClient {
         }
 
         if (this.manageCookies) {
-            var cookies = Object.keys(this.cookies)
+            let cookies = Object.keys(this.cookies)
                 .map(x => {
-                    var c = this.cookies[x];
+                    let c = this.cookies[x];
                     return c.expires && c.expires < new Date()
                         ? null
                         : `${c.name}=${encodeURIComponent(c.value)}`               
@@ -938,9 +972,9 @@ export class JsonServiceClient {
                 this.headers.delete("Cookie");
         }
 
-        var headers = new Headers(this.headers);
-        var hasRequestBody = HttpMethods.hasRequestBody(method);
-        var reqInit:IRequestInit = {
+        let headers = new Headers(this.headers);
+        let hasRequestBody = HttpMethods.hasRequestBody(method);
+        let reqInit:IRequestInit = {
             url,
             method: method,
             mode: this.mode,
@@ -974,16 +1008,17 @@ export class JsonServiceClient {
             throw res;
 
         if (this.manageCookies) {
-            var setCookies = [];
+            let setCookies = [];
             res.headers.forEach((v,k) => {
                 switch (k.toLowerCase()) {
                     case "set-cookie":
-                        setCookies.push(v);
+                        let cookies = v.split(',');
+                        cookies.forEach(c => setCookies.push(c));
                         break;
                 }
             });
             setCookies.forEach(x => {
-                var cookie = parseCookie(x);
+                let cookie = parseCookie(x);
                 if (cookie)
                     this.cookies[cookie.name] = cookie;
             });
@@ -1001,15 +1036,15 @@ export class JsonServiceClient {
         if (this.responseFilter != null)
             this.responseFilter(res);
 
-        var x = request && typeof request != "string" && typeof request.createResponse == 'function'
+        let x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
             : null;
 
         if (typeof x === 'string')
             return res.text().then(o => o as Object as T);
 
-        var contentType = res.headers.get("content-type");
-        var isJson = contentType && contentType.indexOf("application/json") !== -1;
+        let contentType = res.headers.get("content-type");
+        let isJson = contentType && contentType.indexOf("application/json") !== -1;
         if (isJson) {
             return this.json(res).then(o => o as Object as T);
         }
@@ -1052,7 +1087,7 @@ export class JsonServiceClient {
         }
 
         return this.json(res).then(o => {
-            var errorDto = sanitize(o);
+            let errorDto = sanitize(o);
             if (!errorDto.responseStatus)
                 throw createErrorResponse(res.status, res.statusText, type);
             if (type != null)
@@ -1184,7 +1219,7 @@ export function sanitize (status: any): any {
         return status;
     if (status.errors)
         return status;
-    var to: any = {};
+    let to: any = {};
 
     for (let k in status) {
         if (status.hasOwnProperty(k)) {
@@ -1197,10 +1232,10 @@ export function sanitize (status: any): any {
 
     to.errors = [];
     if (status.Errors != null) {
-        for (var i=0, len = status.Errors.length; i<len; i++) {
-            var o = status.Errors[i];
-            var err = {};
-            for (var k in o)
+        for (let i=0, len = status.Errors.length; i<len; i++) {
+            let o = status.Errors[i];
+            let err = {};
+            for (let k in o)
                 err[toCamelCase(k)] = o[k];
             to.errors.push(err);
         }
@@ -1216,14 +1251,14 @@ export function nameOf(o: any) {
     if (typeof o.getTypeName == "function")
         return o.getTypeName();
 
-    var ctor = o && o.constructor;
+    let ctor = o && o.constructor;
     if (ctor == null)
         throw `${o} doesn't have constructor`;
 
     if (ctor.name)
         return ctor.name;
 
-    var str = ctor.toString();
+    let str = ctor.toString();
     return str.substring(9, str.indexOf("(")); //"function ".length == 9
 }
 
@@ -1249,40 +1284,40 @@ export function css (selector: string | NodeListOf<Element>, name: string, value
 
 export function splitOnFirst(s: string, c: string): string[] {
     if (!s) return [s];
-    var pos = s.indexOf(c);
+    let pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
 }
 export function splitOnLast(s: string, c: string): string[] {
     if (!s) return [s];
-    var pos = s.lastIndexOf(c);
+    let pos = s.lastIndexOf(c);
     return pos >= 0
         ? [s.substring(0, pos), s.substring(pos + 1)]
         : [s];
 }
 export function leftPart(s:string, needle:string) {
     if (s == null) return null;
-    var pos = s.indexOf(needle);
+    let pos = s.indexOf(needle);
     return pos == -1
         ? s
         : s.substring(0, pos);
 }
 export function rightPart(s:string, needle:string) {
     if (s == null) return null;
-    var pos = s.indexOf(needle);
+    let pos = s.indexOf(needle);
     return pos == -1
         ? s
         : s.substring(pos + needle.length);
 }
 export function lastLeftPart(s:string, needle:string) {
     if (s == null) return null;
-    var pos = s.lastIndexOf(needle);
+    let pos = s.lastIndexOf(needle);
     return pos == -1
         ? s
         : s.substring(0, pos);
 }
 export function lastRightPart(s:string, needle:string) {
     if (s == null) return null;
-    var pos = s.lastIndexOf(needle);
+    let pos = s.lastIndexOf(needle);
     return pos == -1
         ? s
         : s.substring(pos + needle.length);
@@ -1305,10 +1340,10 @@ export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {};
-    var pairs = splitOnFirst(url, '?')[1].split('&');
-    var map = {};
-    for (var i = 0; i < pairs.length; ++i) {
-        var p = pairs[i].split('=');
+    let pairs = splitOnFirst(url, '?')[1].split('&');
+    let map = {};
+    for (let i = 0; i < pairs.length; ++i) {
+        let p = pairs[i].split('=');
         map[p[0]] = p.length > 1
             ? decodeURIComponent(p[1].replace(/\+/g, ' '))
             : null;
@@ -1317,16 +1352,16 @@ export function queryString(url: string): any {
 }
 
 export function combinePaths(...paths: string[]): string {
-    var parts = [], i, l;
+    let parts = [], i, l;
     for (i = 0, l = paths.length; i < l; i++) {
-        var arg = paths[i];
+        let arg = paths[i];
         parts = arg.indexOf("://") === -1
             ? parts.concat(arg.split("/"))
             : parts.concat(arg.lastIndexOf("/") === arg.length - 1 ? arg.substring(0, arg.length - 1) : arg);
     }
-    var combinedPaths = [];
+    let combinedPaths = [];
     for (i = 0, l = parts.length; i < l; i++) {
-        var part = parts[i];
+        let part = parts[i];
         if (!part || part === ".") continue;
         if (part === "..") combinedPaths.pop();
         else combinedPaths.push(part);
@@ -1336,14 +1371,14 @@ export function combinePaths(...paths: string[]): string {
 }
 
 export function createPath(route: string, args: any) {
-    var argKeys = {};
+    let argKeys = {};
     for (let k in args) {
         argKeys[k.toLowerCase()] = k;
     }
-    var parts = route.split("/");
-    var url = "";
+    let parts = route.split("/");
+    let url = "";
     for (let i = 0; i < parts.length; i++) {
-        var p = parts[i];
+        let p = parts[i];
         if (p == null) p = "";
         if (p[0] === "{" && p[p.length - 1] === "}") {
             const key = argKeys[p.substring(1, p.length - 1).toLowerCase()];
@@ -1359,7 +1394,7 @@ export function createPath(route: string, args: any) {
 }
 
 export function createUrl(route: string, args: any) {
-    var url = createPath(route, args);
+    let url = createPath(route, args);
     return appendQueryString(url, args);
 }
 
@@ -1383,8 +1418,8 @@ function qsValue(arg: any) {
 
 //from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
 export function bytesToBase64(aBytes: Uint8Array): string {
-    var eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
-    for (var nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
+    let eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
+    for (let nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3;
         nUint24 |= aBytes[nIdx] << (16 >>> nMod3 & 24);
         if (nMod3 === 2 || aBytes.length - nIdx === 1) {
@@ -1413,7 +1448,7 @@ interface NodeBuffer extends Uint8Array {
     toString(encoding?: string, start?: number, end?: number): string;
 }
 interface Buffer extends NodeBuffer { }
-declare var Buffer: {
+declare let Buffer: {
     from (str: string, encoding?: string): Buffer;
 }
 function _btoa(base64:string) {
@@ -1446,17 +1481,17 @@ export function tryDecode(s:string) {
 export function parseCookie(setCookie:string): Cookie {
     if (!setCookie)
         return null;
-    var to:Cookie = null;
-    var pairs = setCookie.split(/; */);
-    for (var i=0; i<pairs.length; i++) {
-        var pair = pairs[i];
-        var parts = splitOnFirst(pair, '=');
-        var name = parts[0].trim();
-        var value = parts.length > 1 ? tryDecode(stripQuotes(parts[1].trim())) : null;
+    let to:Cookie = null;
+    let pairs = setCookie.split(/; */);
+    for (let i=0; i<pairs.length; i++) {
+        let pair = pairs[i];
+        let parts = splitOnFirst(pair, '=');
+        let name = parts[0].trim();
+        let value = parts.length > 1 ? tryDecode(stripQuotes(parts[1].trim())) : null;
         if (i == 0) {
             to = { name, value, path: "/" };
         } else {
-            var lower = name.toLowerCase();
+            let lower = name.toLowerCase();
             if (lower == "httponly") {
                 to.httpOnly = true;
             } else if (lower == "secure") {
@@ -1490,7 +1525,7 @@ export function normalize(dto: any, deep?: boolean) {
         return to;
     }
     if (typeof dto != "object") return dto;
-    var o = {};
+    let o = {};
     for (let k in dto) {
         o[normalizeKey(k)] = deep ? normalize(dto[k], deep) : dto[k];
     }
@@ -1505,7 +1540,7 @@ export function getField(o: any, name: string) {
     
 export function parseResponseStatus(json:string, defaultMsg=null) {
     try {
-        var err = JSON.parse(json);
+        let err = JSON.parse(json);
         return sanitize(err.ResponseStatus || err.responseStatus);
     } catch (e) {
         return {
@@ -1517,8 +1552,8 @@ export function parseResponseStatus(json:string, defaultMsg=null) {
 
 export function toFormData(o:any) {
     if (typeof window == "undefined") return;
-    var formData = new FormData();
-    for (var name in o) {
+    let formData = new FormData();
+    for (let name in o) {
         formData.append(name, o[name]);
     }
     return formData;    
@@ -2129,7 +2164,7 @@ export function populateForm(form:HTMLFormElement, model:any) {
   const toggleCase = (s:string) => !s ? s : 
     s[0] === s[0].toUpperCase() ? toCamelCase(s) : s[0] === s[0].toLowerCase() ? toPascalCase(s) : s;
 
-  for (var key in model) {
+  for (let key in model) {
     let val = model[key];
 
     if (typeof val == 'undefined' || val === null)
@@ -2500,7 +2535,7 @@ export function htmlAttrs(o:any) {
 }
 
 export function indexOfAny(str:string, needles:string[]) {
-    for (var i = 0, len = needles.length; i < len; i++) {
+    for (let i = 0, len = needles.length; i < len; i++) {
         let pos = str.indexOf(needles[i]);
         if (pos >= 0) 
             return pos;
@@ -2544,10 +2579,10 @@ export function toGuid(xsdDuration:string) {
 
 // From .NET byte[] (Base64 String) to JVM signed byte[]
 export function fromByteArray(base64:string) : Uint8Array {
-    var binaryStr = _atob(base64);
-    var len = binaryStr.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
+    let binaryStr = _atob(base64);
+    let len = binaryStr.length;
+    let bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
         bytes[i] = binaryStr.charCodeAt(i);
     }
     return bytes;
@@ -2555,7 +2590,7 @@ export function fromByteArray(base64:string) : Uint8Array {
 
 // From JS Uint8Array to .NET byte[] (Base64 String)
 export function toByteArray(bytes:Uint8Array) : string {
-    var str = String.fromCharCode.apply(null, bytes);
+    let str = String.fromCharCode.apply(null, bytes);
     return _btoa(str);
 }
 
@@ -2631,11 +2666,11 @@ export class JSV {
 
     public static stringify(obj:any) {
         if (obj === null || obj === undefined) return null;
-        var typeOf = typeof(obj);
+        let typeOf = typeof(obj);
         if (typeOf === 'function' || typeOf === 'symbol') return null;
     
         if (typeOf === 'object') {
-            var ctorStr = obj.constructor.toString().toLowerCase();
+            let ctorStr = obj.constructor.toString().toLowerCase();
             if (ctorStr.indexOf('string') >= 0)
                 return JSV.encodeString(obj);
             if (ctorStr.indexOf('boolean') >= 0)
@@ -2661,7 +2696,7 @@ export class JSV {
 }
 
 export function uniqueKeys(rows:any[]) : string[] {
-    var to = [];
+    let to = [];
     rows.forEach(o => Object.keys(o).forEach(k => {
         if (to.indexOf(k) === -1) {
             to.push(k);
@@ -2699,24 +2734,18 @@ export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
     return str;
 }
 
-//requires Node
-declare var global: any;
-declare var module: any;
-declare var process: any;
-
 export class Inspect {
     static vars(obj:any) {        
-        if (typeof process === 'undefined') return; //requires Node
-        let R = (global && global.require) || (module && module.require); //dynamic access to fix web ng build
-        if (typeof R !== 'function') return;
+        let _require = R();
+        if (typeof _require !== 'function') return;
         let inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
 
-        let fs = R('fs');
+        let fs = _require('fs');
         let varsPath = inspectVarsPath.replace(/\\/g,'/');
         if (varsPath.indexOf('/') >= 0) {
-            let dir = R('path').dirname(varsPath)
+            let dir = _require('path').dirname(varsPath)
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
@@ -2739,7 +2768,7 @@ export class Inspect {
         keys.forEach(k => {
             let max = k.length;
             mapRows.forEach(row => {
-                var col = row[k];
+                let col = row[k];
                 if (col != null) {
                     let valSize = `${col}`.length;
                     if (valSize > max) {

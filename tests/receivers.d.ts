@@ -6,7 +6,8 @@ export declare class TestNamedReceiver {
     static NoSuchMethodReceived: CustomType;
     static NoSuchMethodSelector: string;
     static QuxSetterReceived: CustomType;
-    quxSetter: CustomType;
+    get quxSetter(): CustomType;
+    set quxSetter(value: CustomType);
     fooMethod(request: CustomType): void;
     barMethod(request: CustomType): CustomType;
     noSuchMethod(selector: string, message: ServerEventMessage): void;
@@ -16,7 +17,7 @@ export declare class TestGlobalReceiver {
     static NoSuchMethodReceived: CustomType;
     static NoSuchMethodSelector: string;
     static SetterTypeReceived: SetterType;
-    SetterType: SetterType;
+    set SetterType(value: SetterType);
     CustomType(request: CustomType): CustomType;
     noSuchMethod(selector: string, message: ServerEventMessage): void;
 }

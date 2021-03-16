@@ -216,17 +216,17 @@ describe ('JsonServiceClient Auth Tests', () => {
     })
 
     it ('Does fetch AccessToken using RefreshTokenCookies', async () => {
-        var client = new JsonServiceClient(TEST_URL);
-        var authResponse = await client.post(new Authenticate({ 
+        let client = new JsonServiceClient(TEST_URL);
+        let authResponse = await client.post(new Authenticate({
             provider:"credentials", 
-            userName:"Test", 
-            password:"test" 
+            userName:"test",
+            password:"test"
         }));
 
         expect(client.useTokenCookie).eq(true);
 
-        var request = new Secured({ name:"test" });
-        var response = await client.post(request);
+        let request = new Secured({ name:"test" });
+        let response = await client.post(request);
         expect(response.result).eq(request.name);
 
         await client.post(new InvalidateLastAccessToken());

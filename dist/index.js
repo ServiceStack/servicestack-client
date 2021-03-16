@@ -1,14 +1,31 @@
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("fetch-everywhere");
+exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.isFormData = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
+exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = void 0;
+exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = void 0;
+function R() {
+    //node require(), dynamic access to fix web ng aot build
+    return typeof process === 'undefined' ? null : require;
+}
+var _require = R();
+if (_require)
+    _require('cross-fetch/polyfill');
 var ResponseStatus = /** @class */ (function () {
     function ResponseStatus(init) {
         Object.assign(this, init);
@@ -98,13 +115,28 @@ var ReadyState;
 })(ReadyState = exports.ReadyState || (exports.ReadyState = {}));
 var ServerEventsClient = /** @class */ (function () {
     function ServerEventsClient(baseUrl, channels, options, eventSource) {
+        var _this = this;
         if (options === void 0) { options = {}; }
         if (eventSource === void 0) { eventSource = null; }
-        var _this = this;
         this.channels = channels;
         this.options = options;
         this.eventSource = eventSource;
         this.onMessage = function (e) {
+            if (typeof document == "undefined") { //node
+                //latest node-fetch + eventsource doesn't split SSE messages properly
+                var requireSplitPos = e.data ? e.data.indexOf('\n') : -1;
+                if (requireSplitPos >= 0) {
+                    var data = e.data;
+                    var lastEventId = e.lastEventId;
+                    var e1 = Object.assign({}, { lastEventId: lastEventId, data: data.substring(0, requireSplitPos) }), e2 = Object.assign({}, { lastEventId: lastEventId, data: data.substring(requireSplitPos + 1) });
+                    _this._onMessage(e1);
+                    _this._onMessage(e2);
+                    return;
+                }
+            }
+            _this._onMessage(e);
+        };
+        this._onMessage = function (e) {
             if (_this.stopped)
                 return;
             var opt = _this.options;
@@ -212,8 +244,8 @@ var ServerEventsClient = /** @class */ (function () {
                     }
                     else {
                         if (!isCmdMsg) { //global receiver
-                            var r = opt.receivers && opt.receivers["cmd"];
-                            _this.invokeReceiver(r, cmd, el, request, "cmd");
+                            var r_1 = opt.receivers && opt.receivers["cmd"];
+                            _this.invokeReceiver(r_1, cmd, el, request, "cmd");
                         }
                     }
                     if (isCmdMsg) {
@@ -343,6 +375,16 @@ var ServerEventsClient = /** @class */ (function () {
                 r[cmd] = request.body;
             }
             else {
+                var metaProp = Object.getOwnPropertyDescriptor(r, cmd);
+                if (metaProp != null) {
+                    if (metaProp.set) {
+                        metaProp.set(request.body);
+                    }
+                    else if (metaProp.writable) {
+                        r[cmd] = request.body;
+                    }
+                    return;
+                }
                 var cmdLower = cmd.toLowerCase();
                 for (var k in r) {
                     if (k.toLowerCase() == cmdLower) {
@@ -725,7 +767,7 @@ var JsonServiceClient = /** @class */ (function () {
             mode: this.mode,
             credentials: this.credentials,
             headers: headers,
-            compress: false,
+            compress: false, // https://github.com/bitinn/node-fetch/issues/93#issuecomment-200791658
         };
         if (hasRequestBody) {
             reqInit.body = body || JSON.stringify(request);
@@ -747,15 +789,16 @@ var JsonServiceClient = /** @class */ (function () {
         if (!res.ok)
             throw res;
         if (this.manageCookies) {
-            var setCookies = [];
+            var setCookies_1 = [];
             res.headers.forEach(function (v, k) {
                 switch (k.toLowerCase()) {
                     case "set-cookie":
-                        setCookies.push(v);
+                        var cookies = v.split(',');
+                        cookies.forEach(function (c) { return setCookies_1.push(c); });
                         break;
                 }
             });
-            setCookies.forEach(function (x) {
+            setCookies_1.forEach(function (x) {
                 var cookie = parseCookie(x);
                 if (cookie)
                     _this.cookies[cookie.name] = cookie;
@@ -935,12 +978,12 @@ function sanitize(status) {
     if (status.errors)
         return status;
     var to = {};
-    for (var k_1 in status) {
-        if (status.hasOwnProperty(k_1)) {
-            if (status[k_1] instanceof Object)
-                to[toCamelCase(k_1)] = sanitize(status[k_1]);
+    for (var k in status) {
+        if (status.hasOwnProperty(k)) {
+            if (status[k] instanceof Object)
+                to[toCamelCase(k)] = sanitize(status[k]);
             else
-                to[toCamelCase(k_1)] = status[k_1];
+                to[toCamelCase(k)] = status[k];
         }
     }
     to.errors = [];
@@ -1148,7 +1191,7 @@ function qsValue(arg) {
 //from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
 function bytesToBase64(aBytes) {
     var eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
-    for (var nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
+    for (var nMod3 = void 0, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3;
         nUint24 |= aBytes[nIdx] << (16 >>> nMod3 & 24);
         if (nMod3 === 2 || aBytes.length - nIdx === 1) {
@@ -1206,13 +1249,13 @@ function parseCookie(setCookie) {
     for (var i = 0; i < pairs.length; i++) {
         var pair = pairs[i];
         var parts = splitOnFirst(pair, '=');
-        var name = parts[0].trim();
+        var name_1 = parts[0].trim();
         var value = parts.length > 1 ? tryDecode(stripQuotes(parts[1].trim())) : null;
         if (i == 0) {
-            to = { name: name, value: value, path: "/" };
+            to = { name: name_1, value: value, path: "/" };
         }
         else {
-            var lower = name.toLowerCase();
+            var lower = name_1.toLowerCase();
             if (lower == "httponly") {
                 to.httpOnly = true;
             }
@@ -1227,7 +1270,7 @@ function parseCookie(setCookie) {
                 }
             }
             else {
-                to[name] = value;
+                to[name_1] = value;
             }
         }
     }
@@ -1280,8 +1323,8 @@ function toFormData(o) {
     if (typeof window == "undefined")
         return;
     var formData = new FormData();
-    for (var name in o) {
-        formData.append(name, o[name]);
+    for (var name_2 in o) {
+        formData.append(name_2, o[name_2]);
     }
     return formData;
 }
@@ -1434,11 +1477,11 @@ function hasClass(el, cls) {
             : (" " + el.className + " ").replace(/[\n\t\r]/g, " ").indexOf(" " + cls + " ") > -1;
 }
 function addClass(el, cls) {
+    var _a;
     return !el ? null
         : el.classList
             ? (_a = el.classList).add.apply(_a, cls.split(' ')) : !hasClass(el, cls)
             ? el.className = (el.className + " " + cls).trim() : null;
-    var _a;
 }
 function remClass(el, cls) {
     return !el ? null
@@ -1554,7 +1597,7 @@ function applyErrors(f, status, opt) {
     status = sanitize(status);
     addClass(f, "has-errors");
     var bs4 = opt && opt.type === "bootstrap-v4";
-    var v = __assign({}, validation, opt);
+    var v = __assign(__assign({}, validation), opt);
     if (opt.messages) {
         v.overrideMessages = true;
     }
@@ -1596,7 +1639,7 @@ function applyErrors(f, status, opt) {
                     addClass(field.parentElement, "has-error");
                 }
                 else {
-                    var type = attr(field, 'type'), isCheck = type === "radio" || type === "checkbox";
+                    var type_1 = attr(field, 'type'), isCheck = type_1 === "radio" || type_1 === "checkbox";
                     if (!isCheck)
                         addClass(field, "is-invalid");
                     sattr(field, "data-invalid", filter(error.message, error.errorCode, "field"));
@@ -1699,7 +1742,7 @@ function formSubmit(options) {
         if (!r.ok) {
             return r.json()
                 .catch(function (e) { throw new Error("The request failed with " + (r.statusText || r.status)); })
-                .then(function (o) { throw Object.assign.apply(Object, [new ErrorResponse()].concat(sanitize(o))); });
+                .then(function (o) { throw Object.assign.apply(Object, __spreadArray([new ErrorResponse()], sanitize(o))); });
         }
         handleHeaderBehaviors(f, r);
         return fromResponse(r);
@@ -1875,8 +1918,8 @@ function populateForm(form, model) {
         var input = el;
         if (!el)
             continue;
-        var type = input.type || el[0].type;
-        switch (type) {
+        var type_2 = input.type || el[0].type;
+        switch (type_2) {
             case 'radio':
             case 'checkbox':
                 var len = el.length;
@@ -2498,18 +2541,16 @@ var Inspect = /** @class */ (function () {
     function Inspect() {
     }
     Inspect.vars = function (obj) {
-        if (typeof process === 'undefined')
-            return; //requires Node
-        var R = (global && global.require) || (module && module.require); //dynamic access to fix web ng build
-        if (typeof R !== 'function')
+        var _require = R();
+        if (typeof _require !== 'function')
             return;
         var inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
-        var fs = R('fs');
+        var fs = _require('fs');
         var varsPath = inspectVarsPath.replace(/\\/g, '/');
         if (varsPath.indexOf('/') >= 0) {
-            var dir = R('path').dirname(varsPath);
+            var dir = _require('path').dirname(varsPath);
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }

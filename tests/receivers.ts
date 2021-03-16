@@ -33,8 +33,12 @@ export class TestNamedReceiver {
 
     noSuchMethod(selector:string, message:ServerEventMessage) {
         var msg:ServerEventMessage  = message;
-        TestNamedReceiver.NoSuchMethodReceived = JSON.parse(message.json);
-        TestNamedReceiver.NoSuchMethodSelector = selector;
+        try {
+            TestNamedReceiver.NoSuchMethodReceived = JSON.parse(message.json);
+            TestNamedReceiver.NoSuchMethodSelector = selector;
+        } catch(e) {
+            console.log('ERROR TestNamedReceiver:', message.json);
+        }
     }
 }
 

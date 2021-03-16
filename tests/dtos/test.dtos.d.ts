@@ -175,29 +175,29 @@ export declare class ArrayResult {
 export declare enum EnumType {
     Value1 = "Value1",
     Value2 = "Value2",
-    Value3 = "Value3",
+    Value3 = "Value3"
 }
 export declare enum EnumTypeFlags {
     Value1 = 0,
     Value2 = 1,
-    Value3 = 2,
+    Value3 = 2
 }
 export declare enum EnumWithValues {
     None = "None",
     Value1 = "Member 1",
-    Value2 = "Value2",
+    Value2 = "Value2"
 }
 export declare enum EnumFlags {
     Value0 = "Value0",
     Value1 = "Value 1",
     Value2 = "Value2",
     Value3 = "Value3",
-    Value123 = "Value123",
+    Value123 = "Value123"
 }
 export declare enum EnumAsInt {
     Value1 = 1000,
     Value2 = 2000,
-    Value3 = 3000,
+    Value3 = 3000
 }
 export declare enum EnumStyle {
     lower = "lower",
@@ -205,7 +205,7 @@ export declare enum EnumStyle {
     PascalCase = "PascalCase",
     camelCase = "camelCase",
     camelUPPER = "camelUPPER",
-    PascalUPPER = "PascalUPPER",
+    PascalUPPER = "PascalUPPER"
 }
 export declare enum EnumStyleMembers {
     Lower = "lower",
@@ -213,7 +213,7 @@ export declare enum EnumStyleMembers {
     PascalCase = "PascalCase",
     CamelCase = "camelCase",
     CamelUpper = "camelUPPER",
-    PascalUpper = "PascalUPPER",
+    PascalUpper = "PascalUPPER"
 }
 export declare class KeyValuePair<TKey, TValue> {
     key: TKey;
@@ -299,7 +299,7 @@ export declare class InnerType {
 export declare enum InnerEnum {
     Foo = "Foo",
     Bar = "Bar",
-    Baz = "Baz",
+    Baz = "Baz"
 }
 export declare enum DayOfWeek {
     Sunday = "Sunday",
@@ -308,11 +308,11 @@ export declare enum DayOfWeek {
     Wednesday = "Wednesday",
     Thursday = "Thursday",
     Friday = "Friday",
-    Saturday = "Saturday",
+    Saturday = "Saturday"
 }
 export declare enum ScopeType {
     Global = 1,
-    Sale = 2,
+    Sale = 2
 }
 export declare class PingService {
     constructor(init?: Partial<PingService>);
@@ -383,7 +383,7 @@ export declare class AuditBase {
 }
 export declare enum LivingStatus {
     Alive = "Alive",
-    Dead = "Dead",
+    Dead = "Dead"
 }
 export declare class RockstarAuditTenant extends AuditBase {
     tenantId: number;
