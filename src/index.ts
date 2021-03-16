@@ -1,14 +1,12 @@
 ﻿//Node globals
-import type = Mocha.utils.type;
-
 declare let process: any;
 declare let require:Function;
-function R() {
+function nodeRequire() {
     //node require(), dynamic access to fix web ng aot build
     return typeof process === 'undefined' ? null : require;
 }
-let _require = R();
-if (_require) _require('cross-fetch/polyfill');
+let R = nodeRequire();
+if (R) R('cross-fetch/polyfill');
 
 export interface IReturnVoid {
     createResponse();
@@ -2736,16 +2734,16 @@ export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
 
 export class Inspect {
     static vars(obj:any) {        
-        let _require = R();
-        if (typeof _require !== 'function') return;
+        let R = nodeRequire();
+        if (typeof R !== 'function') return;
         let inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
 
-        let fs = _require('fs');
+        let fs = R('fs');
         let varsPath = inspectVarsPath.replace(/\\/g,'/');
         if (varsPath.indexOf('/') >= 0) {
-            let dir = _require('path').dirname(varsPath)
+            let dir = R('path').dirname(varsPath)
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }

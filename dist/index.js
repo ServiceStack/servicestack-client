@@ -19,13 +19,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.isFormData = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
 exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = void 0;
 exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = void 0;
-function R() {
+function nodeRequire() {
     //node require(), dynamic access to fix web ng aot build
     return typeof process === 'undefined' ? null : require;
 }
-var _require = R();
-if (_require)
-    _require('cross-fetch/polyfill');
+var R = nodeRequire();
+if (R)
+    R('cross-fetch/polyfill');
 var ResponseStatus = /** @class */ (function () {
     function ResponseStatus(init) {
         Object.assign(this, init);
@@ -1639,7 +1639,7 @@ function applyErrors(f, status, opt) {
                     addClass(field.parentElement, "has-error");
                 }
                 else {
-                    var type_1 = attr(field, 'type'), isCheck = type_1 === "radio" || type_1 === "checkbox";
+                    var type = attr(field, 'type'), isCheck = type === "radio" || type === "checkbox";
                     if (!isCheck)
                         addClass(field, "is-invalid");
                     sattr(field, "data-invalid", filter(error.message, error.errorCode, "field"));
@@ -1918,8 +1918,8 @@ function populateForm(form, model) {
         var input = el;
         if (!el)
             continue;
-        var type_2 = input.type || el[0].type;
-        switch (type_2) {
+        var type = input.type || el[0].type;
+        switch (type) {
             case 'radio':
             case 'checkbox':
                 var len = el.length;
@@ -2541,16 +2541,16 @@ var Inspect = /** @class */ (function () {
     function Inspect() {
     }
     Inspect.vars = function (obj) {
-        var _require = R();
-        if (typeof _require !== 'function')
+        var R = nodeRequire();
+        if (typeof R !== 'function')
             return;
         var inspectVarsPath = process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
-        var fs = _require('fs');
+        var fs = R('fs');
         var varsPath = inspectVarsPath.replace(/\\/g, '/');
         if (varsPath.indexOf('/') >= 0) {
-            var dir = _require('path').dirname(varsPath);
+            var dir = R('path').dirname(varsPath);
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
