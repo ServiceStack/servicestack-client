@@ -2,11 +2,13 @@
 declare let process: any;
 declare let require:Function;
 function nodeRequire() {
-    //node require(), dynamic access to fix web ng aot build
-    return typeof process === 'undefined' ? null : require;
+    //node require(), using dynamic access to fix web ng aot build
+    try {
+        return typeof process === 'undefined' ? null : (typeof require !== 'undefined' ? require : null);
+    } catch (e) { return null; }
 }
 let R = nodeRequire();
-if (R) R('cross-fetch/polyfill');
+if (R) R('cross-fetch/polyfill'); //fetch polyfill only required for node.js
 
 export interface IReturnVoid {
     createResponse();
