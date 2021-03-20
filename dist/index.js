@@ -22,7 +22,7 @@ exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter =
 function nodeRequire() {
     //node require(), using dynamic access to fix web ng aot build
     try {
-        return typeof process === 'undefined' ? null : (typeof require !== 'undefined' ? require : null);
+        return typeof window !== 'undefined' ? null : (typeof require !== 'undefined' ? require : null);
     }
     catch (e) {
         return null;
