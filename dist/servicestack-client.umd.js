@@ -30,7 +30,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     function nodeRequire() {
         //node require(), using dynamic access to fix web ng aot build
         try {
-            return typeof window !== 'undefined' ? null : (typeof require !== 'undefined' ? require : null);
+            var isNode = typeof process === 'object' &&
+                typeof process.versions === 'object' &&
+                typeof process.versions.node !== 'undefined';
+            if (isNode)
+                return require;
+            return null;
         }
         catch (e) {
             return null;
