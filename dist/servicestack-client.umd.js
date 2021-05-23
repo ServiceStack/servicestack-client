@@ -34,7 +34,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
                 typeof process.versions === 'object' &&
                 typeof process.versions.node !== 'undefined';
             if (isNode)
-                return require;
+                return eval('require');
             return null;
         }
         catch (e) {

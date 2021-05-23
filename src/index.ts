@@ -7,7 +7,7 @@ function nodeRequire() {
         let isNode = typeof process === 'object' &&
             typeof process.versions === 'object' &&
             typeof process.versions.node !== 'undefined';
-        if(isNode) return require;
+        if (isNode) return eval('require');
         return null;
     } catch (e) { return null; }
 }
