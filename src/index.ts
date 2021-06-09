@@ -1996,7 +1996,7 @@ export function formSubmit(this:HTMLFormElement,options:IAjaxFormOptions={}) {
       if (!r.ok) {
         return r.json()
           .catch(e => { throw new Error("The request failed with " + (r.statusText || r.status)); })
-          .then(o => { throw Object.assign(new ErrorResponse(), ...sanitize(o)); });
+          .then(o => { throw Object.assign(new ErrorResponse(), sanitize(o)); });
       }
 
       handleHeaderBehaviors(f,r);

@@ -9,11 +9,6 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
@@ -1760,7 +1755,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
             if (!r.ok) {
                 return r.json()
                     .catch(function (e) { throw new Error("The request failed with " + (r.statusText || r.status)); })
-                    .then(function (o) { throw Object.assign.apply(Object, __spreadArray([new ErrorResponse()], sanitize(o))); });
+                    .then(function (o) { throw Object.assign(new ErrorResponse(), sanitize(o)); });
             }
             handleHeaderBehaviors(f, r);
             return fromResponse(r);
