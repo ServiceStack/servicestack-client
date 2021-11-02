@@ -522,5 +522,16 @@ describe ('JsonServiceClient Tests', () => {
         testClient.urlFilter = null;
     })
 
+    it.only ('Should change base path', () => {
+        let client = new JsonServiceClient('https://example.org')
+            .useBasePath('/api');
+        expect(client.replyBaseUrl).to.eq('https://example.org/api/')
+        expect(client.oneWayBaseUrl).to.eq('https://example.org/api/')
+
+        client.useBasePath()
+        expect(client.replyBaseUrl).to.eq('https://example.org/json/reply/')
+        expect(client.oneWayBaseUrl).to.eq('https://example.org/json/oneway/')
+    })
+
 });
 

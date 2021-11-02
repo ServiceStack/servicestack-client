@@ -845,6 +845,20 @@ export class JsonServiceClient {
         this.bearerToken = token;
     }
 
+    useBasePath(path?:string) {
+        if (!path) {
+            this.replyBaseUrl = combinePaths(this.baseUrl, "json", "reply") + "/";
+            this.oneWayBaseUrl = combinePaths(this.baseUrl, "json", "oneway") + "/";
+        } else {
+            if (path[0] != '/') {
+                path = '/' + path;
+            }
+            this.replyBaseUrl = combinePaths(this.baseUrl, path) + "/";
+            this.oneWayBaseUrl = combinePaths(this.baseUrl, path) + "/";
+        }
+        return this;
+    }
+
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
         return typeof request != "string" 
             ? this.send<T>(HttpMethods.Get, request, args)
@@ -1213,6 +1227,16 @@ function createErrorResponse(errorCode: string|number, message: string, type:Err
     error.responseStatus.message = message;
     return error;
 };
+
+export function createError(errorCode:string, message:string, fieldName?:string) {
+    return new ErrorResponse({ 
+        responseStatus: new ResponseStatus({
+            errorCode,
+            message,
+            errors: fieldName ? [new ResponseError({ errorCode, message, fieldName })] : undefined
+        })
+    });
+}
 
 export function toCamelCase (s: string) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
 

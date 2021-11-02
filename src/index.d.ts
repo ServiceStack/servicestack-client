@@ -312,6 +312,7 @@ export declare class JsonServiceClient {
     constructor(baseUrl?: string);
     setCredentials(userName: string, password: string): void;
     setBearerToken(token: string): void;
+    useBasePath(path?: string): this;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T>, args?: any): Promise<T>;
@@ -340,6 +341,7 @@ export declare class JsonServiceClient {
     raiseError(res: Response, error: any): any;
 }
 export declare function isFormData(body: any): boolean;
+export declare function createError(errorCode: string, message: string, fieldName?: string): ErrorResponse;
 export declare function toCamelCase(s: string): string;
 export declare function toPascalCase(s: string): string;
 export declare function sanitize(status: any): any;
