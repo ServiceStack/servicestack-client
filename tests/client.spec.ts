@@ -522,7 +522,7 @@ describe ('JsonServiceClient Tests', () => {
         testClient.urlFilter = null;
     })
 
-    it.only ('Should change base path', () => {
+    it ('Should change base path', () => {
         let client = new JsonServiceClient('https://example.org')
             .useBasePath('/api');
         expect(client.replyBaseUrl).to.eq('https://example.org/api/')
