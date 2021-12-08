@@ -812,7 +812,9 @@ export class JsonServiceClient {
     refreshTokenUri: string;
     useTokenCookie: boolean;
     requestFilter: (req:IRequestInit) => void;
+    static globalRequestFilter: (req:IRequestInit) => void;
     responseFilter: (res:Response) => void;
+    static globalResponseFilter: (res:Response) => void;
     exceptionFilter: (res:Response, error:any) => void;
     urlFilter: (url:string) => void;
     onAuthenticationRequired: () => Promise<any>;
@@ -1011,6 +1013,8 @@ export class JsonServiceClient {
 
         if (this.requestFilter != null)
             this.requestFilter(reqInit);
+        if (JsonServiceClient.globalRequestFilter != null)
+            JsonServiceClient.globalRequestFilter(reqInit);
 
         return reqInit;
     }
@@ -1053,6 +1057,8 @@ export class JsonServiceClient {
 
         if (this.responseFilter != null)
             this.responseFilter(res);
+        if (JsonServiceClient.globalResponseFilter != null)
+            JsonServiceClient.globalResponseFilter(res);
 
         let x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
