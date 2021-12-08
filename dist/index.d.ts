@@ -299,7 +299,9 @@ export declare class JsonServiceClient {
     refreshTokenUri: string;
     useTokenCookie: boolean;
     requestFilter: (req: IRequestInit) => void;
+    static globalRequestFilter: (req: IRequestInit) => void;
     responseFilter: (res: Response) => void;
+    static globalResponseFilter: (res: Response) => void;
     exceptionFilter: (res: Response, error: any) => void;
     urlFilter: (url: string) => void;
     onAuthenticationRequired: () => Promise<any>;

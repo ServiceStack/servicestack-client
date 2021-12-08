@@ -796,6 +796,8 @@ var JsonServiceClient = /** @class */ (function () {
         }
         if (this.requestFilter != null)
             this.requestFilter(reqInit);
+        if (JsonServiceClient.globalRequestFilter != null)
+            JsonServiceClient.globalRequestFilter(reqInit);
         return reqInit;
     };
     JsonServiceClient.prototype.json = function (res) {
@@ -833,6 +835,8 @@ var JsonServiceClient = /** @class */ (function () {
         });
         if (this.responseFilter != null)
             this.responseFilter(res);
+        if (JsonServiceClient.globalResponseFilter != null)
+            JsonServiceClient.globalResponseFilter(res);
         var x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
             : null;
