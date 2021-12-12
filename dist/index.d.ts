@@ -345,13 +345,13 @@ export declare class JsonServiceClient {
     private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
-    api<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiVoid(method: string, request: IReturnVoid, args?: any): Promise<ApiResult<EmptyResponse>>;
-    apiGet<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPost<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPut<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiDelete<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPatch<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    api<TResponse>(request: IReturn<TResponse>, args?: any, method?: string): Promise<ApiResult<TResponse>>;
+    apiVoid(request: IReturnVoid, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
+    apiGet<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPost<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPut<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiDelete<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPatch<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
 }
 export declare function getResponseStatus(e: any): any;
 export declare class ApiResult<TResponse> {

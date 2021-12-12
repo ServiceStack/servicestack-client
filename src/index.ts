@@ -1225,8 +1225,10 @@ export class JsonServiceClient {
         return error;
     }
 
-    async api<TResponse>(method:string, request:IReturn<TResponse>, args?:any) {
+    async api<TResponse>(request:IReturn<TResponse>, args?:any, method?:string) {
         try {
+            if (!method)
+                method = (request as any).getMethod ? (request as any).getMethod() : HttpMethods.Post;
             const result = await this.send<TResponse>(method, request, args);
             return new ApiResult<TResponse>({ response: result });
         } catch(e) {
@@ -1234,7 +1236,7 @@ export class JsonServiceClient {
         }
     }
 
-    async apiVoid(method:string, request:IReturnVoid, args?:any) {
+    async apiVoid(request:IReturnVoid, args?:any, method?:string) {
         try {
             const result = await this.send<EmptyResponse>(method, request, args);
             return new ApiResult<EmptyResponse>({ response: result });
@@ -1243,11 +1245,11 @@ export class JsonServiceClient {
         }
     }
 
-    apiGet<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Get, request, args); }
-    apiPost<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Post, request, args); }
-    apiPut<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Put, request, args); }
-    apiDelete<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Delete, request, args); }
-    apiPatch<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Patch, request, args); }
+    apiGet<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Get); }
+    apiPost<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Post); }
+    apiPut<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Put); }
+    apiDelete<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Delete); }
+    apiPatch<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Patch); }
 }
 
 export function getResponseStatus(e:any) {
@@ -1294,7 +1296,8 @@ export class ApiResult<TResponse>
     }
 
     addFieldError(fieldName:string, message:string, errorCode:string = 'Exception') {
-        this.errorStatus ??= new ResponseStatus();
+        if (!this.errorStatus)
+            this.errorStatus = new ResponseStatus();
         const fieldError = this.fieldError(fieldName);
         if (fieldError != null) {
             fieldError.errorCode = errorCode;

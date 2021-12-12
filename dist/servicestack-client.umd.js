@@ -1026,13 +1026,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             }
             return error;
         };
-        JsonServiceClient.prototype.api = function (method, request, args) {
+        JsonServiceClient.prototype.api = function (request, args, method) {
             return __awaiter(this, void 0, void 0, function () {
                 var result, e_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 2, , 3]);
+                            if (!method)
+                                method = request.getMethod ? request.getMethod() : HttpMethods.Post;
                             return [4 /*yield*/, this.send(method, request, args)];
                         case 1:
                             result = _a.sent();
@@ -1045,7 +1047,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 });
             });
         };
-        JsonServiceClient.prototype.apiVoid = function (method, request, args) {
+        JsonServiceClient.prototype.apiVoid = function (request, args, method) {
             return __awaiter(this, void 0, void 0, function () {
                 var result, e_2;
                 return __generator(this, function (_a) {
@@ -1064,11 +1066,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 });
             });
         };
-        JsonServiceClient.prototype.apiGet = function (method, request, args) { return this.api(HttpMethods.Get, request, args); };
-        JsonServiceClient.prototype.apiPost = function (method, request, args) { return this.api(HttpMethods.Post, request, args); };
-        JsonServiceClient.prototype.apiPut = function (method, request, args) { return this.api(HttpMethods.Put, request, args); };
-        JsonServiceClient.prototype.apiDelete = function (method, request, args) { return this.api(HttpMethods.Delete, request, args); };
-        JsonServiceClient.prototype.apiPatch = function (method, request, args) { return this.api(HttpMethods.Patch, request, args); };
+        JsonServiceClient.prototype.apiGet = function (request, args) { return this.api(request, args, HttpMethods.Get); };
+        JsonServiceClient.prototype.apiPost = function (request, args) { return this.api(request, args, HttpMethods.Post); };
+        JsonServiceClient.prototype.apiPut = function (request, args) { return this.api(request, args, HttpMethods.Put); };
+        JsonServiceClient.prototype.apiDelete = function (request, args) { return this.api(request, args, HttpMethods.Delete); };
+        JsonServiceClient.prototype.apiPatch = function (request, args) { return this.api(request, args, HttpMethods.Patch); };
         return JsonServiceClient;
     }());
     exports.JsonServiceClient = JsonServiceClient;
@@ -1137,9 +1139,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             }
         };
         ApiResult.prototype.addFieldError = function (fieldName, message, errorCode) {
-            var _a;
             if (errorCode === void 0) { errorCode = 'Exception'; }
-            (_a = this.errorStatus) !== null && _a !== void 0 ? _a : (this.errorStatus = new ResponseStatus());
+            if (!this.errorStatus)
+                this.errorStatus = new ResponseStatus();
             var fieldError = this.fieldError(fieldName);
             if (fieldError != null) {
                 fieldError.errorCode = errorCode;
