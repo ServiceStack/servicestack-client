@@ -40,6 +40,10 @@ export class ErrorResponse {
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+export class EmptyResponse {
+    public constructor(init?:Partial<ErrorResponse>) { Object.assign(this, init); }
+    responseStatus: ResponseStatus;
+}
 export class NavItem {
     public label: string;
     public href: string;
@@ -1220,6 +1224,93 @@ export class JsonServiceClient {
         }
         return error;
     }
+
+    async api<TResponse>(method:string, request:IReturn<TResponse>, args?:any) {
+        try {
+            const result = await this.send<TResponse>(method, request, args);
+            return new ApiResult<TResponse>({ response: result });
+        } catch(e) {
+            return new ApiResult<TResponse>({ errorStatus: getResponseStatus(e) });
+        }
+    }
+
+    async apiVoid(method:string, request:IReturnVoid, args?:any) {
+        try {
+            const result = await this.send<EmptyResponse>(method, request, args);
+            return new ApiResult<EmptyResponse>({ response: result });
+        } catch(e) {
+            return new ApiResult<EmptyResponse>({ errorStatus: getResponseStatus(e) });
+        }
+    }
+
+    apiGet<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Get, request, args); }
+    apiPost<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Post, request, args); }
+    apiPut<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Put, request, args); }
+    apiDelete<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Delete, request, args); }
+    apiPatch<TResponse>(method:string, request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(HttpMethods.Patch, request, args); }
+}
+
+export function getResponseStatus(e:any) {
+    return e.responseStatus ?? e.ResponseStatus ?? 
+        (e.errorCode 
+            ? e 
+            : (e.message ? createErrorStatus(e.message) : null))
+}
+
+export class ApiResult<TResponse>
+{
+    response?: TResponse;
+    errorStatus?: ResponseStatus;
+    
+    public constructor(init?:Partial<ApiResult<TResponse>>) { Object.assign(this, init); }
+
+    get completed() { return this.completed != null || this.errorStatus != null; }
+    get isError() { return this.errorStatus?.errorCode != null || this.errorStatus?.message != null; }
+    get isSuccess() { return !this.isError && this.response != null; }
+    get errorMessage() { return this.errorStatus?.message; }
+    get fieldErrors() { return this.errorStatus?.errors ?? []; }
+    get errorSummary() { return this.errorStatus != null && this.fieldErrors.length == 0 ? this.errorMessage : null; }
+
+    fieldError(fieldName: string) { 
+        let matchField = fieldName.toLowerCase()
+        return this.fieldErrors?.find(x => x.fieldName.toLowerCase() == matchField);
+    }
+    fieldErrorMessage(fieldName: string) { return this.fieldError(fieldName)?.message; }
+    hasFieldError(fieldName: string) { return this.fieldError(fieldName) != null; }
+
+    showSummary(exceptFields: string[] = []) {
+        if (!this.isError)
+            return false;
+        return exceptFields.every(x => !this.hasFieldError(x));
+    }
+
+    summaryMessage(exceptFields: string[] = []) {
+        if (this.showSummary(exceptFields)) {
+            // Return first field error that's not visible
+            let fieldSet = exceptFields.map(x => x.toLowerCase());
+            let fieldError = fieldSet.find(x => fieldSet.indexOf(x.toLowerCase()) == -1);
+            return fieldError ?? this.errorMessage;
+        }
+    }
+
+    addFieldError(fieldName:string, message:string, errorCode:string = 'Exception') {
+        this.errorStatus ??= new ResponseStatus();
+        const fieldError = this.fieldError(fieldName);
+        if (fieldError != null) {
+            fieldError.errorCode = errorCode;
+            fieldError.message = message;
+        } else {
+            this.errorStatus.errors.push(new ResponseError({ fieldName, errorCode, message }));
+        }
+    }
+}
+
+export function createErrorStatus(message:string, errorCode:string = 'Exception') {
+    return new ResponseStatus({ errorCode, message});
+}
+
+export function createFieldError(fieldName:string, message:string, errorCode:string = 'Exception') {
+    return new ResponseStatus({ errors:[new ResponseError({fieldName, errorCode, message})] });
 }
 
 export function isFormData(body:any) { return typeof window != "undefined" && body instanceof FormData; }

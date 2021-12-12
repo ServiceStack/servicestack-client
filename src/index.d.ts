@@ -28,6 +28,10 @@ export declare class ErrorResponse {
     type: ErrorResponseType;
     responseStatus: ResponseStatus;
 }
+export declare class EmptyResponse {
+    constructor(init?: Partial<ErrorResponse>);
+    responseStatus: ResponseStatus;
+}
 export declare class NavItem {
     label: string;
     href: string;
@@ -341,7 +345,34 @@ export declare class JsonServiceClient {
     private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
+    api<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiVoid(method: string, request: IReturnVoid, args?: any): Promise<ApiResult<EmptyResponse>>;
+    apiGet<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPost<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPut<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiDelete<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
+    apiPatch<TResponse>(method: string, request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
 }
+export declare function getResponseStatus(e: any): any;
+export declare class ApiResult<TResponse> {
+    response?: TResponse;
+    errorStatus?: ResponseStatus;
+    constructor(init?: Partial<ApiResult<TResponse>>);
+    get completed(): boolean;
+    get isError(): boolean;
+    get isSuccess(): boolean;
+    get errorMessage(): string;
+    get fieldErrors(): ResponseError[];
+    get errorSummary(): string;
+    fieldError(fieldName: string): ResponseError;
+    fieldErrorMessage(fieldName: string): string;
+    hasFieldError(fieldName: string): boolean;
+    showSummary(exceptFields?: string[]): boolean;
+    summaryMessage(exceptFields?: string[]): string;
+    addFieldError(fieldName: string, message: string, errorCode?: string): void;
+}
+export declare function createErrorStatus(message: string, errorCode?: string): ResponseStatus;
+export declare function createFieldError(fieldName: string, message: string, errorCode?: string): ResponseStatus;
 export declare function isFormData(body: any): boolean;
 export declare function createError(errorCode: string, message: string, fieldName?: string): ErrorResponse;
 export declare function toCamelCase(s: string): string;
