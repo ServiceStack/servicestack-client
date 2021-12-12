@@ -1225,11 +1225,19 @@ export class JsonServiceClient {
         return error;
     }
 
+    // Generic send where HTTP method is inferred from v5.14 DTOs
+    fetch<T>(request:IReturn<T>, args?:any, url?:string) {
+        return this.sendRequest<T>({ method: getMethod(request), request, args, url });
+    }
+
+    // Generic sendOneWay where HTTP method is inferred from v5.14 DTOs
+    fetchVoid(request:IReturnVoid, args?:any, url?:string) {
+        return this.sendRequest<EmptyResponse>({ method: getMethod(request), request, args, url });
+    }
+
     async api<TResponse>(request:IReturn<TResponse>, args?:any, method?:string) {
         try {
-            if (!method)
-                method = (request as any).getMethod ? (request as any).getMethod() : HttpMethods.Post;
-            const result = await this.send<TResponse>(method, request, args);
+            const result = await this.send<TResponse>(getMethod(request,method), request, args);
             return new ApiResult<TResponse>({ response: result });
         } catch(e) {
             return new ApiResult<TResponse>({ errorStatus: getResponseStatus(e) });
@@ -1238,7 +1246,7 @@ export class JsonServiceClient {
 
     async apiVoid(request:IReturnVoid, args?:any, method?:string) {
         try {
-            const result = await this.send<EmptyResponse>(method, request, args);
+            const result = await this.send<EmptyResponse>(getMethod(request,method), request, args);
             return new ApiResult<EmptyResponse>({ response: result });
         } catch(e) {
             return new ApiResult<EmptyResponse>({ errorStatus: getResponseStatus(e) });
@@ -1250,6 +1258,10 @@ export class JsonServiceClient {
     apiPut<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Put); }
     apiDelete<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Delete); }
     apiPatch<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Patch); }
+}
+
+function getMethod(request:any, method?:string) {
+    return method ?? (request as any).getMethod ? (request as any).getMethod() : HttpMethods.Post;
 }
 
 export function getResponseStatus(e:any) {

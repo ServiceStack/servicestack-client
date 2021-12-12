@@ -1026,6 +1026,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             }
             return error;
         };
+        // Generic send where HTTP method is inferred from v5.14 DTOs
+        JsonServiceClient.prototype.fetch = function (request, args, url) {
+            return this.sendRequest({ method: getMethod(request), request: request, args: args, url: url });
+        };
+        // Generic sendOneWay where HTTP method is inferred from v5.14 DTOs
+        JsonServiceClient.prototype.fetchVoid = function (request, args, url) {
+            return this.sendRequest({ method: getMethod(request), request: request, args: args, url: url });
+        };
         JsonServiceClient.prototype.api = function (request, args, method) {
             return __awaiter(this, void 0, void 0, function () {
                 var result, e_1;
@@ -1033,9 +1041,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 2, , 3]);
-                            if (!method)
-                                method = request.getMethod ? request.getMethod() : HttpMethods.Post;
-                            return [4 /*yield*/, this.send(method, request, args)];
+                            return [4 /*yield*/, this.send(getMethod(request, method), request, args)];
                         case 1:
                             result = _a.sent();
                             return [2 /*return*/, new ApiResult({ response: result })];
@@ -1054,7 +1060,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.send(method, request, args)];
+                            return [4 /*yield*/, this.send(getMethod(request, method), request, args)];
                         case 1:
                             result = _a.sent();
                             return [2 /*return*/, new ApiResult({ response: result })];
@@ -1074,6 +1080,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return JsonServiceClient;
     }());
     exports.JsonServiceClient = JsonServiceClient;
+    function getMethod(request, method) {
+        return (method !== null && method !== void 0 ? method : request.getMethod) ? request.getMethod() : HttpMethods.Post;
+    }
     function getResponseStatus(e) {
         var _a, _b;
         return (_b = (_a = e.responseStatus) !== null && _a !== void 0 ? _a : e.ResponseStatus) !== null && _b !== void 0 ? _b : (e.errorCode

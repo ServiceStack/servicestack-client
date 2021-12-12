@@ -345,6 +345,8 @@ export declare class JsonServiceClient {
     private sendBody;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
+    fetch<T>(request: IReturn<T>, args?: any, url?: string): Promise<T>;
+    fetchVoid(request: IReturnVoid, args?: any, url?: string): Promise<EmptyResponse>;
     api<TResponse>(request: IReturn<TResponse>, args?: any, method?: string): Promise<ApiResult<TResponse>>;
     apiVoid(request: IReturnVoid, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
     apiGet<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
