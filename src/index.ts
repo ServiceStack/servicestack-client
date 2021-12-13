@@ -846,11 +846,6 @@ export class JsonServiceClient {
         this.password = password;
     }
 
-    // @deprecated use bearerToken property
-    setBearerToken(token:string): void {
-        this.bearerToken = token;
-    }
-
     useBasePath(path?:string) {
         if (!path) {
             this.replyBaseUrl = combinePaths(this.baseUrl, "json", "reply") + "/";
@@ -867,50 +862,50 @@ export class JsonServiceClient {
 
     get<T>(request: IReturn<T>|string, args?:any): Promise<T> {
         return typeof request != "string" 
-            ? this.send<T>(HttpMethods.Get, request, args)
-            : this.send<T>(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
+            ? this.fetch<T>(HttpMethods.Get, request, args)
+            : this.fetch<T>(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
     }
 
     delete<T>(request: IReturn<T>|string, args?:any): Promise<T> {
         return typeof request != "string" 
-            ? this.send<T>(HttpMethods.Delete, request, args)
-            : this.send<T>(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
+            ? this.fetch<T>(HttpMethods.Delete, request, args)
+            : this.fetch<T>(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
     }
 
     post<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Post, request, args);
+        return this.fetch<T>(HttpMethods.Post, request, args);
     }
 
     postToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
+        return this.fetch<T>(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
     }
 
     postBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Post, request, body, args);
+        return this.fetchBody<T>(HttpMethods.Post, request, body, args);
     }
 
     put<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Put, request, args);
+        return this.fetch<T>(HttpMethods.Put, request, args);
     }
 
     putToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
+        return this.fetch<T>(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     }
 
     putBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Put, request, body, args);
+        return this.fetchBody<T>(HttpMethods.Put, request, body, args);
     }
 
     patch<T>(request: IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Patch, request, args);
+        return this.fetch<T>(HttpMethods.Patch, request, args);
     }
 
     patchToUrl<T>(url:string, request:IReturn<T>, args?:any): Promise<T> {
-        return this.send<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
+        return this.fetch<T>(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     }
 
     patchBody<T>(request:IReturn<T>, body:string|any, args?:any) {
-        return this.sendBody<T>(HttpMethods.Patch, request, body, args);
+        return this.fetchBody<T>(HttpMethods.Patch, request, body, args);
     }
 
     publish(request: IReturnVoid, args?:any): Promise<any> {
@@ -919,7 +914,7 @@ export class JsonServiceClient {
     
     sendOneWay<T>(request: IReturn<T>|IReturnVoid, args?:any): Promise<T> {
         const url = combinePaths(this.oneWayBaseUrl, nameOf(request));
-        return this.send<T>(HttpMethods.Post, request, null, url);
+        return this.fetch<T>(HttpMethods.Post, request, null, url);
     }
 
     sendAll<T>(requests:IReturn<T>[]) : Promise<T[]> {
@@ -927,7 +922,7 @@ export class JsonServiceClient {
             return Promise.resolve([]);
 
         const url = combinePaths(this.replyBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send<T[]>(HttpMethods.Post, requests, null, url);
+        return this.fetch<T[]>(HttpMethods.Post, requests, null, url);
     }
 
     sendAllOneWay<T>(requests:IReturn<T>[]) : Promise<void> {
@@ -935,7 +930,7 @@ export class JsonServiceClient {
             return Promise.resolve(void 0);
 
         const url = combinePaths(this.oneWayBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send<T[]>(HttpMethods.Post, requests, null, url)
+        return this.fetch<T[]>(HttpMethods.Post, requests, null, url)
             .then(r => void 0);
     }
 
@@ -1133,11 +1128,11 @@ export class JsonServiceClient {
         });
     }
 
-    send<T>(method:string, request:any|null, args?:any, url?:string): Promise<T> {
+    fetch<T>(method:string, request:any|null, args?:any, url?:string): Promise<T> {
         return this.sendRequest<T>({ method, request, args, url });
     }
 
-    private sendBody<T>(method:string, request:IReturn<T>, body:string|any, args?:any) {
+    fetchBody<T>(method:string, request:IReturn<T>, body:string|any, args?:any) {
         let url = combinePaths(this.replyBaseUrl, nameOf(request));
         return this.sendRequest<T>({
             method,
@@ -1225,19 +1220,19 @@ export class JsonServiceClient {
         return error;
     }
 
-    // Generic send where HTTP method is inferred from v5.14 DTOs
-    fetch<T>(request:IReturn<T>, args?:any, url?:string) {
+    // Generic send that uses APIs preferred HTTP Method (requires v5.13+ DTOs)
+    send<T>(request:IReturn<T>, args?:any, url?:string) {
         return this.sendRequest<T>({ method: getMethod(request), request, args, url });
     }
 
-    // Generic sendOneWay where HTTP method is inferred from v5.14 DTOs
-    fetchVoid(request:IReturnVoid, args?:any, url?:string) {
+    // Generic send IReturnVoid that uses APIs preferred HTTP Method (requires v5.13+ DTOs)
+    sendVoid(request:IReturnVoid, args?:any, url?:string) {
         return this.sendRequest<EmptyResponse>({ method: getMethod(request), request, args, url });
     }
 
     async api<TResponse>(request:IReturn<TResponse>, args?:any, method?:string) {
         try {
-            const result = await this.send<TResponse>(getMethod(request,method), request, args);
+            const result = await this.fetch<TResponse>(getMethod(request,method), request, args);
             return new ApiResult<TResponse>({ response: result });
         } catch(e) {
             return new ApiResult<TResponse>({ errorStatus: getResponseStatus(e) });
@@ -1246,22 +1241,18 @@ export class JsonServiceClient {
 
     async apiVoid(request:IReturnVoid, args?:any, method?:string) {
         try {
-            const result = await this.send<EmptyResponse>(getMethod(request,method), request, args);
+            const result = await this.fetch<EmptyResponse>(getMethod(request,method), request, args);
             return new ApiResult<EmptyResponse>({ response: result });
         } catch(e) {
             return new ApiResult<EmptyResponse>({ errorStatus: getResponseStatus(e) });
         }
     }
-
-    apiGet<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Get); }
-    apiPost<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Post); }
-    apiPut<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Put); }
-    apiDelete<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Delete); }
-    apiPatch<TResponse>(request:IReturn<TResponse>, args?:any) { return this.api<TResponse>(request, args, HttpMethods.Patch); }
 }
 
-function getMethod(request:any, method?:string) {
-    return method ?? (request as any).getMethod ? (request as any).getMethod() : HttpMethods.Post;
+export function getMethod(request:any, method?:string) {
+    return method ?? typeof (request as any).getMethod == "function"
+        ? (request as any).getMethod()
+        : HttpMethods.Post;
 }
 
 export function getResponseStatus(e:any) {

@@ -47,9 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
-exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = void 0;
-exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = void 0;
+exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
+exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = void 0;
+exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = void 0;
 function nodeRequire() {
     //node require(), using dynamic access to fix web ng aot build
     try {
@@ -696,10 +696,6 @@ var JsonServiceClient = /** @class */ (function () {
         this.userName = userName;
         this.password = password;
     };
-    // @deprecated use bearerToken property
-    JsonServiceClient.prototype.setBearerToken = function (token) {
-        this.bearerToken = token;
-    };
     JsonServiceClient.prototype.useBasePath = function (path) {
         if (!path) {
             this.replyBaseUrl = combinePaths(this.baseUrl, "json", "reply") + "/";
@@ -716,59 +712,59 @@ var JsonServiceClient = /** @class */ (function () {
     };
     JsonServiceClient.prototype.get = function (request, args) {
         return typeof request != "string"
-            ? this.send(HttpMethods.Get, request, args)
-            : this.send(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
+            ? this.fetch(HttpMethods.Get, request, args)
+            : this.fetch(HttpMethods.Get, null, args, this.toAbsoluteUrl(request));
     };
     JsonServiceClient.prototype.delete = function (request, args) {
         return typeof request != "string"
-            ? this.send(HttpMethods.Delete, request, args)
-            : this.send(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
+            ? this.fetch(HttpMethods.Delete, request, args)
+            : this.fetch(HttpMethods.Delete, null, args, this.toAbsoluteUrl(request));
     };
     JsonServiceClient.prototype.post = function (request, args) {
-        return this.send(HttpMethods.Post, request, args);
+        return this.fetch(HttpMethods.Post, request, args);
     };
     JsonServiceClient.prototype.postToUrl = function (url, request, args) {
-        return this.send(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
+        return this.fetch(HttpMethods.Post, request, args, this.toAbsoluteUrl(url));
     };
     JsonServiceClient.prototype.postBody = function (request, body, args) {
-        return this.sendBody(HttpMethods.Post, request, body, args);
+        return this.fetchBody(HttpMethods.Post, request, body, args);
     };
     JsonServiceClient.prototype.put = function (request, args) {
-        return this.send(HttpMethods.Put, request, args);
+        return this.fetch(HttpMethods.Put, request, args);
     };
     JsonServiceClient.prototype.putToUrl = function (url, request, args) {
-        return this.send(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
+        return this.fetch(HttpMethods.Put, request, args, this.toAbsoluteUrl(url));
     };
     JsonServiceClient.prototype.putBody = function (request, body, args) {
-        return this.sendBody(HttpMethods.Put, request, body, args);
+        return this.fetchBody(HttpMethods.Put, request, body, args);
     };
     JsonServiceClient.prototype.patch = function (request, args) {
-        return this.send(HttpMethods.Patch, request, args);
+        return this.fetch(HttpMethods.Patch, request, args);
     };
     JsonServiceClient.prototype.patchToUrl = function (url, request, args) {
-        return this.send(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
+        return this.fetch(HttpMethods.Patch, request, args, this.toAbsoluteUrl(url));
     };
     JsonServiceClient.prototype.patchBody = function (request, body, args) {
-        return this.sendBody(HttpMethods.Patch, request, body, args);
+        return this.fetchBody(HttpMethods.Patch, request, body, args);
     };
     JsonServiceClient.prototype.publish = function (request, args) {
         return this.sendOneWay(request, args);
     };
     JsonServiceClient.prototype.sendOneWay = function (request, args) {
         var url = combinePaths(this.oneWayBaseUrl, nameOf(request));
-        return this.send(HttpMethods.Post, request, null, url);
+        return this.fetch(HttpMethods.Post, request, null, url);
     };
     JsonServiceClient.prototype.sendAll = function (requests) {
         if (requests.length == 0)
             return Promise.resolve([]);
         var url = combinePaths(this.replyBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send(HttpMethods.Post, requests, null, url);
+        return this.fetch(HttpMethods.Post, requests, null, url);
     };
     JsonServiceClient.prototype.sendAllOneWay = function (requests) {
         if (requests.length == 0)
             return Promise.resolve(void 0);
         var url = combinePaths(this.oneWayBaseUrl, nameOf(requests[0]) + "[]");
-        return this.send(HttpMethods.Post, requests, null, url)
+        return this.fetch(HttpMethods.Post, requests, null, url)
             .then(function (r) { return void 0; });
     };
     JsonServiceClient.prototype.createUrlFromDto = function (method, request) {
@@ -936,10 +932,10 @@ var JsonServiceClient = /** @class */ (function () {
             throw _this.raiseError(res, error);
         });
     };
-    JsonServiceClient.prototype.send = function (method, request, args, url) {
+    JsonServiceClient.prototype.fetch = function (method, request, args, url) {
         return this.sendRequest({ method: method, request: request, args: args, url: url });
     };
-    JsonServiceClient.prototype.sendBody = function (method, request, body, args) {
+    JsonServiceClient.prototype.fetchBody = function (method, request, body, args) {
         var url = combinePaths(this.replyBaseUrl, nameOf(request));
         return this.sendRequest({
             method: method,
@@ -1018,12 +1014,12 @@ var JsonServiceClient = /** @class */ (function () {
         }
         return error;
     };
-    // Generic send where HTTP method is inferred from v5.14 DTOs
-    JsonServiceClient.prototype.fetch = function (request, args, url) {
+    // Generic send that uses APIs preferred HTTP Method (requires v5.13+ DTOs)
+    JsonServiceClient.prototype.send = function (request, args, url) {
         return this.sendRequest({ method: getMethod(request), request: request, args: args, url: url });
     };
-    // Generic sendOneWay where HTTP method is inferred from v5.14 DTOs
-    JsonServiceClient.prototype.fetchVoid = function (request, args, url) {
+    // Generic send IReturnVoid that uses APIs preferred HTTP Method (requires v5.13+ DTOs)
+    JsonServiceClient.prototype.sendVoid = function (request, args, url) {
         return this.sendRequest({ method: getMethod(request), request: request, args: args, url: url });
     };
     JsonServiceClient.prototype.api = function (request, args, method) {
@@ -1033,7 +1029,7 @@ var JsonServiceClient = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.send(getMethod(request, method), request, args)];
+                        return [4 /*yield*/, this.fetch(getMethod(request, method), request, args)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, new ApiResult({ response: result })];
@@ -1052,7 +1048,7 @@ var JsonServiceClient = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.send(getMethod(request, method), request, args)];
+                        return [4 /*yield*/, this.fetch(getMethod(request, method), request, args)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, new ApiResult({ response: result })];
@@ -1064,17 +1060,15 @@ var JsonServiceClient = /** @class */ (function () {
             });
         });
     };
-    JsonServiceClient.prototype.apiGet = function (request, args) { return this.api(request, args, HttpMethods.Get); };
-    JsonServiceClient.prototype.apiPost = function (request, args) { return this.api(request, args, HttpMethods.Post); };
-    JsonServiceClient.prototype.apiPut = function (request, args) { return this.api(request, args, HttpMethods.Put); };
-    JsonServiceClient.prototype.apiDelete = function (request, args) { return this.api(request, args, HttpMethods.Delete); };
-    JsonServiceClient.prototype.apiPatch = function (request, args) { return this.api(request, args, HttpMethods.Patch); };
     return JsonServiceClient;
 }());
 exports.JsonServiceClient = JsonServiceClient;
 function getMethod(request, method) {
-    return (method !== null && method !== void 0 ? method : request.getMethod) ? request.getMethod() : HttpMethods.Post;
+    return (method !== null && method !== void 0 ? method : typeof request.getMethod == "function")
+        ? request.getMethod()
+        : HttpMethods.Post;
 }
+exports.getMethod = getMethod;
 function getResponseStatus(e) {
     var _a, _b;
     return (_b = (_a = e.responseStatus) !== null && _a !== void 0 ? _a : e.ResponseStatus) !== null && _b !== void 0 ? _b : (e.errorCode

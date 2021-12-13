@@ -22,6 +22,12 @@ This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Template
 
     npm install @servicestack/client
 
+#### v1.1 Changes
+
+ - new `api` and `apiVoid` APIs return an `ApiResult<TResponse>` encapsulating both `response` and `errorStatus`
+ - old `send` API renamed to `fetch`
+ - new `send` and `sendVoid` APIs can infer [IVerb Interface Markers](https://docs.servicestack.net/routing#http-verb-interface-markers)
+
 ### Ideal Typed Message-based API
 
 The TypeScript `JsonServiceClient` enables the same productive, typed API development experience available 

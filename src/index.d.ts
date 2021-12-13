@@ -317,7 +317,6 @@ export declare class JsonServiceClient {
     static toBase64: (rawString: string) => string;
     constructor(baseUrl?: string);
     setCredentials(userName: string, password: string): void;
-    setBearerToken(token: string): void;
     useBasePath(path?: string): this;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
@@ -341,20 +340,16 @@ export declare class JsonServiceClient {
     private json;
     private createResponse;
     private handleError;
-    send<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
-    private sendBody;
+    fetch<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;
+    fetchBody<T>(method: string, request: IReturn<T>, body: string | any, args?: any): Promise<T>;
     sendRequest<T>(info: ISendRequest): Promise<T>;
     raiseError(res: Response, error: any): any;
-    fetch<T>(request: IReturn<T>, args?: any, url?: string): Promise<T>;
-    fetchVoid(request: IReturnVoid, args?: any, url?: string): Promise<EmptyResponse>;
+    send<T>(request: IReturn<T>, args?: any, url?: string): Promise<T>;
+    sendVoid(request: IReturnVoid, args?: any, url?: string): Promise<EmptyResponse>;
     api<TResponse>(request: IReturn<TResponse>, args?: any, method?: string): Promise<ApiResult<TResponse>>;
     apiVoid(request: IReturnVoid, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
-    apiGet<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPost<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPut<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiDelete<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
-    apiPatch<TResponse>(request: IReturn<TResponse>, args?: any): Promise<ApiResult<TResponse>>;
 }
+export declare function getMethod(request: any, method?: string): any;
 export declare function getResponseStatus(e: any): any;
 export declare class ApiResult<TResponse> {
     response?: TResponse;
