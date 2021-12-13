@@ -227,8 +227,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 var eventId = parseInt(e.lastEventId);
                 var data = e.data;
                 var type = eventMessageType(cmd) || "ServerEventMessage";
-                var request = { eventId: eventId, data: data, type: type,
-                    channel: channel, selector: selector, json: json, body: body, op: op, target: tokens[0], cssSelector: cssSelector, meta: {} };
+                var request = { eventId: eventId, data: data, type: type, channel: channel, selector: selector, json: json, body: body, op: op, target: tokens[0], cssSelector: cssSelector, meta: {} };
                 var mergedBody = typeof body == "object"
                     ? Object.assign({}, request, body)
                     : request;
@@ -265,7 +264,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                                 }
                                 fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: _this.serviceClient.credentials }))
                                     .then(function (res) { if (!res.ok)
-                                    throw new Error(res.status + " - " + res.statusText); })
+                                    throw new Error("".concat(res.status, " - ").concat(res.statusText)); })
                                     .catch(function (error) { return _this.reconnectServerEvents({ error: error }); });
                             }, (_this.connectionInfo && _this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                         }
@@ -413,7 +412,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             this.connectionInfo = null;
             return fetch(new Request(hold.unRegisterUrl, { method: "POST", mode: "cors", credentials: this.serviceClient.credentials }))
                 .then(function (res) { if (!res.ok)
-                throw new Error(res.status + " - " + res.statusText); })
+                throw new Error("".concat(res.status, " - ").concat(res.statusText)); })
                 .catch(this.onError);
         };
         ServerEventsClient.prototype.invokeReceiver = function (r, cmd, el, request, name) {
@@ -809,7 +808,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 this.headers.set("Authorization", "Bearer " + this.bearerToken);
             }
             else if (this.userName != null) {
-                this.headers.set('Authorization', 'Basic ' + JsonServiceClient.toBase64(this.userName + ":" + this.password));
+                this.headers.set('Authorization', 'Basic ' + JsonServiceClient.toBase64("".concat(this.userName, ":").concat(this.password)));
             }
             if (this.manageCookies) {
                 var cookies = Object.keys(this.cookies)
@@ -817,7 +816,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     var c = _this.cookies[x];
                     return c.expires && c.expires < new Date()
                         ? null
-                        : c.name + "=" + encodeURIComponent(c.value);
+                        : "".concat(c.name, "=").concat(encodeURIComponent(c.value));
                 })
                     .filter(function (x) { return !!x; });
                 if (cookies.length > 0)
@@ -1228,7 +1227,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             return o.getTypeName();
         var ctor = o && o.constructor;
         if (ctor == null)
-            throw o + " doesn't have constructor";
+            throw "".concat(o, " doesn't have constructor");
         if (ctor.name)
             return ctor.name;
         var str = ctor.toString();
@@ -1646,7 +1645,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.timeFmt12 = timeFmt12;
     function toLocalISOString(d) {
         if (d === void 0) { d = new Date(); }
-        return d.getFullYear() + "-" + padInt(d.getMonth() + 1) + "-" + padInt(d.getDate()) + "T" + padInt(d.getHours()) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds());
+        return "".concat(d.getFullYear(), "-").concat(padInt(d.getMonth() + 1), "-").concat(padInt(d.getDate()), "T").concat(padInt(d.getHours()), ":").concat(padInt(d.getMinutes()), ":").concat(padInt(d.getSeconds()));
     }
     exports.toLocalISOString = toLocalISOString;
     function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
@@ -1741,11 +1740,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function handleEvent(handlers, el, type) {
         if (el === void 0) { el = document; }
         el.addEventListener(type, function (evt) {
-            var evtData = "data-" + type;
+            var evtData = "data-".concat(type);
             var el = evt.target;
             var x = attr(el, evtData);
             if (!x) {
-                var elParent = el.closest("[" + evtData + "]");
+                var elParent = el.closest("[".concat(evtData, "]"));
                 if (elParent) {
                     x = attr(elParent, evtData);
                     el = elParent;
@@ -1779,7 +1778,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         else {
             ['click', 'dblclick', 'change', 'focus', 'blur', 'focusin', 'focusout', 'select', 'keydown', 'keypress', 'keyup', 'hover', 'toggle', 'input']
                 .forEach(function (evt) {
-                if (el.querySelector("[data-" + evt + "]")) {
+                if (el.querySelector("[data-".concat(evt, "]"))) {
                     handleEvent(handlers, el, evt);
                 }
             });
@@ -1936,13 +1935,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         var f = this;
         var contentType = attr(f, 'enctype') || Types.UrlEncoded;
         if (contentType == Types.MultiPart && window.FormData === undefined)
-            throw new Error("FormData Type is needed to send '" + Types.MultiPart + "' Content Types");
+            throw new Error("FormData Type is needed to send '".concat(Types.MultiPart, "' Content Types"));
         var body;
         try {
             body = serializeForm(f, contentType);
         }
         catch (e) {
-            throw new Error("" + (e.message || e));
+            throw new Error("".concat(e.message || e));
         }
         var headers = new Headers();
         headers.set("Accept", Types.Json);
@@ -1957,7 +1956,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (options.requestFilter)
             options.requestFilter(req);
         return fetch(new Request(options.url || attr(f, 'action'), req))
-            .catch(function (e) { throw new Error("Network is unreachable (" + (e.message || e) + ")"); })
+            .catch(function (e) { throw new Error("Network is unreachable (".concat(e.message || e, ")")); })
             .then(function (r) {
             if (options.responseFilter)
                 options.responseFilter(r);
@@ -2043,7 +2042,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             if (e.responseStatus)
                 handleError(null, e);
             else
-                handleError("" + (e.message || e), null);
+                handleError("".concat(e.message || e), null);
         })
             .finally(function () {
             remClass(f, 'loading');
@@ -2472,20 +2471,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         var sb = asXsd ? 'P' : '';
         if (asXsd) {
             if ((days | 0) > 0) {
-                sb += (days | 0) + "D";
+                sb += "".concat(days | 0, "D");
             }
             if (days == 0 || (hours + min + sec) + remainingSecs > 0) {
                 sb += "T";
                 if ((hours | 0) > 0) {
-                    sb += (hours | 0) + "H";
+                    sb += "".concat(hours | 0, "H");
                 }
                 if ((min | 0) > 0) {
-                    sb += (min | 0) + "M";
+                    sb += "".concat(min | 0, "M");
                 }
                 if (remainingSecs > 0) {
                     var secFmt = remainingSecs.toFixed(7);
                     secFmt = trimEnd(trimEnd(secFmt, '0'), '.');
-                    sb += secFmt + "S";
+                    sb += "".concat(secFmt, "S");
                 }
                 else if (sb.length == 2) {
                     sb += '0S';
@@ -2494,13 +2493,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         }
         else {
             if ((days | 0) > 0) {
-                sb += (days | 0) + ":";
+                sb += "".concat(days | 0, ":");
             }
-            sb += padInt(hours | 0) + ":" + padInt(min | 0) + ":";
+            sb += "".concat(padInt(hours | 0), ":").concat(padInt(min | 0), ":");
             if (remainingSecs > 0) {
                 var secFmt = remainingSecs.toFixed(7);
                 secFmt = trimEnd(trimEnd(secFmt, '0'), '.');
-                sb += remainingSecs >= 10 ? "" + secFmt : "0" + secFmt;
+                sb += remainingSecs >= 10 ? "".concat(secFmt) : "0".concat(secFmt);
             }
             else {
                 sb += '00';
@@ -2519,7 +2518,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function enc(o) {
         return o == null ? null : typeof o == 'string'
             ? o.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&#34;')
-            : "" + o;
+            : "".concat(o);
     }
     exports.enc = enc;
     function htmlAttrs(o) {
@@ -2555,7 +2554,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.fromDateTime = fromDateTime;
     // From JS Date to .NET DateTime (WCF JSON Date)
     function toDateTime(date) {
-        return "/Date(" + date.getTime() + ")/";
+        return "/Date(".concat(date.getTime(), ")/");
     }
     exports.toDateTime = toDateTime;
     // From .NET TimeSpan (XSD Duration) to JS String
@@ -2656,7 +2655,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     sb.append(',');
                 sb.append(JSV.stringify(value));
             }
-            return "[" + sb.toString() + "]";
+            return "[".concat(sb.toString(), "]");
         };
         JSV.encodeObject = function (obj) {
             var value, sb = new StringBuffer();
@@ -2670,7 +2669,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 sb.append(':');
                 sb.append(JSV.stringify(value));
             }
-            return "{" + sb.toString() + "}";
+            return "{".concat(sb.toString(), "}");
         };
         JSV.stringify = function (obj) {
             if (obj === null || obj === undefined)
@@ -2750,7 +2749,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.alignRight = alignRight;
     function alignAuto(obj, len, pad) {
         if (pad === void 0) { pad = ' '; }
-        var str = "" + obj;
+        var str = "".concat(obj);
         if (str.length <= len) {
             return typeof obj === "number"
                 ? alignRight(str, len, pad)
@@ -2793,7 +2792,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 mapRows.forEach(function (row) {
                     var col = row[k];
                     if (col != null) {
-                        var valSize = ("" + col).length;
+                        var valSize = "".concat(col).length;
                         if (valSize > max) {
                             max = valSize;
                         }
@@ -2807,17 +2806,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 (colSizesLength * 2) +
                 (colSizesLength + 1);
             var sb = [];
-            sb.push("+" + '-'.repeat(rowWidth - 2) + "+");
+            sb.push("+".concat('-'.repeat(rowWidth - 2), "+"));
             var head = '|';
             keys.forEach(function (k) { return head += alignCenter(k, colSizes[k]) + '|'; });
             sb.push(head);
-            sb.push("|" + '-'.repeat(rowWidth - 2) + "|");
+            sb.push("|".concat('-'.repeat(rowWidth - 2), "|"));
             mapRows.forEach(function (row) {
                 var to = '|';
                 keys.forEach(function (k) { return to += '' + alignAuto(row[k], colSizes[k]) + '|'; });
                 sb.push(to);
             });
-            sb.push("+" + '-'.repeat(rowWidth - 2) + "+");
+            sb.push("+".concat('-'.repeat(rowWidth - 2), "+"));
             return sb.join('\n');
         };
         Inspect.printDumpTable = function (rows) { console.log(Inspect.dumpTable(rows)); };
