@@ -1034,7 +1034,7 @@ var JsonServiceClient = /** @class */ (function () {
                         return [2 /*return*/, new ApiResult({ response: result })];
                     case 2:
                         e_1 = _a.sent();
-                        return [2 /*return*/, new ApiResult({ errorStatus: getResponseStatus(e_1) })];
+                        return [2 /*return*/, new ApiResult({ error: getResponseStatus(e_1) })];
                     case 3: return [2 /*return*/];
                 }
             });
@@ -1053,7 +1053,7 @@ var JsonServiceClient = /** @class */ (function () {
                         return [2 /*return*/, new ApiResult({ response: result })];
                     case 2:
                         e_2 = _a.sent();
-                        return [2 /*return*/, new ApiResult({ errorStatus: getResponseStatus(e_2) })];
+                        return [2 /*return*/, new ApiResult({ error: getResponseStatus(e_2) })];
                     case 3: return [2 /*return*/];
                 }
             });
@@ -1072,7 +1072,7 @@ function getResponseStatus(e) {
     var _a, _b;
     return (_b = (_a = e.responseStatus) !== null && _a !== void 0 ? _a : e.ResponseStatus) !== null && _b !== void 0 ? _b : (e.errorCode
         ? e
-        : (e.message ? createErrorStatus(e.message) : null));
+        : (e.message ? createErrorStatus(e.message, e.errorCode) : null));
 }
 exports.getResponseStatus = getResponseStatus;
 var ApiResult = /** @class */ (function () {
@@ -1080,12 +1080,12 @@ var ApiResult = /** @class */ (function () {
         Object.assign(this, init);
     }
     Object.defineProperty(ApiResult.prototype, "completed", {
-        get: function () { return this.completed != null || this.errorStatus != null; },
+        get: function () { return this.completed != null || this.error != null; },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(ApiResult.prototype, "isError", {
-        get: function () { var _a, _b; return ((_a = this.errorStatus) === null || _a === void 0 ? void 0 : _a.errorCode) != null || ((_b = this.errorStatus) === null || _b === void 0 ? void 0 : _b.message) != null; },
+        get: function () { var _a, _b; return ((_a = this.error) === null || _a === void 0 ? void 0 : _a.errorCode) != null || ((_b = this.error) === null || _b === void 0 ? void 0 : _b.message) != null; },
         enumerable: false,
         configurable: true
     });
@@ -1095,24 +1095,29 @@ var ApiResult = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(ApiResult.prototype, "errorMessage", {
-        get: function () { var _a; return (_a = this.errorStatus) === null || _a === void 0 ? void 0 : _a.message; },
+        get: function () { var _a; return (_a = this.error) === null || _a === void 0 ? void 0 : _a.message; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(ApiResult.prototype, "fieldErrors", {
-        get: function () { var _a, _b; return (_b = (_a = this.errorStatus) === null || _a === void 0 ? void 0 : _a.errors) !== null && _b !== void 0 ? _b : []; },
+    Object.defineProperty(ApiResult.prototype, "errorCode", {
+        get: function () { var _a; return (_a = this.error) === null || _a === void 0 ? void 0 : _a.errorCode; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ApiResult.prototype, "errors", {
+        get: function () { var _a, _b; return (_b = (_a = this.error) === null || _a === void 0 ? void 0 : _a.errors) !== null && _b !== void 0 ? _b : []; },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(ApiResult.prototype, "errorSummary", {
-        get: function () { return this.errorStatus != null && this.fieldErrors.length == 0 ? this.errorMessage : null; },
+        get: function () { return this.error != null && this.errors.length == 0 ? this.errorMessage : null; },
         enumerable: false,
         configurable: true
     });
     ApiResult.prototype.fieldError = function (fieldName) {
         var _a;
         var matchField = fieldName.toLowerCase();
-        return (_a = this.fieldErrors) === null || _a === void 0 ? void 0 : _a.find(function (x) { return x.fieldName.toLowerCase() == matchField; });
+        return (_a = this.errors) === null || _a === void 0 ? void 0 : _a.find(function (x) { return x.fieldName.toLowerCase() == matchField; });
     };
     ApiResult.prototype.fieldErrorMessage = function (fieldName) { var _a; return (_a = this.fieldError(fieldName)) === null || _a === void 0 ? void 0 : _a.message; };
     ApiResult.prototype.hasFieldError = function (fieldName) { return this.fieldError(fieldName) != null; };
@@ -1134,15 +1139,15 @@ var ApiResult = /** @class */ (function () {
     };
     ApiResult.prototype.addFieldError = function (fieldName, message, errorCode) {
         if (errorCode === void 0) { errorCode = 'Exception'; }
-        if (!this.errorStatus)
-            this.errorStatus = new ResponseStatus();
+        if (!this.error)
+            this.error = new ResponseStatus();
         var fieldError = this.fieldError(fieldName);
         if (fieldError != null) {
             fieldError.errorCode = errorCode;
             fieldError.message = message;
         }
         else {
-            this.errorStatus.errors.push(new ResponseError({ fieldName: fieldName, errorCode: errorCode, message: message }));
+            this.error.errors.push(new ResponseError({ fieldName: fieldName, errorCode: errorCode, message: message }));
         }
     };
     return ApiResult;

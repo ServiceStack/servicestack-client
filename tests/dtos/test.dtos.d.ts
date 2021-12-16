@@ -4,21 +4,23 @@ export interface IReturn<T> {
 export interface IReturnVoid {
     createResponse(): void;
 }
+export interface IPost {
+}
+export interface IGet {
+}
 export interface ICreateDb<Table> {
 }
 export interface IUpdateDb<Table> {
 }
 export interface IPatchDb<Table> {
 }
+export interface ISaveDb<Table> {
+}
 export interface IHasSessionId {
     sessionId: string;
 }
 export interface IHasBearerToken {
     bearerToken: string;
-}
-export interface IGet {
-}
-export interface IPost {
 }
 export interface IPut {
 }
@@ -27,6 +29,67 @@ export interface IDelete {
 export interface IPatch {
 }
 export interface IDeleteDb<Table> {
+}
+export declare class QueryBase {
+    skip?: number;
+    take?: number;
+    orderBy: string;
+    orderByDesc: string;
+    include: string;
+    fields: string;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<QueryBase>);
+}
+export declare class QueryDb_2<From, Into> extends QueryBase {
+    constructor(init?: Partial<QueryDb_2<From, Into>>);
+}
+export declare class Item {
+    name: string;
+    description: string;
+    constructor(init?: Partial<Item>);
+}
+export declare class Poco {
+    name: string;
+    constructor(init?: Partial<Poco>);
+}
+export declare class CustomType {
+    id: number;
+    name: string;
+    constructor(init?: Partial<CustomType>);
+}
+export declare class SetterType {
+    id: number;
+    name: string;
+    constructor(init?: Partial<SetterType>);
+}
+export declare class DeclarativeChildValidation {
+    name: string;
+    value: string;
+    constructor(init?: Partial<DeclarativeChildValidation>);
+}
+export declare class FluentChildValidation {
+    name: string;
+    value: string;
+    constructor(init?: Partial<FluentChildValidation>);
+}
+export declare class DeclarativeSingleValidation {
+    name: string;
+    value: string;
+    constructor(init?: Partial<DeclarativeSingleValidation>);
+}
+export declare class FluentSingleValidation {
+    name: string;
+    value: string;
+    constructor(init?: Partial<FluentSingleValidation>);
+}
+export declare class CancelRequest implements IPost {
+    tag: string;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<CancelRequest>);
 }
 export declare class ResponseError {
     errorCode: string;
@@ -47,20 +110,124 @@ export declare class ResponseStatus {
     };
     constructor(init?: Partial<ResponseStatus>);
 }
-export declare class CustomType {
-    id: number;
-    name: string;
-    constructor(init?: Partial<CustomType>);
+export declare class CancelRequestResponse {
+    tag: string;
+    elapsed: string;
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<CancelRequestResponse>);
 }
-export declare class SetterType {
-    id: number;
-    name: string;
-    constructor(init?: Partial<SetterType>);
+export declare class UpdateEventSubscriber implements IPost {
+    id: string;
+    subscribeChannels: string[];
+    unsubscribeChannels: string[];
+    constructor(init?: Partial<UpdateEventSubscriber>);
 }
-export declare class Item {
+export declare class UpdateEventSubscriberResponse {
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<UpdateEventSubscriberResponse>);
+}
+export declare class GetApiKeys implements IGet {
+    environment: string;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<GetApiKeys>);
+}
+export declare class UserApiKey {
+    key: string;
+    keyType: string;
+    expiryDate?: string;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<UserApiKey>);
+}
+export declare class GetApiKeysResponse {
+    results: UserApiKey[];
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<GetApiKeysResponse>);
+}
+export declare class RegenerateApiKeys implements IPost {
+    environment: string;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<RegenerateApiKeys>);
+}
+export declare class RegenerateApiKeysResponse {
+    results: UserApiKey[];
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<RegenerateApiKeysResponse>);
+}
+export declare class NavItem {
+    label: string;
+    href: string;
+    exact?: boolean;
+    id: string;
+    className: string;
+    iconClass: string;
+    show: string;
+    hide: string;
+    children: NavItem[];
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<NavItem>);
+}
+export declare class GetNavItems {
     name: string;
-    description: string;
-    constructor(init?: Partial<Item>);
+    constructor(init?: Partial<GetNavItems>);
+}
+export declare class GetNavItemsResponse {
+    baseUrl: string;
+    results: NavItem[];
+    navItemsMap: {
+        [index: string]: NavItem[];
+    };
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<GetNavItemsResponse>);
+}
+export declare class IdResponse {
+    id: string;
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<IdResponse>);
+}
+export declare class StringResponse {
+    result: string;
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<StringResponse>);
+}
+export declare class StringsResponse {
+    results: string[];
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<StringsResponse>);
+}
+export declare class AuditBase {
+    createdDate: string;
+    createdBy: string;
+    modifiedDate: string;
+    modifiedBy: string;
+    deletedDate?: string;
+    deletedBy: string;
+    constructor(init?: Partial<AuditBase>);
 }
 export interface IAuthTokens {
     provider: string;
@@ -138,39 +305,9 @@ export declare class AuthUserSession {
     type: string;
     constructor(init?: Partial<AuthUserSession>);
 }
-export declare class MetadataTestNestedChild {
-    name: string;
-    constructor(init?: Partial<MetadataTestNestedChild>);
-}
-export declare class MetadataTestChild {
-    name: string;
-    results: MetadataTestNestedChild[];
-    constructor(init?: Partial<MetadataTestChild>);
-}
-export declare class MenuItemExampleItem {
-    name1: string;
-    constructor(init?: Partial<MenuItemExampleItem>);
-}
-export declare class MenuItemExample {
-    name1: string;
-    menuItemExampleItem: MenuItemExampleItem;
-    constructor(init?: Partial<MenuItemExample>);
-}
-export declare class MenuExample {
-    menuItemExample1: MenuItemExample;
-    constructor(init?: Partial<MenuExample>);
-}
 export declare class NestedClass {
     value: string;
     constructor(init?: Partial<NestedClass>);
-}
-export declare class ListResult {
-    result: string;
-    constructor(init?: Partial<ListResult>);
-}
-export declare class ArrayResult {
-    result: string;
-    constructor(init?: Partial<ArrayResult>);
 }
 export declare enum EnumType {
     Value1 = "Value1",
@@ -188,11 +325,11 @@ export declare enum EnumWithValues {
     Value2 = "Value2"
 }
 export declare enum EnumFlags {
-    Value0 = "Value0",
-    Value1 = "Value 1",
-    Value2 = "Value2",
-    Value3 = "Value3",
-    Value123 = "Value123"
+    Value0 = 0,
+    Value1 = 1,
+    Value2 = 2,
+    Value3 = 4,
+    Value123 = 7
 }
 export declare enum EnumAsInt {
     Value1 = 1000,
@@ -258,30 +395,14 @@ export declare class AllTypesBase {
     subType: SubType;
     constructor(init?: Partial<AllTypesBase>);
 }
-export declare class Poco {
-    name: string;
-    constructor(init?: Partial<Poco>);
-}
 export declare class HelloBase {
     id: number;
     constructor(init?: Partial<HelloBase>);
-}
-export declare class HelloResponseBase {
-    refId: number;
-    constructor(init?: Partial<HelloResponseBase>);
 }
 export declare class HelloBase_1<T> {
     items: T[];
     counts: number[];
     constructor(init?: Partial<HelloBase_1<T>>);
-}
-export declare class HelloWithReturnResponse {
-    result: string;
-    constructor(init?: Partial<HelloWithReturnResponse>);
-}
-export declare class HelloType {
-    result: string;
-    constructor(init?: Partial<HelloType>);
 }
 export interface IPoco {
     name: string;
@@ -290,16 +411,6 @@ export interface IEmptyInterface {
 }
 export declare class EmptyClass {
     constructor(init?: Partial<EmptyClass>);
-}
-export declare class InnerType {
-    id: number;
-    name: string;
-    constructor(init?: Partial<InnerType>);
-}
-export declare enum InnerEnum {
-    Foo = "Foo",
-    Bar = "Bar",
-    Baz = "Baz"
 }
 export declare enum DayOfWeek {
     Sunday = "Sunday",
@@ -316,19 +427,6 @@ export declare enum ScopeType {
 }
 export declare class PingService {
     constructor(init?: Partial<PingService>);
-}
-export declare class ReturnedDto {
-    id: number;
-    constructor(init?: Partial<ReturnedDto>);
-}
-export declare class CustomUserSession extends AuthUserSession {
-    customName: string;
-    customInfo: string;
-    constructor(init?: Partial<CustomUserSession>);
-}
-export declare class UnAuthInfo {
-    customInfo: string;
-    constructor(init?: Partial<UnAuthInfo>);
 }
 export declare class Channel {
     name: string;
@@ -354,32 +452,8 @@ export declare class Rockstar {
     age?: number;
     constructor(init?: Partial<Rockstar>);
 }
-export declare class QueryBase {
-    skip?: number;
-    take?: number;
-    orderBy: string;
-    orderByDesc: string;
-    include: string;
-    fields: string;
-    meta: {
-        [index: string]: string;
-    };
-    constructor(init?: Partial<QueryBase>);
-}
-export declare class QueryDb_2<From, Into> extends QueryBase {
-    constructor(init?: Partial<QueryDb_2<From, Into>>);
-}
 export declare class QueryDbTenant_2<From, Into> extends QueryDb_2<From, Into> {
     constructor(init?: Partial<QueryDbTenant_2<From, Into>>);
-}
-export declare class AuditBase {
-    createdDate: string;
-    createdBy: string;
-    modifiedDate: string;
-    modifiedBy: string;
-    deletedDate?: string;
-    deletedBy: string;
-    constructor(init?: Partial<AuditBase>);
 }
 export declare enum LivingStatus {
     Alive = "Alive",
@@ -466,8 +540,91 @@ export declare class RockstarVersion extends RockstarBase {
     rowVersion: number;
     constructor(init?: Partial<RockstarVersion>);
 }
+export declare class MessageCrud implements IReturnVoid, ISaveDb<MessageCrud> {
+    id: number;
+    name: string;
+    constructor(init?: Partial<MessageCrud>);
+    createResponse(): void;
+    getTypeName(): string;
+    getMethod(): string;
+}
+export declare class MetadataTestNestedChild {
+    name: string;
+    constructor(init?: Partial<MetadataTestNestedChild>);
+}
+export declare class MetadataTestChild {
+    name: string;
+    results: MetadataTestNestedChild[];
+    constructor(init?: Partial<MetadataTestChild>);
+}
+export declare class MenuItemExampleItem {
+    name1: string;
+    constructor(init?: Partial<MenuItemExampleItem>);
+}
+export declare class MenuItemExample {
+    name1: string;
+    menuItemExampleItem: MenuItemExampleItem;
+    constructor(init?: Partial<MenuItemExample>);
+}
+export declare class MenuExample {
+    menuItemExample1: MenuItemExample;
+    constructor(init?: Partial<MenuExample>);
+}
+export declare class ListResult {
+    result: string;
+    constructor(init?: Partial<ListResult>);
+}
+export declare class ArrayResult {
+    result: string;
+    constructor(init?: Partial<ArrayResult>);
+}
+export declare class HelloResponseBase {
+    refId: number;
+    constructor(init?: Partial<HelloResponseBase>);
+}
+export declare class HelloWithReturnResponse {
+    result: string;
+    constructor(init?: Partial<HelloWithReturnResponse>);
+}
+export declare class HelloType {
+    result: string;
+    constructor(init?: Partial<HelloType>);
+}
+export declare class InnerType {
+    id: number;
+    name: string;
+    constructor(init?: Partial<InnerType>);
+}
+export declare enum InnerEnum {
+    Foo = "Foo",
+    Bar = "Bar",
+    Baz = "Baz"
+}
+export declare class ReturnedDto {
+    id: number;
+    constructor(init?: Partial<ReturnedDto>);
+}
+export declare class CustomUserSession extends AuthUserSession {
+    customName: string;
+    customInfo: string;
+    constructor(init?: Partial<CustomUserSession>);
+}
+export declare class UnAuthInfo {
+    customInfo: string;
+    constructor(init?: Partial<UnAuthInfo>);
+}
 export declare class TypesGroup {
     constructor(init?: Partial<TypesGroup>);
+}
+export declare class QueryResponse<T> {
+    offset: number;
+    total: number;
+    results: T[];
+    meta: {
+        [index: string]: string;
+    };
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<QueryResponse<T>>);
 }
 export declare class ChatMessage {
     id: number;
@@ -531,6 +688,14 @@ export declare class Items {
     results: Item[];
     constructor(init?: Partial<Items>);
 }
+export declare class EmptyResponse {
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<EmptyResponse>);
+}
+export declare class ReturnCustom400Response {
+    responseStatus: ResponseStatus;
+    constructor(init?: Partial<ReturnCustom400Response>);
+}
 export declare class ThrowTypeResponse {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<ThrowTypeResponse>);
@@ -570,10 +735,6 @@ export declare class CreateRefreshJwtResponse {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<CreateRefreshJwtResponse>);
 }
-export declare class EmptyResponse {
-    responseStatus: ResponseStatus;
-    constructor(init?: Partial<EmptyResponse>);
-}
 export declare class MetadataTestResponse {
     id: number;
     results: MetadataTestChild[];
@@ -583,6 +744,14 @@ export declare class GetExampleResponse {
     responseStatus: ResponseStatus;
     menuExample1: MenuExample;
     constructor(init?: Partial<GetExampleResponse>);
+}
+export declare class Message implements IReturn<Message> {
+    id: number;
+    name: string;
+    constructor(init?: Partial<Message>);
+    createResponse(): Message;
+    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetRandomIdsResponse {
     results: string[];
@@ -633,6 +802,7 @@ export declare class AllTypes implements IReturn<AllTypes> {
     constructor(init?: Partial<AllTypes>);
     createResponse(): AllTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class AllCollectionTypes implements IReturn<AllCollectionTypes> {
     intArray: number[];
@@ -657,6 +827,7 @@ export declare class AllCollectionTypes implements IReturn<AllCollectionTypes> {
     constructor(init?: Partial<AllCollectionTypes>);
     createResponse(): AllCollectionTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloAllTypesResponse {
     result: string;
@@ -673,6 +844,7 @@ export declare class HelloDateTime implements IReturn<HelloDateTime> {
     constructor(init?: Partial<HelloDateTime>);
     createResponse(): HelloDateTime;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithDataContractResponse {
     result: string;
@@ -721,6 +893,7 @@ export declare class HelloTypes implements IReturn<HelloTypes> {
     constructor(init?: Partial<HelloTypes>);
     createResponse(): HelloTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloZipResponse {
     result: string;
@@ -776,18 +949,21 @@ export declare class RequiresAdmin implements IReturn<RequiresAdmin> {
     constructor(init?: Partial<RequiresAdmin>);
     createResponse(): RequiresAdmin;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CustomRoute implements IReturn<CustomRoute> {
     data: string;
     constructor(init?: Partial<CustomRoute>);
     createResponse(): CustomRoute;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class Wait implements IReturn<Wait> {
     forMs: number;
     constructor(init?: Partial<Wait>);
     createResponse(): Wait;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class EchoTypes implements IReturn<EchoTypes> {
     byte: number;
@@ -809,6 +985,7 @@ export declare class EchoTypes implements IReturn<EchoTypes> {
     constructor(init?: Partial<EchoTypes>);
     createResponse(): EchoTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class EchoCollections implements IReturn<EchoCollections> {
     stringList: string[];
@@ -822,6 +999,7 @@ export declare class EchoCollections implements IReturn<EchoCollections> {
     constructor(init?: Partial<EchoCollections>);
     createResponse(): EchoCollections;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class EchoComplexTypes implements IReturn<EchoComplexTypes> {
     subType: SubType;
@@ -838,11 +1016,13 @@ export declare class EchoComplexTypes implements IReturn<EchoComplexTypes> {
     constructor(init?: Partial<EchoComplexTypes>);
     createResponse(): EchoComplexTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class StoreRockstars extends Array<Rockstar> implements IReturn<StoreRockstars> {
     constructor(init?: Partial<StoreRockstars>);
     createResponse(): StoreRockstars;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class AuthenticateResponse implements IHasSessionId, IHasBearerToken {
     userId: string;
@@ -879,6 +1059,21 @@ export declare class UnAssignRolesResponse {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<UnAssignRolesResponse>);
 }
+export declare class RegisterResponse implements IHasSessionId, IHasBearerToken {
+    userId: string;
+    sessionId: string;
+    userName: string;
+    referrerUrl: string;
+    bearerToken: string;
+    refreshToken: string;
+    roles: string[];
+    permissions: string[];
+    responseStatus: ResponseStatus;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<RegisterResponse>);
+}
 export declare class ConvertSessionToTokenResponse {
     meta: {
         [index: string]: string;
@@ -895,16 +1090,6 @@ export declare class GetAccessTokenResponse {
     };
     responseStatus: ResponseStatus;
     constructor(init?: Partial<GetAccessTokenResponse>);
-}
-export declare class QueryResponse<T> {
-    offset: number;
-    total: number;
-    results: T[];
-    meta: {
-        [index: string]: string;
-    };
-    responseStatus: ResponseStatus;
-    constructor(init?: Partial<QueryResponse<T>>);
 }
 export declare class RockstarWithIdResponse {
     id: number;
@@ -929,6 +1114,12 @@ export declare class RockstarWithIdAndRowVersionResponse {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<RockstarWithIdAndRowVersionResponse>);
 }
+export declare class QueryItems extends QueryDb_2<Item, Poco> implements IReturn<QueryResponse<Poco>> {
+    constructor(init?: Partial<QueryItems>);
+    createResponse(): QueryResponse<Poco>;
+    getTypeName(): string;
+    getMethod(): string;
+}
 export declare class PostRawToChannel implements IReturnVoid {
     from: string;
     toUserId: string;
@@ -938,6 +1129,7 @@ export declare class PostRawToChannel implements IReturnVoid {
     constructor(init?: Partial<PostRawToChannel>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class PostChatToChannel implements IReturn<ChatMessage> {
     from: string;
@@ -948,6 +1140,7 @@ export declare class PostChatToChannel implements IReturn<ChatMessage> {
     constructor(init?: Partial<PostChatToChannel>);
     createResponse(): ChatMessage;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetChatHistory implements IReturn<GetChatHistoryResponse> {
     channels: string[];
@@ -956,16 +1149,19 @@ export declare class GetChatHistory implements IReturn<GetChatHistoryResponse> {
     constructor(init?: Partial<GetChatHistory>);
     createResponse(): GetChatHistoryResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ClearChatHistory implements IReturnVoid {
     constructor(init?: Partial<ClearChatHistory>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ResetServerEvents implements IReturnVoid {
     constructor(init?: Partial<ResetServerEvents>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class PostObjectToChannel implements IReturnVoid {
     toUserId: string;
@@ -976,11 +1172,13 @@ export declare class PostObjectToChannel implements IReturnVoid {
     constructor(init?: Partial<PostObjectToChannel>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetUserDetails implements IReturn<GetUserDetailsResponse> {
     constructor(init?: Partial<GetUserDetails>);
     createResponse(): GetUserDetailsResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CustomHttpError implements IReturn<CustomHttpErrorResponse> {
     statusCode: number;
@@ -988,41 +1186,121 @@ export declare class CustomHttpError implements IReturn<CustomHttpErrorResponse>
     constructor(init?: Partial<CustomHttpError>);
     createResponse(): CustomHttpErrorResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class AltQueryItems implements IReturn<QueryResponseAlt<Item>> {
     name: string;
     constructor(init?: Partial<AltQueryItems>);
     createResponse(): QueryResponseAlt<Item>;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetItems implements IReturn<Items> {
     constructor(init?: Partial<GetItems>);
     createResponse(): Items;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetNakedItems implements IReturn<Item[]> {
     constructor(init?: Partial<GetNakedItems>);
     createResponse(): Item[];
     getTypeName(): string;
+    getMethod(): string;
+}
+export declare class DeclarativeValidationAuth {
+    name: string;
+    constructor(init?: Partial<DeclarativeValidationAuth>);
+    getMethod(): string;
+}
+export declare class DeclarativeCollectiveValidationTest implements IReturn<EmptyResponse> {
+    site: string;
+    declarativeValidations: DeclarativeChildValidation[];
+    fluentValidations: FluentChildValidation[];
+    constructor(init?: Partial<DeclarativeCollectiveValidationTest>);
+    createResponse(): EmptyResponse;
+    getTypeName(): string;
+    getMethod(): string;
+}
+export declare class DeclarativeSingleValidationTest implements IReturn<EmptyResponse> {
+    site: string;
+    declarativeSingleValidation: DeclarativeSingleValidation;
+    fluentSingleValidation: FluentSingleValidation;
+    constructor(init?: Partial<DeclarativeSingleValidationTest>);
+    createResponse(): EmptyResponse;
+    getTypeName(): string;
+    getMethod(): string;
+}
+export declare class ConvertSessionToToken implements IReturn<ConvertSessionToTokenResponse>, IPost {
+    preserveSession: boolean;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<ConvertSessionToToken>);
+    createResponse(): ConvertSessionToTokenResponse;
+    getTypeName(): string;
+    getMethod(): string;
+}
+export declare class GetAccessToken implements IReturn<GetAccessTokenResponse>, IPost {
+    refreshToken: string;
+    useTokenCookie?: boolean;
+    meta: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<GetAccessToken>);
+    createResponse(): GetAccessTokenResponse;
+    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class DummyTypes {
     helloResponses: HelloResponse[];
     listResult: ListResult[];
     arrayResult: ArrayResult[];
+    cancelRequest: CancelRequest;
+    cancelRequestResponse: CancelRequestResponse;
+    updateEventSubscriber: UpdateEventSubscriber;
+    updateEventSubscriberResponse: UpdateEventSubscriberResponse;
+    getApiKeys: GetApiKeys;
+    getApiKeysResponse: GetApiKeysResponse;
+    regenerateApiKeys: RegenerateApiKeys;
+    regenerateApiKeysResponse: RegenerateApiKeysResponse;
+    userApiKey: UserApiKey;
+    convertSessionToToken: ConvertSessionToToken;
+    convertSessionToTokenResponse: ConvertSessionToTokenResponse;
+    getAccessToken: GetAccessToken;
+    getAccessTokenResponse: GetAccessTokenResponse;
+    navItem: NavItem;
+    getNavItems: GetNavItems;
+    getNavItemsResponse: GetNavItemsResponse;
+    emptyResponse: EmptyResponse;
+    idResponse: IdResponse;
+    stringResponse: StringResponse;
+    stringsResponse: StringsResponse;
+    auditBase: AuditBase;
     constructor(init?: Partial<DummyTypes>);
+    getMethod(): string;
 }
 export declare class ThrowHttpError {
     status?: number;
     message: string;
     constructor(init?: Partial<ThrowHttpError>);
+    getMethod(): string;
 }
 export declare class Throw404 {
     message: string;
     constructor(init?: Partial<Throw404>);
+    getMethod(): string;
 }
 export declare class ThrowCustom400 {
     message: string;
     constructor(init?: Partial<ThrowCustom400>);
+    getMethod(): string;
+}
+export declare class ReturnCustom400 implements IReturn<ReturnCustom400Response> {
+    message: string;
+    constructor(init?: Partial<ReturnCustom400>);
+    createResponse(): ReturnCustom400Response;
+    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ThrowType implements IReturn<ThrowTypeResponse> {
     type: string;
@@ -1030,6 +1308,7 @@ export declare class ThrowType implements IReturn<ThrowTypeResponse> {
     constructor(init?: Partial<ThrowType>);
     createResponse(): ThrowTypeResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ThrowValidation implements IReturn<ThrowValidationResponse> {
     age: number;
@@ -1038,21 +1317,25 @@ export declare class ThrowValidation implements IReturn<ThrowValidationResponse>
     constructor(init?: Partial<ThrowValidation>);
     createResponse(): ThrowValidationResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ThrowBusinessError implements IReturn<ThrowBusinessErrorResponse> {
     constructor(init?: Partial<ThrowBusinessError>);
     createResponse(): ThrowBusinessErrorResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class RootPathRoutes {
     path: string;
     constructor(init?: Partial<RootPathRoutes>);
+    getMethod(): string;
 }
 export declare class GetAccount implements IReturn<Account> {
     account: string;
     constructor(init?: Partial<GetAccount>);
     createResponse(): Account;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetProject implements IReturn<Project> {
     account: string;
@@ -1060,42 +1343,49 @@ export declare class GetProject implements IReturn<Project> {
     constructor(init?: Partial<GetProject>);
     createResponse(): Project;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ImageAsStream implements IReturn<Blob> {
     format: string;
     constructor(init?: Partial<ImageAsStream>);
     createResponse(): Blob;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ImageAsBytes implements IReturn<string> {
+export declare class ImageAsBytes implements IReturn<Uint8Array> {
     format: string;
     constructor(init?: Partial<ImageAsBytes>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ImageAsCustomResult implements IReturn<string> {
+export declare class ImageAsCustomResult implements IReturn<Uint8Array> {
     format: string;
     constructor(init?: Partial<ImageAsCustomResult>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ImageWriteToResponse implements IReturn<string> {
+export declare class ImageWriteToResponse implements IReturn<Uint8Array> {
     format: string;
     constructor(init?: Partial<ImageWriteToResponse>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ImageAsFile implements IReturn<string> {
+export declare class ImageAsFile implements IReturn<Uint8Array> {
     format: string;
     constructor(init?: Partial<ImageAsFile>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ImageAsRedirect {
     format: string;
     constructor(init?: Partial<ImageAsRedirect>);
+    getMethod(): string;
 }
-export declare class HelloImage implements IReturn<string> {
+export declare class HelloImage implements IReturn<Uint8Array> {
     name: string;
     format: string;
     width?: number;
@@ -1105,20 +1395,23 @@ export declare class HelloImage implements IReturn<string> {
     foreground: string;
     background: string;
     constructor(init?: Partial<HelloImage>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class Secured implements IReturn<SecuredResponse> {
     name: string;
     constructor(init?: Partial<Secured>);
     createResponse(): SecuredResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateJwt extends AuthUserSession implements IReturn<CreateJwtResponse> {
     jwtExpiry?: string;
     constructor(init?: Partial<CreateJwt>);
     createResponse(): CreateJwtResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateRefreshJwt implements IReturn<CreateRefreshJwtResponse> {
     userAuthId: string;
@@ -1126,52 +1419,69 @@ export declare class CreateRefreshJwt implements IReturn<CreateRefreshJwtRespons
     constructor(init?: Partial<CreateRefreshJwt>);
     createResponse(): CreateRefreshJwtResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class InvalidateLastAccessToken implements IReturn<EmptyResponse> {
     constructor(init?: Partial<InvalidateLastAccessToken>);
     createResponse(): EmptyResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ViewLogs implements IReturn<string> {
     clear: boolean;
     constructor(init?: Partial<ViewLogs>);
     createResponse(): string;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class MetadataTest implements IReturn<MetadataTestResponse> {
     id: number;
     constructor(init?: Partial<MetadataTest>);
     createResponse(): MetadataTestResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class MetadataTestArray implements IReturn<MetadataTestChild[]> {
     id: number;
     constructor(init?: Partial<MetadataTestArray>);
     createResponse(): MetadataTestChild[];
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetExample implements IReturn<GetExampleResponse> {
     constructor(init?: Partial<GetExample>);
     createResponse(): GetExampleResponse;
     getTypeName(): string;
+    getMethod(): string;
+}
+export declare class RequestMessage implements IReturn<Message> {
+    id: number;
+    constructor(init?: Partial<RequestMessage>);
+    createResponse(): Message;
+    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetRandomIds implements IReturn<GetRandomIdsResponse> {
     take?: number;
     constructor(init?: Partial<GetRandomIds>);
     createResponse(): GetRandomIdsResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class TextFileTest {
     asAttachment: boolean;
     constructor(init?: Partial<TextFileTest>);
+    getMethod(): string;
 }
 export declare class ReturnText {
     text: string;
     constructor(init?: Partial<ReturnText>);
+    getMethod(): string;
 }
 export declare class ReturnHtml {
     text: string;
     constructor(init?: Partial<ReturnHtml>);
+    getMethod(): string;
 }
 export declare class Hello implements IReturn<HelloResponse> {
     name: string;
@@ -1179,6 +1489,14 @@ export declare class Hello implements IReturn<HelloResponse> {
     constructor(init?: Partial<Hello>);
     createResponse(): HelloResponse;
     getTypeName(): string;
+    getMethod(): string;
+}
+export declare class HelloSecure implements IReturn<HelloResponse> {
+    name: string;
+    constructor(init?: Partial<HelloSecure>);
+    createResponse(): HelloResponse;
+    getTypeName(): string;
+    getMethod(): string;
 }
 /**
 * Description on HelloAll type
@@ -1188,6 +1506,7 @@ export declare class HelloAnnotated implements IReturn<HelloAnnotatedResponse> {
     constructor(init?: Partial<HelloAnnotated>);
     createResponse(): HelloAnnotatedResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithNestedClass implements IReturn<HelloResponse> {
     name: string;
@@ -1195,18 +1514,21 @@ export declare class HelloWithNestedClass implements IReturn<HelloResponse> {
     constructor(init?: Partial<HelloWithNestedClass>);
     createResponse(): HelloResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloList implements IReturn<ListResult[]> {
     names: string[];
     constructor(init?: Partial<HelloList>);
     createResponse(): ListResult[];
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloArray implements IReturn<ArrayResult[]> {
     names: string[];
     constructor(init?: Partial<HelloArray>);
     createResponse(): ArrayResult[];
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithEnum {
     enumProp: EnumType;
@@ -1218,6 +1540,7 @@ export declare class HelloWithEnum {
     enumStyle: EnumStyle;
     enumStyleMembers: EnumStyleMembers;
     constructor(init?: Partial<HelloWithEnum>);
+    getMethod(): string;
 }
 export declare class HelloWithEnumList {
     enumProp: EnumType[];
@@ -1226,6 +1549,7 @@ export declare class HelloWithEnumList {
     enumFlags: EnumFlags[];
     enumStyle: EnumStyle[];
     constructor(init?: Partial<HelloWithEnumList>);
+    getMethod(): string;
 }
 export declare class HelloWithEnumMap {
     enumProp: {
@@ -1244,12 +1568,14 @@ export declare class HelloWithEnumMap {
         [index: string]: EnumStyle;
     };
     constructor(init?: Partial<HelloWithEnumMap>);
+    getMethod(): string;
 }
 export declare class RestrictedAttributes {
     id: number;
     name: string;
     hello: Hello;
     constructor(init?: Partial<RestrictedAttributes>);
+    getMethod(): string;
 }
 /**
 * AllowedAttributes Description
@@ -1260,6 +1586,7 @@ export declare class AllowedAttributes {
     */
     range: number;
     constructor(init?: Partial<AllowedAttributes>);
+    getMethod(): string;
 }
 export declare class HelloAllTypes implements IReturn<HelloAllTypesResponse> {
     name: string;
@@ -1268,22 +1595,26 @@ export declare class HelloAllTypes implements IReturn<HelloAllTypesResponse> {
     constructor(init?: Partial<HelloAllTypes>);
     createResponse(): HelloAllTypesResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloSubAllTypes extends AllTypesBase implements IReturn<SubAllTypes> {
     hierarchy: number;
     constructor(init?: Partial<HelloSubAllTypes>);
     createResponse(): SubAllTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloString implements IReturn<string> {
     name: string;
     constructor(init?: Partial<HelloString>);
     createResponse(): string;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloVoid {
     name: string;
     constructor(init?: Partial<HelloVoid>);
+    getMethod(): string;
 }
 export declare class HelloWithDataContract implements IReturn<HelloWithDataContractResponse> {
     name: string;
@@ -1291,6 +1622,7 @@ export declare class HelloWithDataContract implements IReturn<HelloWithDataContr
     constructor(init?: Partial<HelloWithDataContract>);
     createResponse(): HelloWithDataContractResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 /**
 * Description on HelloWithDescription type
@@ -1300,97 +1632,111 @@ export declare class HelloWithDescription implements IReturn<HelloWithDescriptio
     constructor(init?: Partial<HelloWithDescription>);
     createResponse(): HelloWithDescriptionResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithInheritance extends HelloBase implements IReturn<HelloWithInheritanceResponse> {
     name: string;
     constructor(init?: Partial<HelloWithInheritance>);
     createResponse(): HelloWithInheritanceResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithGenericInheritance extends HelloBase_1<Poco> {
     result: string;
     constructor(init?: Partial<HelloWithGenericInheritance>);
+    getMethod(): string;
 }
 export declare class HelloWithGenericInheritance2 extends HelloBase_1<Hello> {
     result: string;
     constructor(init?: Partial<HelloWithGenericInheritance2>);
-}
-export declare class HelloWithNestedInheritance extends HelloBase_1<Item> {
-    constructor(init?: Partial<HelloWithNestedInheritance>);
+    getMethod(): string;
 }
 export declare class HelloWithReturn implements IReturn<HelloWithAlternateReturnResponse> {
     name: string;
     constructor(init?: Partial<HelloWithReturn>);
     createResponse(): HelloWithAlternateReturnResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithRoute implements IReturn<HelloWithRouteResponse> {
     name: string;
     constructor(init?: Partial<HelloWithRoute>);
     createResponse(): HelloWithRouteResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloWithType implements IReturn<HelloWithTypeResponse> {
     name: string;
     constructor(init?: Partial<HelloWithType>);
     createResponse(): HelloWithTypeResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloInterface {
     poco: IPoco;
     emptyInterface: IEmptyInterface;
     emptyClass: EmptyClass;
     constructor(init?: Partial<HelloInterface>);
+    getMethod(): string;
 }
 export declare class HelloInnerTypes implements IReturn<HelloInnerTypesResponse> {
     constructor(init?: Partial<HelloInnerTypes>);
     createResponse(): HelloInnerTypesResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloBuiltin {
     dayOfWeek: DayOfWeek;
     constructor(init?: Partial<HelloBuiltin>);
+    getMethod(): string;
 }
 export declare class HelloGet implements IReturn<HelloVerbResponse>, IGet {
     id: number;
     constructor(init?: Partial<HelloGet>);
     createResponse(): HelloVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloPost extends HelloBase implements IReturn<HelloVerbResponse>, IPost {
     constructor(init?: Partial<HelloPost>);
     createResponse(): HelloVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloPut implements IReturn<HelloVerbResponse>, IPut {
     id: number;
     constructor(init?: Partial<HelloPut>);
     createResponse(): HelloVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloDelete implements IReturn<HelloVerbResponse>, IDelete {
     id: number;
     constructor(init?: Partial<HelloDelete>);
     createResponse(): HelloVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloPatch implements IReturn<HelloVerbResponse>, IPatch {
     id: number;
     constructor(init?: Partial<HelloPatch>);
     createResponse(): HelloVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloReturnVoid implements IReturnVoid {
     id: number;
     constructor(init?: Partial<HelloReturnVoid>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class EnumRequest implements IReturn<EnumResponse>, IPut {
     operator: ScopeType;
     constructor(init?: Partial<EnumRequest>);
     createResponse(): EnumResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloZip implements IReturn<HelloZipResponse> {
     name: string;
@@ -1398,47 +1744,68 @@ export declare class HelloZip implements IReturn<HelloZipResponse> {
     constructor(init?: Partial<HelloZip>);
     createResponse(): HelloZipResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class Ping implements IReturn<PingResponse> {
     constructor(init?: Partial<Ping>);
     createResponse(): PingResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ResetConnections {
     constructor(init?: Partial<ResetConnections>);
+    getMethod(): string;
 }
 export declare class RequiresRole implements IReturn<RequiresRoleResponse> {
     constructor(init?: Partial<RequiresRole>);
     createResponse(): RequiresRoleResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ReturnString implements IReturn<string> {
     data: string;
     constructor(init?: Partial<ReturnString>);
     createResponse(): string;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ReturnBytes implements IReturn<string> {
+export declare class ReturnBytes implements IReturn<Uint8Array> {
     data: string;
     constructor(init?: Partial<ReturnBytes>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class ReturnStream implements IReturn<Blob> {
     data: string;
     constructor(init?: Partial<ReturnStream>);
     createResponse(): Blob;
     getTypeName(): string;
+    getMethod(): string;
+}
+export declare class ReturnJson {
+    constructor(init?: Partial<ReturnJson>);
+    getMethod(): string;
+}
+export declare class ReturnJsonHeader {
+    constructor(init?: Partial<ReturnJsonHeader>);
+    getMethod(): string;
+}
+export declare class WriteJson {
+    constructor(init?: Partial<WriteJson>);
+    getMethod(): string;
 }
 export declare class GetRequest1 implements IReturn<ReturnedDto[]>, IGet {
     constructor(init?: Partial<GetRequest1>);
     createResponse(): ReturnedDto[];
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetRequest2 implements IReturn<ReturnedDto[]>, IGet {
     constructor(init?: Partial<GetRequest2>);
     createResponse(): ReturnedDto[];
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendJson implements IReturn<string> {
     id: number;
@@ -1446,6 +1813,7 @@ export declare class SendJson implements IReturn<string> {
     constructor(init?: Partial<SendJson>);
     createResponse(): string;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendText implements IReturn<string> {
     id: number;
@@ -1454,61 +1822,71 @@ export declare class SendText implements IReturn<string> {
     constructor(init?: Partial<SendText>);
     createResponse(): string;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class SendRaw implements IReturn<string> {
+export declare class SendRaw implements IReturn<Uint8Array> {
     id: number;
     name: string;
     contentType: string;
     constructor(init?: Partial<SendRaw>);
-    createResponse(): string;
+    createResponse(): Uint8Array;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendDefault implements IReturn<SendVerbResponse> {
     id: number;
     constructor(init?: Partial<SendDefault>);
     createResponse(): SendVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendRestGet implements IReturn<SendVerbResponse>, IGet {
     id: number;
     constructor(init?: Partial<SendRestGet>);
     createResponse(): SendVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendGet implements IReturn<SendVerbResponse>, IGet {
     id: number;
     constructor(init?: Partial<SendGet>);
     createResponse(): SendVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendPost implements IReturn<SendVerbResponse>, IPost {
     id: number;
     constructor(init?: Partial<SendPost>);
     createResponse(): SendVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendPut implements IReturn<SendVerbResponse>, IPut {
     id: number;
     constructor(init?: Partial<SendPut>);
     createResponse(): SendVerbResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SendReturnVoid implements IReturnVoid {
     id: number;
     constructor(init?: Partial<SendReturnVoid>);
     createResponse(): void;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetSession implements IReturn<GetSessionResponse> {
     constructor(init?: Partial<GetSession>);
     createResponse(): GetSessionResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class UpdateSession implements IReturn<GetSessionResponse> {
     customName: string;
     constructor(init?: Partial<UpdateSession>);
     createResponse(): GetSessionResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetStuff implements IReturn<GetStuffResponse> {
     summaryDate?: string;
@@ -1519,39 +1897,47 @@ export declare class GetStuff implements IReturn<GetStuffResponse> {
     constructor(init?: Partial<GetStuff>);
     createResponse(): GetStuffResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class StoreLogs implements IReturn<StoreLogsResponse> {
     loggers: Logger[];
     constructor(init?: Partial<StoreLogs>);
     createResponse(): StoreLogsResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class HelloAuth implements IReturn<HelloResponse> {
     name: string;
     constructor(init?: Partial<HelloAuth>);
     createResponse(): HelloResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class TestAuth implements IReturn<TestAuthResponse> {
     constructor(init?: Partial<TestAuth>);
     createResponse(): TestAuthResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class TestDataAllTypes implements IReturn<AllTypes> {
     constructor(init?: Partial<TestDataAllTypes>);
     createResponse(): AllTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class TestDataAllCollectionTypes implements IReturn<AllCollectionTypes> {
     constructor(init?: Partial<TestDataAllCollectionTypes>);
     createResponse(): AllCollectionTypes;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class TestVoidResponse {
     constructor(init?: Partial<TestVoidResponse>);
+    getMethod(): string;
 }
 export declare class TestNullResponse {
     constructor(init?: Partial<TestNullResponse>);
+    getMethod(): string;
 }
 export declare class Authenticate implements IReturn<AuthenticateResponse>, IPost {
     provider: string;
@@ -1578,6 +1964,7 @@ export declare class Authenticate implements IReturn<AuthenticateResponse>, IPos
     constructor(init?: Partial<Authenticate>);
     createResponse(): AuthenticateResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class AssignRoles implements IReturn<AssignRolesResponse>, IPost {
     userName: string;
@@ -1589,6 +1976,7 @@ export declare class AssignRoles implements IReturn<AssignRolesResponse>, IPost 
     constructor(init?: Partial<AssignRoles>);
     createResponse(): AssignRolesResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class UnAssignRoles implements IReturn<UnAssignRolesResponse>, IPost {
     userName: string;
@@ -1600,31 +1988,32 @@ export declare class UnAssignRoles implements IReturn<UnAssignRolesResponse>, IP
     constructor(init?: Partial<UnAssignRoles>);
     createResponse(): UnAssignRolesResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
-export declare class ConvertSessionToToken implements IReturn<ConvertSessionToTokenResponse>, IPost {
-    preserveSession: boolean;
+export declare class Register implements IReturn<RegisterResponse>, IPost {
+    userName: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    autoLogin?: boolean;
+    errorView: string;
     meta: {
         [index: string]: string;
     };
-    constructor(init?: Partial<ConvertSessionToToken>);
-    createResponse(): ConvertSessionToTokenResponse;
+    constructor(init?: Partial<Register>);
+    createResponse(): RegisterResponse;
     getTypeName(): string;
-}
-export declare class GetAccessToken implements IReturn<GetAccessTokenResponse>, IPost {
-    refreshToken: string;
-    useTokenCookie?: boolean;
-    meta: {
-        [index: string]: string;
-    };
-    constructor(init?: Partial<GetAccessToken>);
-    createResponse(): GetAccessTokenResponse;
-    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class QueryRockstarAudit extends QueryDbTenant_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>> {
     id?: number;
     constructor(init?: Partial<QueryRockstarAudit>);
     createResponse(): QueryResponse<RockstarAuto>;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class QueryRockstarAuditSubOr extends QueryDb_2<RockstarAuditTenant, RockstarAuto> implements IReturn<QueryResponse<RockstarAuto>> {
     firstNameStartsWith: string;
@@ -1632,28 +2021,40 @@ export declare class QueryRockstarAuditSubOr extends QueryDb_2<RockstarAuditTena
     constructor(init?: Partial<QueryRockstarAuditSubOr>);
     createResponse(): QueryResponse<RockstarAuto>;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class QueryPocoBase extends QueryDb_1<OnlyDefinedInGenericType> implements IReturn<QueryResponse<OnlyDefinedInGenericType>> {
     id: number;
     constructor(init?: Partial<QueryPocoBase>);
     createResponse(): QueryResponse<OnlyDefinedInGenericType>;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class QueryPocoIntoBase extends QueryDb_2<OnlyDefinedInGenericTypeFrom, OnlyDefinedInGenericTypeInto> implements IReturn<QueryResponse<OnlyDefinedInGenericTypeInto>> {
     id: number;
     constructor(init?: Partial<QueryPocoIntoBase>);
     createResponse(): QueryResponse<OnlyDefinedInGenericTypeInto>;
     getTypeName(): string;
+    getMethod(): string;
+}
+export declare class MessageQuery extends QueryDb_1<MessageQuery> implements IReturn<QueryResponse<MessageQuery>> {
+    id: number;
+    constructor(init?: Partial<MessageQuery>);
+    createResponse(): QueryResponse<MessageQuery>;
+    getTypeName(): string;
+    getMethod(): string;
 }
 export declare class QueryRockstars extends QueryDb_1<Rockstar> implements IReturn<QueryResponse<Rockstar>> {
     constructor(init?: Partial<QueryRockstars>);
     createResponse(): QueryResponse<Rockstar>;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateRockstarAudit extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit> {
     constructor(init?: Partial<CreateRockstarAudit>);
     createResponse(): RockstarWithIdResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateRockstarAuditTenant extends CreateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
     sessionId: string;
@@ -1666,6 +2067,7 @@ export declare class CreateRockstarAuditTenant extends CreateAuditTenantBase<Roc
     constructor(init?: Partial<CreateRockstarAuditTenant>);
     createResponse(): RockstarWithIdAndResultResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class UpdateRockstarAuditTenant extends UpdateAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
     sessionId: string;
@@ -1675,6 +2077,7 @@ export declare class UpdateRockstarAuditTenant extends UpdateAuditTenantBase<Roc
     constructor(init?: Partial<UpdateRockstarAuditTenant>);
     createResponse(): RockstarWithIdAndResultResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class PatchRockstarAuditTenant extends PatchAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse>, IHasSessionId {
     sessionId: string;
@@ -1684,18 +2087,21 @@ export declare class PatchRockstarAuditTenant extends PatchAuditTenantBase<Rocks
     constructor(init?: Partial<PatchRockstarAuditTenant>);
     createResponse(): RockstarWithIdAndResultResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class SoftDeleteAuditTenant extends SoftDeleteAuditTenantBase<RockstarAuditTenant, RockstarWithIdAndResultResponse> implements IReturn<RockstarWithIdAndResultResponse> {
     id: number;
     constructor(init?: Partial<SoftDeleteAuditTenant>);
     createResponse(): RockstarWithIdAndResultResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateRockstarAuditMqToken extends RockstarBase implements IReturn<RockstarWithIdResponse>, ICreateDb<RockstarAudit>, IHasBearerToken {
     bearerToken: string;
     constructor(init?: Partial<CreateRockstarAuditMqToken>);
     createResponse(): RockstarWithIdResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class RealDeleteAuditTenant implements IReturn<RockstarWithIdAndCountResponse>, IDeleteDb<RockstarAuditTenant>, IHasSessionId {
     sessionId: string;
@@ -1704,9 +2110,11 @@ export declare class RealDeleteAuditTenant implements IReturn<RockstarWithIdAndC
     constructor(init?: Partial<RealDeleteAuditTenant>);
     createResponse(): RockstarWithIdAndCountResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class CreateRockstarVersion extends RockstarBase implements IReturn<RockstarWithIdAndRowVersionResponse>, ICreateDb<RockstarVersion> {
     constructor(init?: Partial<CreateRockstarVersion>);
     createResponse(): RockstarWithIdAndRowVersionResponse;
     getTypeName(): string;
+    getMethod(): string;
 }

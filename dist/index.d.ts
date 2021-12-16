@@ -353,13 +353,14 @@ export declare function getMethod(request: any, method?: string): any;
 export declare function getResponseStatus(e: any): any;
 export declare class ApiResult<TResponse> {
     response?: TResponse;
-    errorStatus?: ResponseStatus;
+    error?: ResponseStatus;
     constructor(init?: Partial<ApiResult<TResponse>>);
     get completed(): boolean;
     get isError(): boolean;
     get isSuccess(): boolean;
     get errorMessage(): string;
-    get fieldErrors(): ResponseError[];
+    get errorCode(): string;
+    get errors(): ResponseError[];
     get errorSummary(): string;
     fieldError(fieldName: string): ResponseError;
     fieldErrorMessage(fieldName: string): string;

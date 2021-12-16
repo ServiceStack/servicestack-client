@@ -1235,7 +1235,7 @@ export class JsonServiceClient {
             const result = await this.fetch<TResponse>(getMethod(request,method), request, args);
             return new ApiResult<TResponse>({ response: result });
         } catch(e) {
-            return new ApiResult<TResponse>({ errorStatus: getResponseStatus(e) });
+            return new ApiResult<TResponse>({ error: getResponseStatus(e) });
         }
     }
 
@@ -1244,7 +1244,7 @@ export class JsonServiceClient {
             const result = await this.fetch<EmptyResponse>(getMethod(request,method), request, args);
             return new ApiResult<EmptyResponse>({ response: result });
         } catch(e) {
-            return new ApiResult<EmptyResponse>({ errorStatus: getResponseStatus(e) });
+            return new ApiResult<EmptyResponse>({ error: getResponseStatus(e) });
         }
     }
 }
@@ -1256,29 +1256,30 @@ export function getMethod(request:any, method?:string) {
 }
 
 export function getResponseStatus(e:any) {
-    return e.responseStatus ?? e.ResponseStatus ?? 
+    return e.responseStatus ?? e.ResponseStatus ??
         (e.errorCode 
             ? e 
-            : (e.message ? createErrorStatus(e.message) : null))
+            : (e.message ? createErrorStatus(e.message, e.errorCode) : null))
 }
 
 export class ApiResult<TResponse>
 {
     response?: TResponse;
-    errorStatus?: ResponseStatus;
+    error?: ResponseStatus;
     
     public constructor(init?:Partial<ApiResult<TResponse>>) { Object.assign(this, init); }
 
-    get completed() { return this.completed != null || this.errorStatus != null; }
-    get isError() { return this.errorStatus?.errorCode != null || this.errorStatus?.message != null; }
+    get completed() { return this.completed != null || this.error != null; }
+    get isError() { return this.error?.errorCode != null || this.error?.message != null; }
     get isSuccess() { return !this.isError && this.response != null; }
-    get errorMessage() { return this.errorStatus?.message; }
-    get fieldErrors() { return this.errorStatus?.errors ?? []; }
-    get errorSummary() { return this.errorStatus != null && this.fieldErrors.length == 0 ? this.errorMessage : null; }
+    get errorMessage() { return this.error?.message; }
+    get errorCode() { return this.error?.errorCode; }
+    get errors() { return this.error?.errors ?? []; }
+    get errorSummary() { return this.error != null && this.errors.length == 0 ? this.errorMessage : null; }
 
     fieldError(fieldName: string) { 
         let matchField = fieldName.toLowerCase()
-        return this.fieldErrors?.find(x => x.fieldName.toLowerCase() == matchField);
+        return this.errors?.find(x => x.fieldName.toLowerCase() == matchField);
     }
     fieldErrorMessage(fieldName: string) { return this.fieldError(fieldName)?.message; }
     hasFieldError(fieldName: string) { return this.fieldError(fieldName) != null; }
@@ -1299,14 +1300,14 @@ export class ApiResult<TResponse>
     }
 
     addFieldError(fieldName:string, message:string, errorCode:string = 'Exception') {
-        if (!this.errorStatus)
-            this.errorStatus = new ResponseStatus();
+        if (!this.error)
+            this.error = new ResponseStatus();
         const fieldError = this.fieldError(fieldName);
         if (fieldError != null) {
             fieldError.errorCode = errorCode;
             fieldError.message = message;
         } else {
-            this.errorStatus.errors.push(new ResponseError({ fieldName, errorCode, message }));
+            this.error.errors.push(new ResponseError({ fieldName, errorCode, message }));
         }
     }
 }

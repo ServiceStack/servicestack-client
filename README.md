@@ -22,9 +22,9 @@ This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Template
 
     npm install @servicestack/client
 
-#### v1.1 Changes
+#### v1.x Changes
 
- - new `api` and `apiVoid` APIs return an `ApiResult<TResponse>` encapsulating both `response` and `errorStatus`
+ - new `api` and `apiVoid` APIs return an `ApiResult<TResponse>` encapsulating both `response` and `error`
  - old `send` API renamed to `fetch`
  - new `send` and `sendVoid` APIs can infer [IVerb Interface Markers](https://docs.servicestack.net/routing#http-verb-interface-markers)
 
@@ -38,28 +38,31 @@ to achieve the ideal typed, message-based API - so all API requests benefit from
 Typed API. 
 
 Here's a quick look at what it looks like. The example below shows how to create a 
-[C# Gist in Gislyn](https://github.com/ServiceStack/Gistlyn) 
+[C# Gist in Gistlyn](https://github.com/ServiceStack/Gistlyn) 
 after adding a [TypeScript ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
 to `gistlyn.com` and installing the [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) 
 npm package: 
 
 ```ts
 import { JsonServiceClient } from '@servicestack/client';
-import { StoreGist, GithubFile } from './Gistlyn.dtos';
+import { StoreGist, GithubFile } from './dtos';
 
-var client = new JsonServiceClient("http://gistlyn.com");
+const client = new JsonServiceClient("https://gistlyn.com");
 
-var request = new StoreGist();
-var file = new GithubFile();
-file.filename = "main.cs";
-file.content = 'var greeting = "Hi, from TypeScript!";';
-request.files = { [file.filename]: file };
+const request = new StoreGist({
+    files: { 
+        [file.filename]: new GithubFile({
+            filename: 'main.cs',
+            content: 'var greeting = "Hi, from TypeScript!";' 
+        }) 
+    }
+})
 
 try {
     const response = client.post(request); //response:StoreGistResponse
 
     console.log(`New C# Gist was created with id: ${r.gist}`);
-    location.href = `http://gistlyn.com?gist=${r.gist}`;
+    location.href = `https://gist.cafe/${r.gist}`;
 } catch(e) {
     console.log("Failed to create Gist: ", e.responseStatus);
 }
@@ -74,10 +77,8 @@ Many AutoQuery Services utilize
 to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can now be queried by specifying additional arguments with the typed Request DTO, e.g:
 
 ```ts
-const request = new FindTechStacks();
-
 //typed to QueryResponse<TechnologyStack> 
-const response = await client.get(request, { VendorName: "ServiceStack" });
+const response = await client.get(new FindTechStacks(), { VendorName: "ServiceStack" });
 ```
 
 Which will [return TechStacks](http://techstacks.io/ss_admin/autoquery/FindTechStacks) developed by ServiceStack.
@@ -144,13 +145,8 @@ Alternatively you can authenticate using userName/password credentials by
 to your remote ServiceStack Instance and sending a populated `Authenticate` Request DTO, e.g:
 
 ```ts
-let request = new Authenticate();
-request.provider = "credentials";
-request.userName = userName;
-request.password = password;
-request.rememberMe = true;
-
-const response = await client.post(request);
+const response = await client.post(new Authenticate({
+    provider: "credentials", userName, password, rememberMe: true }));
 ```
 
 This will populate the `JsonServiceClient` with 
@@ -250,11 +246,11 @@ const client = new ServerEventsClient("/", channels, {
         onUpdate: (msg:ServerEventUpdate) => {    // User channel subscription was changed
             console.log(msg.displayName + " channels subscription were updated");
         },        
-        onMessage: (msg:ServerEventMessage) => {} // Invoked for each other message
+        onMessage: (msg:ServerEventMessage) => {},// Invoked for each other message
         //... Register custom handlers
-        announce: (text:string) => {}             // Handle messages with simple argument
-        chat: (chatMsg:ChatMessage) => {}         // Handle messages with complex type argument
-        CustomMessage: (msg:CustomMessage) => {}  // Handle complex types with default selector
+        announce: (text:string) => {},            // Handle messages with simple argument
+        chat: (chatMsg:ChatMessage) => {},        // Handle messages with complex type argument
+        CustomMessage: (msg:CustomMessage) => {}, // Handle complex types with default selector
     },
     receivers: { 
         //... Register any receivers
