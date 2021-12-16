@@ -50,7 +50,7 @@ describe ('JsonServiceClient Tests', () => {
         chai.expect(api.response.results.length).to.be.greaterThan(0)
     })
 
-    it.only ('Can get multiple responses', async () => {
+    it ('Can get multiple responses', async () => {
         let requests:ApiRequest[] = [
             new dtos.AppOverview(),
             new dtos.DeleteTechnology(), // requires auth
