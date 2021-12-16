@@ -1,3 +1,8 @@
+export interface ApiRequest {
+    getTypeName(): string;
+    getMethod(): string;
+    createResponse(): any;
+}
 export interface IReturnVoid {
     createResponse(): any;
 }
@@ -346,12 +351,23 @@ export declare class JsonServiceClient {
     raiseError(res: Response, error: any): any;
     send<T>(request: IReturn<T>, args?: any, url?: string): Promise<T>;
     sendVoid(request: IReturnVoid, args?: any, url?: string): Promise<EmptyResponse>;
-    api<TResponse>(request: IReturn<TResponse>, args?: any, method?: string): Promise<ApiResult<TResponse>>;
-    apiVoid(request: IReturnVoid, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
+    api<TResponse>(request: IReturn<TResponse> | ApiRequest, args?: any, method?: string): Promise<ApiResult<TResponse>>;
+    apiVoid(request: IReturnVoid | ApiRequest, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
 }
 export declare function getMethod(request: any, method?: string): any;
 export declare function getResponseStatus(e: any): any;
-export declare class ApiResult<TResponse> {
+export interface ApiResponse {
+    response?: any;
+    error?: ResponseStatus;
+    get completed(): boolean;
+    get failed(): boolean;
+    get succeeded(): boolean;
+    get errorMessage(): string;
+    get errorCode(): string;
+    get errors(): ResponseError[];
+    get errorSummary(): string;
+}
+export declare class ApiResult<TResponse> implements ApiResponse {
     response?: TResponse;
     error?: ResponseStatus;
     constructor(init?: Partial<ApiResult<TResponse>>);

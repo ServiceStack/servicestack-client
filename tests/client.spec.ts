@@ -14,11 +14,12 @@ import {
     SendJson, SendText, SendRaw,
 } from "./dtos/test.dtos"
 import * as chai from "chai"
-import { 
+import {
     JsonServiceClient,
     ErrorResponse,
-    appendQueryString,
-} from  '../src/index'
+    appendQueryString, ApiRequest, ApiResponse,
+} from '../src/index'
+import {AppOverviewResponse} from "./dtos/techstacks.dtos";
 
 declare var process:any
 
@@ -47,6 +48,29 @@ describe ('JsonServiceClient Tests', () => {
         const api = await client.api(new dtos.GetAllTechnologies())
 
         chai.expect(api.response.results.length).to.be.greaterThan(0)
+    })
+
+    it.only ('Can get multiple responses', async () => {
+        let requests:ApiRequest[] = [
+            new dtos.AppOverview(),
+            new dtos.DeleteTechnology(), // requires auth
+            new dtos.GetAllTechnologies(),
+            new dtos.GetAllTechnologyStacks(),
+        ]
+
+        let results = await Promise.all(requests.map(async (request) =>
+            ({ request, api:await client.api(request) as ApiResponse}) ))
+
+        let failed = results.filter(x => x.api.failed)
+        console.log(`${failed.length} failed`)
+        failed.forEach(x =>
+            console.log(`    ${x.request.getTypeName()} Request Failed: ${failed.map(x => x.api.errorMessage)}`))
+
+        let succeeded = results.filter(x => x.api.succeeded)
+        console.log(`\n${succeeded.length} succeeded: ${succeeded.map(x => x.request.getTypeName()).join(', ')}`)
+
+        let r = succeeded.find(x => x.request.getTypeName() == 'AppOverview')?.api.response as AppOverviewResponse
+        if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,4).map(tech => tech.name).join(', ')}`)
     })
 
     it('Should get techstacks overview', async () => {

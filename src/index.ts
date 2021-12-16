@@ -14,6 +14,12 @@ function nodeRequire() {
 let R = nodeRequire();
 if (R) R('cross-fetch/polyfill'); //fetch polyfill only required for node.js
 
+export interface ApiRequest {
+    getTypeName(): string;
+    getMethod(): string;
+    createResponse();
+}
+
 export interface IReturnVoid {
     createResponse();
 }
@@ -1230,7 +1236,7 @@ export class JsonServiceClient {
         return this.sendRequest<EmptyResponse>({ method: getMethod(request), request, args, url });
     }
 
-    async api<TResponse>(request:IReturn<TResponse>, args?:any, method?:string) {
+    async api<TResponse>(request:IReturn<TResponse>|ApiRequest, args?:any, method?:string) {
         try {
             const result = await this.fetch<TResponse>(getMethod(request,method), request, args);
             return new ApiResult<TResponse>({ response: result });
@@ -1239,7 +1245,7 @@ export class JsonServiceClient {
         }
     }
 
-    async apiVoid(request:IReturnVoid, args?:any, method?:string) {
+    async apiVoid(request:IReturnVoid|ApiRequest, args?:any, method?:string) {
         try {
             const result = await this.fetch<EmptyResponse>(getMethod(request,method), request, args);
             return new ApiResult<EmptyResponse>({ response: result });
@@ -1262,7 +1268,20 @@ export function getResponseStatus(e:any) {
             : (e.message ? createErrorStatus(e.message, e.errorCode) : null))
 }
 
-export class ApiResult<TResponse>
+export interface ApiResponse {
+    response?: any;
+    error?: ResponseStatus;
+    get completed(): boolean;
+    get failed(): boolean;
+    get succeeded(): boolean;
+
+    get errorMessage(): string;
+    get errorCode(): string;
+    get errors(): ResponseError[];
+    get errorSummary(): string;
+}
+
+export class ApiResult<TResponse> implements ApiResponse
 {
     response?: TResponse;
     error?: ResponseStatus;

@@ -28,6 +28,69 @@ This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Template
  - old `send` API renamed to `fetch`
  - new `send` and `sendVoid` APIs can infer [IVerb Interface Markers](https://docs.servicestack.net/routing#http-verb-interface-markers)
 
+### New API
+
+The new `api` returns a typed `ApiResult<Response>` Value Result that encapsulates either a Typed Response or a 
+structured API Error populated in `ResponseStatus` allowing you to handle API responses programmatically without
+`try/catch` handling:
+
+```ts
+const api = client.api(new Hello({ name }))
+if (api.failed) {
+    console.log(`Greeting failed! ${e.errorCode}: ${e.errorMessage}`);
+    return;
+}
+
+console.log(`API Says: ${api.response.result}`) //api.succeeded
+```
+
+### Simplified API Handling
+
+Being able to treat errors as values greatly increases the ability to programmatically handle and genericise api handling
+and greatly simplifies functionality needing to handle both successful and error responses like binding to UI components.
+
+An example of this is below where we're able to concurrently fire off multiple unrelated async requests in parallel, 
+wait for them all to complete, print out the ones that have succeeded or failed then access their strong typed responses: 
+
+```ts
+import { JsonServiceClient } from "@servicestack/client"
+
+let requests:ApiRequest[] = [
+    new AppOverview(),            // GET => AppOverviewResponse
+    new DeleteTechnology(),       // DELETE => IReturnVoid (requires auth) 
+    new GetAllTechnologies(),     // GET => GetAllTechnologiesResponse
+    new GetAllTechnologyStacks(), // GET => GetAllTechnologyStacksResponse
+]
+
+let results = await Promise.all(requests.map(async (request) =>
+    ({ request, api:await client.api(request) as ApiResponse}) ))
+
+let failed = results.filter(x => x.api.failed)
+console.log(`${failed.length} failed:`)
+failed.forEach(x =>
+    console.log(`    ${x.request.getTypeName()} Request Failed: ${failed.map(x => x.api.errorMessage)}`))
+
+let succeeded = results.filter(x => x.api.succeeded)
+console.log(`\n${succeeded.length} succeeded: ${succeeded.map(x => x.request.getTypeName()).join(', ')}`)
+
+let r = succeeded.find(x => x.request.getTypeName() == 'AppOverview')?.api.response as AppOverviewResponse
+if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,4).map(tech => tech.name).join(', ')}`)
+```
+
+Output:
+
+    1 failed
+    DeleteTechnology Request Failed: Unauthorized
+    
+    3 succeeded: AppOverview, GetAllTechnologies, GetAllTechnologyStacks
+    Top 5 Technologies: Redis, MySQL, Amazon EC2, Nginx
+
+
+Being able to treat Errors as values has dramatically reduced the effort required to accomplish the same feat if needing 
+to handle errors with `try/catch`.
+
+> Requires ServiceStack v5.13+
+
 ### Ideal Typed Message-based API
 
 The TypeScript `JsonServiceClient` enables the same productive, typed API development experience available 
@@ -58,13 +121,12 @@ const request = new StoreGist({
     }
 })
 
-try {
-    const response = client.post(request); //response:StoreGistResponse
-
+const api = client.api(request); //response:StoreGistResponse
+if (api.succeeded) {
     console.log(`New C# Gist was created with id: ${r.gist}`);
     location.href = `https://gist.cafe/${r.gist}`;
-} catch(e) {
-    console.log("Failed to create Gist: ", e.responseStatus);
+} else {
+    console.log("Failed to create Gist: ", e.errorMessage);
 }
 ```
 
