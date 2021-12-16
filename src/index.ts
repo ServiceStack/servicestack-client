@@ -1270,8 +1270,9 @@ export class ApiResult<TResponse>
     public constructor(init?:Partial<ApiResult<TResponse>>) { Object.assign(this, init); }
 
     get completed() { return this.completed != null || this.error != null; }
-    get isError() { return this.error?.errorCode != null || this.error?.message != null; }
-    get isSuccess() { return !this.isError && this.response != null; }
+    get failed() { return this.error?.errorCode != null || this.error?.message != null; }
+    get succeeded() { return !this.failed && this.response != null; }
+
     get errorMessage() { return this.error?.message; }
     get errorCode() { return this.error?.errorCode; }
     get errors() { return this.error?.errors ?? []; }
@@ -1285,7 +1286,7 @@ export class ApiResult<TResponse>
     hasFieldError(fieldName: string) { return this.fieldError(fieldName) != null; }
 
     showSummary(exceptFields: string[] = []) {
-        if (!this.isError)
+        if (!this.failed)
             return false;
         return exceptFields.every(x => !this.hasFieldError(x));
     }

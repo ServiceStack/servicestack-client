@@ -34,7 +34,7 @@ const clearSession = async (client:JsonServiceClient) => {
     await client.post(logout)
 }
 
-describe.only ('JsonServiceClient Tests', () => {
+describe ('JsonServiceClient Tests', () => {
     let client: JsonServiceClient
     let testClient: JsonServiceClient
 

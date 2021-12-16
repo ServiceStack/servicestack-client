@@ -1098,7 +1098,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             configurable: true
         });
         Object.defineProperty(ApiResult.prototype, "isSuccess", {
-            get: function () { return !this.isError && this.response != null; },
+            get: function () { return !this.failed && this.response != null; },
             enumerable: false,
             configurable: true
         });
@@ -1132,7 +1132,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         ApiResult.prototype.showSummary = function (exceptFields) {
             var _this = this;
             if (exceptFields === void 0) { exceptFields = []; }
-            if (!this.isError)
+            if (!this.failed)
                 return false;
             return exceptFields.every(function (x) { return !_this.hasFieldError(x); });
         };

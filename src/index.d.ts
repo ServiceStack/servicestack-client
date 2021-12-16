@@ -356,8 +356,8 @@ export declare class ApiResult<TResponse> {
     error?: ResponseStatus;
     constructor(init?: Partial<ApiResult<TResponse>>);
     get completed(): boolean;
-    get isError(): boolean;
-    get isSuccess(): boolean;
+    get failed(): boolean;
+    get succeeded(): boolean;
     get errorMessage(): string;
     get errorCode(): string;
     get errors(): ResponseError[];
