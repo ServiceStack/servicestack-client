@@ -1084,12 +1084,12 @@ var ApiResult = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(ApiResult.prototype, "isError", {
+    Object.defineProperty(ApiResult.prototype, "failed", {
         get: function () { var _a, _b; return ((_a = this.error) === null || _a === void 0 ? void 0 : _a.errorCode) != null || ((_b = this.error) === null || _b === void 0 ? void 0 : _b.message) != null; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(ApiResult.prototype, "isSuccess", {
+    Object.defineProperty(ApiResult.prototype, "succeeded", {
         get: function () { return !this.failed && this.response != null; },
         enumerable: false,
         configurable: true
