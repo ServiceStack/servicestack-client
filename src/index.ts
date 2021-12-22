@@ -76,6 +76,132 @@ export class GetNavItemsResponse {
     public responseStatus: ResponseStatus;
     public constructor(init?:Partial<GetNavItemsResponse>) { (Object as any).assign(this, init); }
 }
+export class MetadataTypesConfig
+{
+    public baseUrl?: string;
+    public defaultNamespaces?: string[];
+    public defaultImports?: string[];
+    public includeTypes?: string[];
+    public excludeTypes?: string[];
+    public treatTypesAsStrings?: string[];
+    public globalNamespace?: string;
+    public ignoreTypes?: string[];
+    public exportTypes?: string[];
+    public exportAttributes?: string[];
+    public ignoreTypesInNamespaces?: string[];
+    public constructor(init?: Partial<MetadataTypesConfig>) { (Object as any).assign(this, init); }
+}
+export class MetadataRoute
+{
+    public path?: string;
+    public verbs?: string;
+    public notes?: string;
+    public summary?: string;
+    public constructor(init?: Partial<MetadataRoute>) { (Object as any).assign(this, init); }
+}
+export class MetadataOperationType
+{
+    public request?: MetadataType;
+    public response?: MetadataType;
+    public actions?: string[];
+    public returnsVoid?: boolean;
+    public returnType?: MetadataTypeName;
+    public routes?: MetadataRoute[];
+    public dataModel?: MetadataTypeName;
+    public viewModel?: MetadataTypeName;
+    public requiresAuth?: boolean;
+    public requiredRoles?: string[];
+    public requiresAnyRole?: string[];
+    public requiredPermissions?: string[];
+    public requiresAnyPermission?: string[];
+    public tags?: string[];
+    public constructor(init?: Partial<MetadataOperationType>) { (Object as any).assign(this, init); }
+}
+export class MetadataTypes
+{
+    public config?: MetadataTypesConfig;
+    public namespaces?: string[];
+    public types?: MetadataType[];
+    public operations?: MetadataOperationType[];
+    public constructor(init?: Partial<MetadataTypes>) { (Object as any).assign(this, init); }
+}
+export class MetadataTypeName
+{
+    public name?: string;
+    public namespace?: string;
+    public genericArgs?: string[];
+    public constructor(init?: Partial<MetadataTypeName>) { (Object as any).assign(this, init); }
+}
+export class MetadataDataContract
+{
+    public name?: string;
+    public namespace?: string;
+    public constructor(init?: Partial<MetadataDataContract>) { (Object as any).assign(this, init); }
+}
+export class MetadataDataMember
+{
+    public name?: string;
+    public order?: number;
+    public isRequired?: boolean;
+    public emitDefaultValue?: boolean;
+    public constructor(init?: Partial<MetadataDataMember>) { (Object as any).assign(this, init); }
+}
+export class MetadataAttribute
+{
+    public name?: string;
+    public constructorArgs?: MetadataPropertyType[];
+    public args?: MetadataPropertyType[];
+    public constructor(init?: Partial<MetadataAttribute>) { (Object as any).assign(this, init); }
+}
+export class MetadataPropertyType
+{
+    public name?: string;
+    public type?: string;
+    public isValueType?: boolean;
+    public isSystemType?: boolean;
+    public isEnum?: boolean;
+    public isPrimaryKey?: boolean;
+    public typeNamespace?: string;
+    public genericArgs?: string[];
+    public value?: string;
+    public description?: string;
+    public dataMember?: MetadataDataMember;
+    public readOnly?: boolean;
+    public paramType?: string;
+    public displayType?: string;
+    public isRequired?: boolean;
+    public allowableValues?: string[];
+    public allowableMin?: number;
+    public allowableMax?: number;
+    public attributes?: MetadataAttribute[];
+    public constructor(init?: Partial<MetadataPropertyType>) { (Object as any).assign(this, init); }
+}
+export class MetadataType
+{
+    public name?: string;
+    public namespace?: string;
+    public genericArgs?: string[];
+    public inherits?: MetadataTypeName;
+    public implements?: MetadataTypeName[];
+    public displayType?: string;
+    public description?: string;
+    public isNested?: boolean;
+    public isEnum?: boolean;
+    public isEnumInt?: boolean;
+    public isInterface?: boolean;
+    public isAbstract?: boolean;
+    public dataContract?: MetadataDataContract;
+    public properties?: MetadataPropertyType[];
+    public attributes?: MetadataAttribute[];
+    public innerTypes?: MetadataTypeName[];
+    public enumNames?: string[];
+    public enumValues?: string[];
+    public enumMemberValues?: string[];
+    public enumDescriptions?: string[];
+    public meta?: { [index: string]: string; };
+    public constructor(init?: Partial<MetadataType>) { (Object as any).assign(this, init); }
+}
+
 
 export type ErrorResponseType = null | "RefreshTokenException";
 

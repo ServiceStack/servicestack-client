@@ -69,6 +69,123 @@ export declare class GetNavItemsResponse {
     responseStatus: ResponseStatus;
     constructor(init?: Partial<GetNavItemsResponse>);
 }
+export declare class MetadataTypesConfig {
+    baseUrl?: string;
+    defaultNamespaces?: string[];
+    defaultImports?: string[];
+    includeTypes?: string[];
+    excludeTypes?: string[];
+    treatTypesAsStrings?: string[];
+    globalNamespace?: string;
+    ignoreTypes?: string[];
+    exportTypes?: string[];
+    exportAttributes?: string[];
+    ignoreTypesInNamespaces?: string[];
+    constructor(init?: Partial<MetadataTypesConfig>);
+}
+export declare class MetadataRoute {
+    path?: string;
+    verbs?: string;
+    notes?: string;
+    summary?: string;
+    constructor(init?: Partial<MetadataRoute>);
+}
+export declare class MetadataOperationType {
+    request?: MetadataType;
+    response?: MetadataType;
+    actions?: string[];
+    returnsVoid?: boolean;
+    returnType?: MetadataTypeName;
+    routes?: MetadataRoute[];
+    dataModel?: MetadataTypeName;
+    viewModel?: MetadataTypeName;
+    requiresAuth?: boolean;
+    requiredRoles?: string[];
+    requiresAnyRole?: string[];
+    requiredPermissions?: string[];
+    requiresAnyPermission?: string[];
+    tags?: string[];
+    constructor(init?: Partial<MetadataOperationType>);
+}
+export declare class MetadataTypes {
+    config?: MetadataTypesConfig;
+    namespaces?: string[];
+    types?: MetadataType[];
+    operations?: MetadataOperationType[];
+    constructor(init?: Partial<MetadataTypes>);
+}
+export declare class MetadataTypeName {
+    name?: string;
+    namespace?: string;
+    genericArgs?: string[];
+    constructor(init?: Partial<MetadataTypeName>);
+}
+export declare class MetadataDataContract {
+    name?: string;
+    namespace?: string;
+    constructor(init?: Partial<MetadataDataContract>);
+}
+export declare class MetadataDataMember {
+    name?: string;
+    order?: number;
+    isRequired?: boolean;
+    emitDefaultValue?: boolean;
+    constructor(init?: Partial<MetadataDataMember>);
+}
+export declare class MetadataAttribute {
+    name?: string;
+    constructorArgs?: MetadataPropertyType[];
+    args?: MetadataPropertyType[];
+    constructor(init?: Partial<MetadataAttribute>);
+}
+export declare class MetadataPropertyType {
+    name?: string;
+    type?: string;
+    isValueType?: boolean;
+    isSystemType?: boolean;
+    isEnum?: boolean;
+    isPrimaryKey?: boolean;
+    typeNamespace?: string;
+    genericArgs?: string[];
+    value?: string;
+    description?: string;
+    dataMember?: MetadataDataMember;
+    readOnly?: boolean;
+    paramType?: string;
+    displayType?: string;
+    isRequired?: boolean;
+    allowableValues?: string[];
+    allowableMin?: number;
+    allowableMax?: number;
+    attributes?: MetadataAttribute[];
+    constructor(init?: Partial<MetadataPropertyType>);
+}
+export declare class MetadataType {
+    name?: string;
+    namespace?: string;
+    genericArgs?: string[];
+    inherits?: MetadataTypeName;
+    implements?: MetadataTypeName[];
+    displayType?: string;
+    description?: string;
+    isNested?: boolean;
+    isEnum?: boolean;
+    isEnumInt?: boolean;
+    isInterface?: boolean;
+    isAbstract?: boolean;
+    dataContract?: MetadataDataContract;
+    properties?: MetadataPropertyType[];
+    attributes?: MetadataAttribute[];
+    innerTypes?: MetadataTypeName[];
+    enumNames?: string[];
+    enumValues?: string[];
+    enumMemberValues?: string[];
+    enumDescriptions?: string[];
+    meta?: {
+        [index: string]: string;
+    };
+    constructor(init?: Partial<MetadataType>);
+}
 export declare type ErrorResponseType = null | "RefreshTokenException";
 export interface IAuthSession {
     userName: string;
