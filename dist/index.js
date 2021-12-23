@@ -1245,7 +1245,6 @@ function createErrorResponse(errorCode, message, type) {
     error.responseStatus.message = message;
     return error;
 }
-;
 function createError(errorCode, message, fieldName) {
     return new ErrorResponse({
         responseStatus: new ResponseStatus({
@@ -2270,6 +2269,10 @@ function omit(o, keys) {
     return to;
 }
 exports.omit = omit;
+function apply(x, fn) {
+    fn(x);
+    return x;
+}
 /* NAV */
 function activeClassNav(x, activePath) {
     return x.href != null && (x.exact || activePath.length <= 1

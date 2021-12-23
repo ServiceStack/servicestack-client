@@ -1476,7 +1476,7 @@ function createErrorResponse(errorCode: string|number, message: string, type:Err
     error.responseStatus.errorCode = errorCode && errorCode.toString();
     error.responseStatus.message = message;
     return error;
-};
+}
 
 export function createError(errorCode:string, message:string, fieldName?:string) {
     return new ErrorResponse({ 
@@ -2511,6 +2511,11 @@ export function omit(o:any, keys:string[]) {
         }
     }
     return to;
+}
+
+function apply<T>(x:T, fn:(x:T) => void) {
+    fn(x)
+    return x
 }
 
 /* NAV */
