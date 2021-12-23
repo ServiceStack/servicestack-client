@@ -597,6 +597,7 @@ export declare function trimEnd(s: string, c: string): string;
 export declare function safeVarName(s: string): string;
 export declare function pick(o: any, keys: string[]): {};
 export declare function omit(o: any, keys: string[]): {};
+export declare function apply<T>(x: T, fn: (x: T) => void): T;
 export declare function activeClassNav(x: NavItem, activePath: string): string;
 export declare function activeClass(href: string | null, activePath: string, exact?: boolean): string;
 export declare const BootstrapColors: string[];
