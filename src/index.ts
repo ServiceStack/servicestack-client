@@ -1374,7 +1374,7 @@ export class JsonServiceClient {
     async apiVoid(request:IReturnVoid|ApiRequest, args?:any, method?:string) {
         try {
             const result = await this.fetch<EmptyResponse>(getMethod(request,method), request, args);
-            return new ApiResult<EmptyResponse>({ response: result });
+            return new ApiResult<EmptyResponse>({ response: result ?? new EmptyResponse() });
         } catch(e) {
             return new ApiResult<EmptyResponse>({ error: getResponseStatus(e) });
         }
@@ -1414,7 +1414,7 @@ export class ApiResult<TResponse> implements ApiResponse
     
     public constructor(init?:Partial<ApiResult<TResponse>>) { Object.assign(this, init); }
 
-    get completed() { return this.completed != null || this.error != null; }
+    get completed() { return this.response != null || this.error != null; }
     get failed() { return this.error?.errorCode != null || this.error?.message != null; }
     get succeeded() { return !this.failed && this.response != null; }
 

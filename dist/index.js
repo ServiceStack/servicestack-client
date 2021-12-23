@@ -1120,7 +1120,7 @@ var JsonServiceClient = /** @class */ (function () {
                         return [4 /*yield*/, this.fetch(getMethod(request, method), request, args)];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, new ApiResult({ response: result })];
+                        return [2 /*return*/, new ApiResult({ response: result !== null && result !== void 0 ? result : new EmptyResponse() })];
                     case 2:
                         e_2 = _a.sent();
                         return [2 /*return*/, new ApiResult({ error: getResponseStatus(e_2) })];
@@ -1150,7 +1150,7 @@ var ApiResult = /** @class */ (function () {
         Object.assign(this, init);
     }
     Object.defineProperty(ApiResult.prototype, "completed", {
-        get: function () { return this.completed != null || this.error != null; },
+        get: function () { return this.response != null || this.error != null; },
         enumerable: false,
         configurable: true
     });

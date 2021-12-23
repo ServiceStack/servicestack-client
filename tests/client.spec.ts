@@ -44,10 +44,13 @@ describe ('JsonServiceClient Tests', () => {
         testClient = new JsonServiceClient(TEST_URL)
     })
 
-    it('Should get techs response', async () => {
+    it ('Should get techs response', async () => {
         const api = await client.api(new dtos.GetAllTechnologies())
 
         chai.expect(api.response.results.length).to.be.greaterThan(0)
+        chai.expect(api.completed).eq(true)
+        chai.expect(api.succeeded).eq(true)
+        chai.expect(api.failed).eq(false)
     })
 
     it ('Can get multiple responses', async () => {
@@ -242,11 +245,17 @@ describe ('JsonServiceClient Tests', () => {
     })
 
     it ('Can GET IReturnVoid requests', async () => {
-        await testClient.apiVoid(new HelloReturnVoid({ id:1 }), 'GET')
+        let api = await testClient.apiVoid(new HelloReturnVoid({ id:1 }), 'GET')
+        chai.expect(api.completed).eq(true)
+        chai.expect(api.succeeded).eq(true)
+        chai.expect(api.failed).eq(false)
     })
 
     it ('Can POST IReturnVoid requests', async () => {
-        await testClient.apiVoid(new HelloReturnVoid({ id:1 }))
+        let api = await testClient.apiVoid(new HelloReturnVoid({ id:1 }))
+        chai.expect(api.completed).eq(true)
+        chai.expect(api.succeeded).eq(true)
+        chai.expect(api.failed).eq(false)
     })
 
     it ('Can handle Validation Errors with Camel Casing', async () => {
