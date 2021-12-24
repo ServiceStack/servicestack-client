@@ -763,7 +763,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             this.replyBaseUrl = combinePaths(baseUrl, "json", "reply") + "/";
             this.oneWayBaseUrl = combinePaths(baseUrl, "json", "oneway") + "/";
             this.mode = "cors";
-            this.credentials = 'include';
+            this.credentials = "include";
             this.headers = new Headers();
             this.headers.set("Content-Type", "application/json");
             this.manageCookies = typeof document == "undefined"; //because node-fetch doesn't
@@ -774,17 +774,28 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             this.password = password;
         };
         JsonServiceClient.prototype.useBasePath = function (path) {
-            if (!path) {
-                this.replyBaseUrl = combinePaths(this.baseUrl, "json", "reply") + "/";
-                this.oneWayBaseUrl = combinePaths(this.baseUrl, "json", "oneway") + "/";
-            }
-            else {
-                if (path[0] != '/') {
-                    path = '/' + path;
+            this.basePath = path;
+            return this;
+        };
+        Object.defineProperty(JsonServiceClient.prototype, "basePath", {
+            set: function (path) {
+                if (!path) {
+                    this.replyBaseUrl = combinePaths(this.baseUrl, "json", "reply") + "/";
+                    this.oneWayBaseUrl = combinePaths(this.baseUrl, "json", "oneway") + "/";
                 }
-                this.replyBaseUrl = combinePaths(this.baseUrl, path) + "/";
-                this.oneWayBaseUrl = combinePaths(this.baseUrl, path) + "/";
-            }
+                else {
+                    if (path[0] != '/') {
+                        path = '/' + path;
+                    }
+                    this.replyBaseUrl = combinePaths(this.baseUrl, path) + "/";
+                    this.oneWayBaseUrl = combinePaths(this.baseUrl, path) + "/";
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        JsonServiceClient.prototype.apply = function (f) {
+            f(this);
             return this;
         };
         JsonServiceClient.prototype.get = function (request, args) {
@@ -1245,12 +1256,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.isFormData = isFormData;
     function createErrorResponse(errorCode, message, type) {
         if (type === void 0) { type = null; }
-        var error = new ErrorResponse();
-        if (type != null)
-            error.type = type;
-        error.responseStatus = new ResponseStatus();
-        error.responseStatus.errorCode = errorCode && errorCode.toString();
-        error.responseStatus.message = message;
+        var error = apply(new ErrorResponse(), function (e) {
+            if (type != null)
+                e.type = type;
+            e.responseStatus = apply(new ResponseStatus(), function (status) {
+                status.errorCode = errorCode && errorCode.toString();
+                status.message = message;
+            });
+        });
         return error;
     }
     function createError(errorCode, message, fieldName) {
@@ -1958,8 +1971,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             var htmlSummary_1 = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
             if (!bs4) {
                 $(".error-summary").forEach(function (el) {
-                    el.innerHTML = htmlSummary_1;
-                    el.style.display = 'block';
+                    el.innerHTML = htmlSummary_1(el).style.display = 'block';
                 });
             }
             else {
@@ -2326,7 +2338,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return null;
     }
     exports.btnSizeClass = btnSizeClass;
-    ;
     function btnClasses(props) {
         var to = [];
         var color = btnColorClass(props);

@@ -138,15 +138,15 @@ function assertAllCollectionTypes(dto: AllCollectionTypes) {
     expect(dto.pocoList[0].name).equals("pocoList");
 
     expect(Object.keys(dto.pocoLookup).length).equals(1);
-    var pocoLookupValues = dto.pocoLookup["A"];
+    let pocoLookupValues = dto.pocoLookup["A"];
     expect(pocoLookupValues.length).equals(2);
     expect(pocoLookupValues[0].name).equals("B");
     expect(pocoLookupValues[1].name).equals("C");
 
     expect(Object.keys(dto.pocoLookupMap).length).equals(1);
-    var pocoLookupMapValues = dto.pocoLookupMap["A"];
+    let pocoLookupMapValues = dto.pocoLookupMap["A"];
     expect(Object.keys(pocoLookupMapValues).length).equals(1);
-    var pocoLookupMapAList = pocoLookupMapValues[0];
+    let pocoLookupMapAList = pocoLookupMapValues[0];
     expect(Object.keys(pocoLookupMapAList).length).equals(2);
     expect(pocoLookupMapAList["B"].name).equals("C");
     expect(pocoLookupMapAList["D"].name).equals("E");
@@ -160,16 +160,16 @@ function createTestClient() {
 describe ('Serialization Tests', () => {
 
     it ('Can POST HelloAllTypes', async () => {
-        var client = createTestClient();
-        var request = createHelloAllTypes();
-        var response = await client.post(request);
+        let client = createTestClient();
+        let request = createHelloAllTypes();
+        let response = await client.post(request);
         assertHelloAllTypesResponse(response);
     });
 
     it ('Can PUT HelloAllTypes', async () => {
-        var client = createTestClient();
-        var request = createHelloAllTypes();
-        var response = await client.put(request);
+        let client = createTestClient();
+        let request = createHelloAllTypes();
+        let response = await client.put(request);
         assertHelloAllTypesResponse(response);
     });
 

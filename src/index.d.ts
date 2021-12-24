@@ -440,6 +440,8 @@ export declare class JsonServiceClient {
     constructor(baseUrl?: string);
     setCredentials(userName: string, password: string): void;
     useBasePath(path?: string): this;
+    set basePath(path: string | null);
+    apply(f: (client: JsonServiceClient) => void): this;
     get<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     delete<T>(request: IReturn<T> | string, args?: any): Promise<T>;
     post<T>(request: IReturn<T>, args?: any): Promise<T>;
