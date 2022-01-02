@@ -67,6 +67,7 @@ export class GetNavItems {
     public constructor(init?:Partial<GetNavItems>) { (Object as any).assign(this, init) }
     public createResponse() { return new GetNavItemsResponse() }
     public getTypeName() { return 'GetNavItems' }
+    public getMethod() { return 'GET' }
 }
 export class GetNavItemsResponse {
     public baseUrl: string
@@ -917,7 +918,8 @@ class GetAccessToken implements IReturn<GetAccessTokenResponse> {
     public refreshToken: string
     public useTokenCookie?: boolean
     public createResponse() { return new GetAccessTokenResponse() }
-    public getTypeName() { return "GetAccessToken" }
+    public getTypeName() { return 'GetAccessToken' }
+    public getMethod() { return 'POST' }
 }
 export class GetAccessTokenResponse {
     accessToken: string
@@ -1165,9 +1167,18 @@ export class JsonServiceClient {
         return res.json()
     }
 
+    private applyResponseFilters(res:Response) {
+        if (this.responseFilter != null)
+            this.responseFilter(res)
+        if (JsonServiceClient.globalResponseFilter != null)
+            JsonServiceClient.globalResponseFilter(res)
+    }
+
     private createResponse<T>(res:Response, request:any|null) {
-        if (!res.ok)
+        if (!res.ok) {
+            this.applyResponseFilters(res)
             throw res
+        }
 
         if (this.manageCookies) {
             let setCookies = []
@@ -1195,10 +1206,7 @@ export class JsonServiceClient {
                 }
         })
 
-        if (this.responseFilter != null)
-            this.responseFilter(res)
-        if (JsonServiceClient.globalResponseFilter != null)
-            JsonServiceClient.globalResponseFilter(res)
+        this.applyResponseFilters(res)
 
         let x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
