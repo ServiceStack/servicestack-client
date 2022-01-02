@@ -56,6 +56,7 @@ export declare class GetNavItems {
     constructor(init?: Partial<GetNavItems>);
     createResponse(): GetNavItemsResponse;
     getTypeName(): string;
+    getMethod(): string;
 }
 export declare class GetNavItemsResponse {
     baseUrl: string;
@@ -462,6 +463,7 @@ export declare class JsonServiceClient {
     deleteCookie(name: string): void;
     private createRequest;
     private json;
+    private applyResponseFilters;
     private createResponse;
     private handleError;
     fetch<T>(method: string, request: any | null, args?: any, url?: string): Promise<T>;

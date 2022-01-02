@@ -108,6 +108,7 @@ var GetNavItems = /** @class */ (function () {
     }
     GetNavItems.prototype.createResponse = function () { return new GetNavItemsResponse(); };
     GetNavItems.prototype.getTypeName = function () { return 'GetNavItems'; };
+    GetNavItems.prototype.getMethod = function () { return 'GET'; };
     return GetNavItems;
 }());
 exports.GetNavItems = GetNavItems;
@@ -739,7 +740,8 @@ var GetAccessToken = /** @class */ (function () {
         Object.assign(this, init);
     }
     GetAccessToken.prototype.createResponse = function () { return new GetAccessTokenResponse(); };
-    GetAccessToken.prototype.getTypeName = function () { return "GetAccessToken"; };
+    GetAccessToken.prototype.getTypeName = function () { return 'GetAccessToken'; };
+    GetAccessToken.prototype.getMethod = function () { return 'POST'; };
     return GetAccessToken;
 }());
 var GetAccessTokenResponse = /** @class */ (function () {
@@ -924,10 +926,18 @@ var JsonServiceClient = /** @class */ (function () {
             return this.parseJson(res);
         return res.json();
     };
+    JsonServiceClient.prototype.applyResponseFilters = function (res) {
+        if (this.responseFilter != null)
+            this.responseFilter(res);
+        if (JsonServiceClient.globalResponseFilter != null)
+            JsonServiceClient.globalResponseFilter(res);
+    };
     JsonServiceClient.prototype.createResponse = function (res, request) {
         var _this = this;
-        if (!res.ok)
+        if (!res.ok) {
+            this.applyResponseFilters(res);
             throw res;
+        }
         if (this.manageCookies) {
             var setCookies_1 = [];
             res.headers.forEach(function (v, k) {
@@ -952,10 +962,7 @@ var JsonServiceClient = /** @class */ (function () {
                     break;
             }
         });
-        if (this.responseFilter != null)
-            this.responseFilter(res);
-        if (JsonServiceClient.globalResponseFilter != null)
-            JsonServiceClient.globalResponseFilter(res);
+        this.applyResponseFilters(res);
         var x = request && typeof request != "string" && typeof request.createResponse == 'function'
             ? request.createResponse()
             : null;
