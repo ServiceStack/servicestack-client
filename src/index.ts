@@ -3034,6 +3034,28 @@ export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
     }
     return str
 }
+export function EventBus() {
+    let subscriptions = {}
+    this.subscribe = function(type, callback) {
+        let id = Symbol('id')
+        if (!subscriptions[type]) subscriptions[type] = {}
+        subscriptions[type][id] = callback
+        return {
+            unsubscribe: function() {
+                delete subscriptions[type][id]
+                if (Object.getOwnPropertySymbols(subscriptions[type]).length === 0) {
+                    delete subscriptions[type]
+                }
+            }
+        }
+    }
+    this.publish = function(eventType, arg) {
+        if (!subscriptions[eventType]) return
+        Object.getOwnPropertySymbols(subscriptions[eventType])
+            .forEach(key => subscriptions[eventType][key](arg))
+    }
+}
+
 
 export class Inspect {
     static vars(obj:any) {        

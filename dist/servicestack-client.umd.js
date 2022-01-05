@@ -57,7 +57,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Inspect = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
+    exports.Inspect = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
     function nodeRequire() {
         //node require(), using dynamic access to fix web ng aot build
         try {
@@ -2855,6 +2855,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return str;
     }
     exports.alignAuto = alignAuto;
+    function EventBus() {
+        var subscriptions = {};
+        this.subscribe = function (type, callback) {
+            var id = Symbol('id');
+            if (!subscriptions[type])
+                subscriptions[type] = {};
+            subscriptions[type][id] = callback;
+            return {
+                unsubscribe: function () {
+                    delete subscriptions[type][id];
+                    if (Object.getOwnPropertySymbols(subscriptions[type]).length === 0) {
+                        delete subscriptions[type];
+                    }
+                }
+            };
+        };
+        this.publish = function (eventType, arg) {
+            if (!subscriptions[eventType])
+                return;
+            Object.getOwnPropertySymbols(subscriptions[eventType])
+                .forEach(function (key) { return subscriptions[eventType][key](arg); });
+        };
+    }
+    exports.EventBus = EventBus;
     var Inspect = /** @class */ (function () {
         function Inspect() {
         }
