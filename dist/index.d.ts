@@ -425,6 +425,7 @@ export declare class JsonServiceClient {
     refreshToken: string;
     refreshTokenUri: string;
     useTokenCookie: boolean;
+    enableAutoRefreshToken: boolean;
     requestFilter: (req: IRequestInit) => void;
     static globalRequestFilter: (req: IRequestInit) => void;
     responseFilter: (res: Response) => void;

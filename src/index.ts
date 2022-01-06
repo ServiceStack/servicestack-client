@@ -949,6 +949,7 @@ export class JsonServiceClient {
     refreshToken: string
     refreshTokenUri: string
     useTokenCookie: boolean
+    enableAutoRefreshToken: boolean
     requestFilter: (req:IRequestInit) => void
     static globalRequestFilter: (req:IRequestInit) => void
     responseFilter: (res:Response) => void
@@ -973,6 +974,7 @@ export class JsonServiceClient {
         this.headers.set("Content-Type", "application/json")
         this.manageCookies = typeof document == "undefined" //because node-fetch doesn't
         this.cookies = {}
+        this.enableAutoRefreshToken = true
     }
 
     setCredentials(userName:string, password:string) {
@@ -1325,7 +1327,7 @@ export class JsonServiceClient {
             .catch(res => {
 
                 if (res.status === 401) {
-                    if (this.refreshToken || this.useTokenCookie || this.cookies['ss-reftok'] != null) {
+                    if (this.enableAutoRefreshToken && (this.refreshToken || this.useTokenCookie || this.cookies['ss-reftok'] != null)) {
                         const jwtReq = new GetAccessToken({ refreshToken:this.refreshToken, useTokenCookie: !!this.useTokenCookie })
                         let url = this.refreshTokenUri || this.createUrlFromDto(HttpMethods.Post, jwtReq)
 

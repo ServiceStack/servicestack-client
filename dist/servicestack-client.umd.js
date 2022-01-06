@@ -770,6 +770,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             this.headers.set("Content-Type", "application/json");
             this.manageCookies = typeof document == "undefined"; //because node-fetch doesn't
             this.cookies = {};
+            this.enableAutoRefreshToken = true;
         }
         JsonServiceClient.prototype.setCredentials = function (userName, password) {
             this.userName = userName;
@@ -1068,7 +1069,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             })
                 .catch(function (res) {
                 if (res.status === 401) {
-                    if (_this.refreshToken || _this.useTokenCookie || _this.cookies['ss-reftok'] != null) {
+                    if (_this.enableAutoRefreshToken && (_this.refreshToken || _this.useTokenCookie || _this.cookies['ss-reftok'] != null)) {
                         var jwtReq_1 = new GetAccessToken({ refreshToken: _this.refreshToken, useTokenCookie: !!_this.useTokenCookie });
                         var url = _this.refreshTokenUri || _this.createUrlFromDto(HttpMethods.Post, jwtReq_1);
                         if (_this.useTokenCookie) {
