@@ -1928,8 +1928,9 @@ export function errorResponse(fieldName:string) {
         : undefined
 }
 
+export function isDate(d) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d) }
 export function toDate(s: string|any) { return !s ? null 
-    : typeof (s as Date).getMonth === 'function' 
+    : typeof isDate(s)
         ? s as Date 
         : s[0] == '/' 
             ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) 
@@ -2537,6 +2538,33 @@ export function apply<T>(x:T, fn:(x:T) => void) {
     fn(x)
     return x
 }
+export function resolve<T>(o:T, f?:(x:T) => any) {
+    let ret = typeof o == 'function' ? o() : o
+    return typeof f == 'function' ? f(ret) : ret
+}
+export function mapGet(o:any, name:string) {
+    if (!o || !name) return null
+    return o[name] || (typeof o == 'object'
+        ? Object.keys(o).reduce((acc,x) => { acc[x.toLowerCase()] = o[x]; return acc }, {})[name.toLowerCase()]
+        : null) || null
+}
+export function apiValue(o:any) {
+    if (o == null) return ''
+    if (typeof o == 'string')
+        return o.substring(0, 6) === '/Date('
+            ? toDate(o)
+            : o.trim()
+    return o
+}
+export function apiValueFmt(o:any) {
+    let ret = apiValue(o)
+    return (ret != null
+        ? isDate(ret)
+            ? dateFmt(ret)
+            : ret
+        : null) || ''
+}
+
 
 /* NAV */
 
