@@ -2544,9 +2544,14 @@ export function resolve<T>(o:T, f?:(x:T) => any) {
 }
 export function mapGet(o:any, name:string) {
     if (!o || !name) return null
-    return o[name] || (typeof o == 'object'
-        ? Object.keys(o).reduce((acc,x) => { acc[x.toLowerCase()] = o[x]; return acc }, {})[name.toLowerCase()]
-        : null) || null
+    let ret = o[name]
+    if (ret) return ret
+    if (typeof o == 'object') {
+        let nameLower = name.toLowerCase()
+        let match = Object.keys(o).find(k => k.toLowerCase() === nameLower)
+        return match ? o[match] : null
+    }
+    return null
 }
 export function apiValue(o:any) {
     if (o == null) return ''
