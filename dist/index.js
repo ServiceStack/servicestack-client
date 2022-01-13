@@ -1706,7 +1706,7 @@ function isDate(d) { return d && Object.prototype.toString.call(d) === "[object 
 exports.isDate = isDate;
 function toDate(s) {
     return !s ? null
-        : typeof isDate(s)
+        : isDate(s)
             ? s
             : s[0] == '/'
                 ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]))

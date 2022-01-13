@@ -1930,7 +1930,7 @@ export function errorResponse(fieldName:string) {
 
 export function isDate(d) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d) }
 export function toDate(s: string|any) { return !s ? null 
-    : typeof isDate(s)
+    : isDate(s)
         ? s as Date 
         : s[0] == '/' 
             ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1])) 

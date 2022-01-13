@@ -1714,7 +1714,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.isDate = isDate;
     function toDate(s) {
         return !s ? null
-            : typeof isDate(s)
+            : isDate(s)
                 ? s
                 : s[0] == '/'
                     ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]))
