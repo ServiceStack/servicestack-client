@@ -559,6 +559,10 @@ export interface ICreateElementOptions {
     insertAfter?: Element | null;
 }
 export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
+export declare function $1(sel: string | any, el?: HTMLElement): any;
+export declare function $$(sel: string | any, el?: HTMLElement): any;
+export declare function on(sel: any, handlers: any): void;
+export declare function humanify(id: any): any;
 export declare function bootstrap(el?: Element): void;
 export interface IBindHandlersOptions {
     events: string[];
@@ -604,6 +608,7 @@ export declare function safeVarName(s: string): string;
 export declare function pick(o: any, keys: string[]): {};
 export declare function omit(o: any, keys: string[]): {};
 export declare function apply<T>(x: T, fn: (x: T) => void): T;
+export declare function each(xs: any[], f: (acc: any, x: any) => void, o?: any): any;
 export declare function resolve<T>(o: T, f?: (x: T) => any): any;
 export declare function mapGet(o: any, name: string): any;
 export declare function apiValue(o: any): any;

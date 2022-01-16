@@ -2011,7 +2011,30 @@ function remClass(el:Element|HTMLElement|null, cls:string) { return !el ? null
             ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ') 
             : null
 }
-  
+
+export function $1(sel:string|any, el?:HTMLElement) {
+    return typeof sel === "string" ? (el || document).querySelector(sel) : sel || null
+}
+export function $$(sel:string|any, el?:HTMLElement) {
+    return typeof sel === "string"
+        ? Array.prototype.slice.call((el || document).querySelectorAll(sel))
+        : Array.isArray(sel) ? sel : [sel]
+}
+export function on(sel, handlers) {
+    $$(sel).forEach(e => {
+        Object.keys(handlers).forEach(function (evt) {
+            let fn = handlers[evt]
+            if (typeof evt === 'string' && typeof fn === 'function') {
+                e.addEventListener(evt, fn.bind(e))
+            }
+        })
+    })
+}
+
+export function humanify(id) {
+    return humanize(toPascalCase(id))
+}
+
 // init generic behavior to bootstrap elements
 export function bootstrap(el?:Element) {
   const els = (el || document).querySelectorAll('[data-invalid]')
@@ -2538,6 +2561,10 @@ export function apply<T>(x:T, fn:(x:T) => void) {
     fn(x)
     return x
 }
+export function each(xs:any[], f:(acc, x) => void, o?:any) {
+    return xs.reduce((acc,x) => { f(acc,x); return acc }, o || {})
+}
+
 export function resolve<T>(o:T, f?:(x:T) => any) {
     let ret = typeof o == 'function' ? o() : o
     return typeof f == 'function' ? f(ret) : ret
@@ -2686,6 +2713,7 @@ export class LinkButtonDefaults {
     public static create() { return new NavOptions({ navItemClass: LinkButtonDefaults.navItemClass }) }
     public static forLinkButton(options?: NavOptions|null) { return NavDefaults.overrideDefaults(options || null, LinkButtonDefaults.create()) }
 }
+
 
 export class UserAttributes
 {
