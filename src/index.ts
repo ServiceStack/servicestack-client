@@ -2031,6 +2031,12 @@ export function on(sel, handlers) {
     })
 }
 
+export function delaySet(f:(loading:boolean) => any, opt?:{ duration?:number }) {
+    let duration = opt && opt.duration || 300
+    let timeout = setTimeout(() => f(true), duration)
+    return () => { clearTimeout(timeout); f(false) }
+}
+
 export function humanify(id) {
     return humanize(toPascalCase(id))
 }

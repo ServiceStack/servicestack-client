@@ -562,6 +562,9 @@ export declare function createElement(tagName: string, options?: ICreateElementO
 export declare function $1(sel: string | any, el?: HTMLElement): any;
 export declare function $$(sel: string | any, el?: HTMLElement): any;
 export declare function on(sel: any, handlers: any): void;
+export declare function delaySet(f: (loading: boolean) => any, opt?: {
+    duration?: number;
+}): () => void;
 export declare function humanify(id: any): any;
 export declare function bootstrap(el?: Element): void;
 export interface IBindHandlersOptions {
