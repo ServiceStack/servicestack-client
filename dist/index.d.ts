@@ -529,6 +529,7 @@ export declare function onlyProps(obj: {
     [index: string]: any;
 };
 export declare function humanize(s: any): any;
+export declare const humanify: (s: any) => any;
 export declare function queryString(url: string): any;
 export declare function combinePaths(...paths: string[]): string;
 export declare function createPath(route: string, args: any): string;
@@ -565,7 +566,6 @@ export declare function on(sel: any, handlers: any): void;
 export declare function delaySet(f: (loading: boolean) => any, opt?: {
     duration?: number;
 }): () => void;
-export declare function humanify(id: any): any;
 export declare function bootstrap(el?: Element): void;
 export interface IBindHandlersOptions {
     events: string[];

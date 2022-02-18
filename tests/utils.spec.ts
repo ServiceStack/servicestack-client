@@ -8,6 +8,7 @@ import {
     errorResponseExcept,
     toObject,
 } from  '../src/index';
+import {humanify} from "../dist";
 
 describe ('Util Tests', () => {
     it ('Can parse cookie', done => {
@@ -107,5 +108,15 @@ describe ('Util Tests', () => {
 
     it ('Can base64 encode', () => {
         expect(JsonServiceClient.toBase64("Aa1&/:+=!()|[]@")).eq("QWExJi86Kz0hKCl8W11A");
+    })
+
+    it ('Does humanify', () => {
+        expect(humanify('a')).eq('A')
+        expect(humanify('aBc')).eq('A Bc')
+        expect(humanify('TheId')).eq('The Id')
+        expect(humanify('TheID')).eq('The ID')
+        expect(humanify('TheIDWithWord')).eq('The ID With Word')
+        expect(humanify('TheID2WithWord')).eq('The ID2 With Word')
+        expect(humanify('Leave me Alone!')).eq('Leave me Alone!')
     })
 });

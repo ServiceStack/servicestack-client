@@ -1635,7 +1635,13 @@ function splitCase(t: string) {
     return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim()
 }
 
-export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(s)) }
+export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))) }
+
+export const humanify = s => !s || s.indexOf(' ') >= 0 ? s :
+    (s.charAt(0).toUpperCase() + s.substring(1))
+        .split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/g)
+        .map(x => x.replace(/([0-9]+)/g,'$1 '))
+        .join(' ')
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
@@ -2035,10 +2041,6 @@ export function delaySet(f:(loading:boolean) => any, opt?:{ duration?:number }) 
     let duration = opt && opt.duration || 300
     let timeout = setTimeout(() => f(true), duration)
     return () => { clearTimeout(timeout); f(false) }
-}
-
-export function humanify(id) {
-    return humanize(toPascalCase(id))
 }
 
 // init generic behavior to bootstrap elements

@@ -19,7 +19,7 @@ describe ('Usages Tests', () => {
         expect(Array.from(client.headers.keys()).length).eq(0)
     })
 
-    it.only ('Does map each item and returns result', () => {
+    it ('Does map each item and returns result', () => {
         let o = { a:1, b:2 }
 
         let r = each(Object.keys(o), (acc, k) => acc[k] = o[k] * 2)
