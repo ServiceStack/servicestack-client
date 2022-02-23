@@ -529,6 +529,11 @@ export declare function onlyProps(obj: {
     [index: string]: any;
 };
 export declare function humanize(s: any): any;
+export declare const ucFirst: (s: string) => string;
+export declare const isUpper: (c: string) => boolean;
+export declare const isLower: (c: string) => boolean;
+export declare const isDigit: (c: string) => boolean;
+export declare function splitTitleCase(s: string): any[];
 export declare const humanify: (s: any) => any;
 export declare function queryString(url: string): any;
 export declare function combinePaths(...paths: string[]): string;

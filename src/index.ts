@@ -1637,11 +1637,30 @@ function splitCase(t: string) {
 
 export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))) }
 
-export const humanify = s => !s || s.indexOf(' ') >= 0 ? s :
-    (s.charAt(0).toUpperCase() + s.substring(1))
-        .split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/g)
-        .map(x => x.replace(/([0-9]+)/g,'$1 '))
-        .join(' ')
+export const ucFirst = (s:string) => s.charAt(0).toUpperCase() + s.substring(1)
+export const isUpper = (c:string) => c >= 'A' && c <= 'Z'
+export const isLower = (c:string) => c >= 'a' && c <= 'z'
+export const isDigit = (c:string) => c >= '0' && c <= '9'
+const upperOrDigit = (c:string) => isUpper(c) || isDigit(c)
+
+export function splitTitleCase(s:string) {
+    let to = []
+    if (typeof s != 'string') return to
+    let lastSplit = 0
+    for (let i=0; i<s.length; i++) {
+        let c = s[i]
+        let prev = i>0 ? s[i-1] : null
+        let next = i+1 < s.length ? s[i+1] : null
+        if (upperOrDigit(c) && (!upperOrDigit(prev) || !upperOrDigit(next))) {
+            to.push(s.substring(lastSplit, i))
+            lastSplit = i
+        }
+    }
+    to.push(s.substring(lastSplit, s.length))
+    return to.filter(x => !!x)
+}
+
+export const humanify = s => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '))
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
