@@ -1398,6 +1398,24 @@ export class JsonServiceClient {
             return new ApiResult<EmptyResponse>({ error: getResponseStatus(e) })
         }
     }
+
+    async apiForm<TResponse>(request:IReturn<TResponse>|ApiRequest, body:FormData, args?:any, method?:string) {
+        try {
+            const result = await this.fetchBody<TResponse>(getMethod(request,method), request, body, args)
+            return new ApiResult<TResponse>({ response: result })
+        } catch(e) {
+            return new ApiResult<TResponse>({ error: getResponseStatus(e) })
+        }
+    }
+
+    async apiFormVoid(request:IReturnVoid|ApiRequest, body:FormData, args?:any, method?:string) {
+        try {
+            const result = await this.fetchBody<EmptyResponse>(getMethod(request,method), request, body, args)
+            return new ApiResult<EmptyResponse>({ response: result ?? new EmptyResponse() })
+        } catch(e) {
+            return new ApiResult<EmptyResponse>({ error: getResponseStatus(e) })
+        }
+    }
 }
 
 export function getMethod(request:any, method?:string) {

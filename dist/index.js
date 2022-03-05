@@ -1149,6 +1149,44 @@ var JsonServiceClient = /** @class */ (function () {
             });
         });
     };
+    JsonServiceClient.prototype.apiForm = function (request, body, args, method) {
+        return __awaiter(this, void 0, void 0, function () {
+            var result, e_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.fetchBody(getMethod(request, method), request, body, args)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, new ApiResult({ response: result })];
+                    case 2:
+                        e_3 = _a.sent();
+                        return [2 /*return*/, new ApiResult({ error: getResponseStatus(e_3) })];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    JsonServiceClient.prototype.apiFormVoid = function (request, body, args, method) {
+        return __awaiter(this, void 0, void 0, function () {
+            var result, e_4;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.fetchBody(getMethod(request, method), request, body, args)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, new ApiResult({ response: result !== null && result !== void 0 ? result : new EmptyResponse() })];
+                    case 2:
+                        e_4 = _a.sent();
+                        return [2 /*return*/, new ApiResult({ error: getResponseStatus(e_4) })];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return JsonServiceClient;
 }());
 exports.JsonServiceClient = JsonServiceClient;

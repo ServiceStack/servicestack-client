@@ -475,6 +475,8 @@ export declare class JsonServiceClient {
     sendVoid(request: IReturnVoid, args?: any, url?: string): Promise<EmptyResponse>;
     api<TResponse>(request: IReturn<TResponse> | ApiRequest, args?: any, method?: string): Promise<ApiResult<TResponse>>;
     apiVoid(request: IReturnVoid | ApiRequest, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
+    apiForm<TResponse>(request: IReturn<TResponse> | ApiRequest, body: FormData, args?: any, method?: string): Promise<ApiResult<TResponse>>;
+    apiFormVoid(request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
 }
 export declare function getMethod(request: any, method?: string): any;
 export declare function getResponseStatus(e: any): any;
