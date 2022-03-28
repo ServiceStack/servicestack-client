@@ -887,6 +887,7 @@ export class HttpMethods {
     static Head = "HEAD"
     static Options = "OPTIONS"
 
+    
     static hasRequestBody = (method: string) =>
         !(method === "GET" || method === "DELETE" || method === "HEAD" || method === "OPTIONS")
 }
@@ -3143,8 +3144,14 @@ export function alignAuto(obj:any, len:number, pad:string = ' ') : string {
     return str
 }
 export function EventBus() {
+    let { subscribe, publish } = createBus()
+    this.subscribe = subscribe
+    this.publish = publish
+}
+
+export function createBus() {
     let subscriptions = {}
-    this.subscribe = function(type, callback) {
+    function subscribe(type:string, callback:Function) {
         let id = Symbol('id')
         if (!subscriptions[type]) subscriptions[type] = {}
         subscriptions[type][id] = callback
@@ -3157,13 +3164,13 @@ export function EventBus() {
             }
         }
     }
-    this.publish = function(eventType, arg) {
+    function publish(eventType:string, arg:any) {
         if (!subscriptions[eventType]) return
         Object.getOwnPropertySymbols(subscriptions[eventType])
             .forEach(key => subscriptions[eventType][key](arg))
     }
+    return { subscribe, publish }
 }
-
 
 export class Inspect {
     static vars(obj:any) {        
