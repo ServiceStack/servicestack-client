@@ -611,6 +611,7 @@ export declare function serializeForm(form: HTMLFormElement, contentType?: strin
 export declare function serializeToObject(form: HTMLFormElement): any;
 export declare function serializeToUrlEncoded(form: HTMLFormElement): string;
 export declare function serializeToFormData(form: HTMLFormElement): FormData;
+export declare function sanitizeFormData(formData: FormData): FormData;
 export declare function triggerEvent(el: Element, name: string, data?: any): void;
 export declare function populateForm(form: HTMLFormElement, model: any): void;
 export declare function trimEnd(s: string, c: string): string;

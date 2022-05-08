@@ -6,7 +6,7 @@
     "removeComments": false,
     "declaration": true,
     "sourceMap": false,
-    "target": "es5",
+    "target": "ES2015",
     "module": "commonjs",
     "experimentalDecorators": true,
     "lib": ["es2015","dom","dom.iterable"]

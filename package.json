@@ -20,7 +20,8 @@
     "publish": "tsc && tsc -p tsconfig.umd.json && move dist\\index.js dist\\servicestack-client.umd.js && bash inject-umd.sh && npm run uglify && move src\\index.js dist && copy src\\index.d.ts dist",
     "dtos": "cd tests/dtos && typescript-ref",
     "test": "mocha -t 5000 ./tests/*.js",
-    "testonly": "mocha -t 5000 ./tests/serverevents.spec.js"
+    "testonly": "mocha -t 5000 ./tests/serverevents.spec.js",
+    "postversion": "git push && git push --tags"
   },
   "files": [
     "dist/index.js",
@@ -49,6 +50,6 @@
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
     "mocha": "^9.1.3",
-    "typescript": "^4.5.3"
+    "typescript": "^4.6.4"
   }
 }

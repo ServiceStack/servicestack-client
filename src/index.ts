@@ -1152,6 +1152,7 @@ export class JsonServiceClient {
             reqInit.body = body || JSON.stringify(request)
 
             if (isFormData(body)) {
+                reqInit.body = sanitizeFormData(body)
                 headers.delete('Content-Type') //set by FormData
             }
         }
@@ -2513,6 +2514,17 @@ export function serializeToUrlEncoded(form:HTMLFormElement) {
 
 export function serializeToFormData(form:HTMLFormElement) {
     return formEntries(form, new FormData(), (to,name,value) => to.append(name, value))
+}
+
+export function sanitizeFormData(formData:FormData) {
+    // @ts-ignore
+    for (let [key, value] of formData) {
+        // Remove 0 length files
+        if (typeof value == 'object' && value.size === 0) {
+            formData.delete(key)
+        }
+    }
+    return formData
 }
 
 export function triggerEvent(el:Element,name:string,data:any=null) {
