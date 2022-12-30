@@ -28,7 +28,9 @@
     "dist/index.js",
     "dist/index.d.ts",
     "dist/servicestack-client.umd.js",
-    "dist/servicestack-client.min.js"
+    "dist/servicestack-client.min.js",
+    "dist/servicestack-client.esm.js",
+    "dist/servicestack-client.esm.min.js"
   ],
   "keywords": [
     "servicestack",
