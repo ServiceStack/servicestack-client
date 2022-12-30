@@ -1320,8 +1320,11 @@ exports.createUrl = createUrl;
 function appendQueryString(url, args) {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
+            let val = args[k];
+            if (typeof val == 'undefined')
+                continue;
             url += url.indexOf("?") >= 0 ? "&" : "?";
-            url += k + "=" + qsValue(args[k]);
+            url += k + "=" + qsValue(val);
         }
     }
     return url;

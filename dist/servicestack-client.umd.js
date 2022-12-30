@@ -1558,8 +1558,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function appendQueryString(url, args) {
         for (var k in args) {
             if (args.hasOwnProperty(k)) {
+                var val = args[k];
+                if (typeof val == 'undefined')
+                    continue;
                 url += url.indexOf("?") >= 0 ? "&" : "?";
-                url += k + "=" + qsValue(args[k]);
+                url += k + "=" + qsValue(val);
             }
         }
         return url;
