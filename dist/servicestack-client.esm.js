@@ -1,18 +1,3 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
-exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = void 0;
-exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = void 0;
-exports.Inspect = exports.createBus = exports.EventBus = void 0;
 function nodeRequire() {
     //node require(), using dynamic access to fix web ng aot build
     try {
@@ -30,90 +15,183 @@ function nodeRequire() {
 let R = nodeRequire();
 if (R)
     R('cross-fetch/polyfill'); //fetch polyfill only required for node.js
-class ResponseStatus {
+export class ResponseStatus {
+    constructor(init) { Object.assign(this, init); }
+    errorCode;
+    message;
+    stackTrace;
+    errors;
+    meta;
+}
+export class ResponseError {
+    constructor(init) { Object.assign(this, init); }
+    errorCode;
+    fieldName;
+    message;
+    meta;
+}
+export class ErrorResponse {
+    constructor(init) { Object.assign(this, init); }
+    type;
+    responseStatus;
+}
+export class EmptyResponse {
+    constructor(init) { Object.assign(this, init); }
+    responseStatus;
+}
+export class NavItem {
+    label;
+    href;
+    exact;
+    id;
+    className;
+    iconClass;
+    show;
+    hide;
+    children;
+    meta;
     constructor(init) { Object.assign(this, init); }
 }
-exports.ResponseStatus = ResponseStatus;
-class ResponseError {
-    constructor(init) { Object.assign(this, init); }
-}
-exports.ResponseError = ResponseError;
-class ErrorResponse {
-    constructor(init) { Object.assign(this, init); }
-}
-exports.ErrorResponse = ErrorResponse;
-class EmptyResponse {
-    constructor(init) { Object.assign(this, init); }
-}
-exports.EmptyResponse = EmptyResponse;
-class NavItem {
-    constructor(init) { Object.assign(this, init); }
-}
-exports.NavItem = NavItem;
-class GetNavItems {
+export class GetNavItems {
     constructor(init) { Object.assign(this, init); }
     createResponse() { return new GetNavItemsResponse(); }
     getTypeName() { return 'GetNavItems'; }
     getMethod() { return 'GET'; }
 }
-exports.GetNavItems = GetNavItems;
-class GetNavItemsResponse {
+export class GetNavItemsResponse {
+    baseUrl;
+    results;
+    navItemsMap;
+    meta;
+    responseStatus;
     constructor(init) { Object.assign(this, init); }
 }
-exports.GetNavItemsResponse = GetNavItemsResponse;
-class MetadataTypesConfig {
+export class MetadataTypesConfig {
+    baseUrl;
+    defaultNamespaces;
+    defaultImports;
+    includeTypes;
+    excludeTypes;
+    treatTypesAsStrings;
+    globalNamespace;
+    ignoreTypes;
+    exportTypes;
+    exportAttributes;
+    ignoreTypesInNamespaces;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataTypesConfig = MetadataTypesConfig;
-class MetadataRoute {
+export class MetadataRoute {
+    path;
+    verbs;
+    notes;
+    summary;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataRoute = MetadataRoute;
-class MetadataOperationType {
+export class MetadataOperationType {
+    request;
+    response;
+    actions;
+    returnsVoid;
+    returnType;
+    routes;
+    dataModel;
+    viewModel;
+    requiresAuth;
+    requiredRoles;
+    requiresAnyRole;
+    requiredPermissions;
+    requiresAnyPermission;
+    tags;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataOperationType = MetadataOperationType;
-class MetadataTypes {
+export class MetadataTypes {
+    config;
+    namespaces;
+    types;
+    operations;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataTypes = MetadataTypes;
-class MetadataTypeName {
+export class MetadataTypeName {
+    name;
+    namespace;
+    genericArgs;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataTypeName = MetadataTypeName;
-class MetadataDataContract {
+export class MetadataDataContract {
+    name;
+    namespace;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataDataContract = MetadataDataContract;
-class MetadataDataMember {
+export class MetadataDataMember {
+    name;
+    order;
+    isRequired;
+    emitDefaultValue;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataDataMember = MetadataDataMember;
-class MetadataAttribute {
+export class MetadataAttribute {
+    name;
+    constructorArgs;
+    args;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataAttribute = MetadataAttribute;
-class MetadataPropertyType {
+export class MetadataPropertyType {
+    name;
+    type;
+    isValueType;
+    isSystemType;
+    isEnum;
+    isPrimaryKey;
+    typeNamespace;
+    genericArgs;
+    value;
+    description;
+    dataMember;
+    readOnly;
+    paramType;
+    displayType;
+    isRequired;
+    allowableValues;
+    allowableMin;
+    allowableMax;
+    attributes;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataPropertyType = MetadataPropertyType;
-class MetadataType {
+export class MetadataType {
+    name;
+    namespace;
+    genericArgs;
+    inherits;
+    implements;
+    displayType;
+    description;
+    isNested;
+    isEnum;
+    isEnumInt;
+    isInterface;
+    isAbstract;
+    dataContract;
+    properties;
+    attributes;
+    innerTypes;
+    enumNames;
+    enumValues;
+    enumMemberValues;
+    enumDescriptions;
+    meta;
     constructor(init) { Object.assign(this, init); }
 }
-exports.MetadataType = MetadataType;
-class NewInstanceResolver {
+export class NewInstanceResolver {
     tryResolve(ctor) {
         return new ctor();
     }
 }
-exports.NewInstanceResolver = NewInstanceResolver;
-class SingletonInstanceResolver {
+export class SingletonInstanceResolver {
     tryResolve(ctor) {
         return ctor.instance
             || (ctor.instance = new ctor());
     }
 }
-exports.SingletonInstanceResolver = SingletonInstanceResolver;
 function eventMessageType(evt) {
     switch (evt) {
         case 'onConnect':
@@ -132,181 +210,30 @@ function eventMessageType(evt) {
 /**
  * EventSource
  */
-var ReadyState;
+export var ReadyState;
 (function (ReadyState) {
     ReadyState[ReadyState["CONNECTING"] = 0] = "CONNECTING";
     ReadyState[ReadyState["OPEN"] = 1] = "OPEN";
     ReadyState[ReadyState["CLOSED"] = 2] = "CLOSED";
-})(ReadyState = exports.ReadyState || (exports.ReadyState = {}));
-class ServerEventsClient {
+})(ReadyState || (ReadyState = {}));
+export class ServerEventsClient {
+    channels;
+    options;
+    eventSource;
+    static UnknownChannel = "*";
+    eventStreamUri;
+    updateSubscriberUrl;
+    connectionInfo;
+    serviceClient;
+    stopped;
+    resolver;
+    listeners;
+    EventSource;
+    withCredentials;
     constructor(baseUrl, channels, options = {}, eventSource = null) {
         this.channels = channels;
         this.options = options;
         this.eventSource = eventSource;
-        this.onMessage = (e) => {
-            if (typeof document == "undefined") { //node
-                //latest node-fetch + eventsource doesn't split SSE messages properly
-                let requireSplitPos = e.data ? e.data.indexOf('\n') : -1;
-                if (requireSplitPos >= 0) {
-                    let data = e.data;
-                    let lastEventId = e.lastEventId;
-                    let e1 = Object.assign({}, { lastEventId, data: data.substring(0, requireSplitPos) }), e2 = Object.assign({}, { lastEventId, data: data.substring(requireSplitPos + 1) });
-                    this._onMessage(e1);
-                    this._onMessage(e2);
-                    return;
-                }
-            }
-            this._onMessage(e);
-        };
-        this._onMessage = (e) => {
-            if (this.stopped)
-                return;
-            let opt = this.options;
-            if (typeof document == "undefined") {
-                var document = {
-                    querySelectorAll: sel => []
-                };
-            }
-            let $ = document.querySelectorAll.bind(document);
-            let parts = splitOnFirst(e.data, " ");
-            let channel = null;
-            let selector = parts[0];
-            let selParts = splitOnFirst(selector, "@");
-            if (selParts.length > 1) {
-                channel = selParts[0];
-                selector = selParts[1];
-            }
-            const json = parts[1];
-            let body = null;
-            try {
-                body = json ? JSON.parse(json) : null;
-            }
-            catch (ignore) { }
-            parts = splitOnFirst(selector, ".");
-            if (parts.length <= 1)
-                throw "invalid selector format: " + selector;
-            let op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
-            const tokens = splitOnFirst(target, "$");
-            const [cmd, cssSelector] = tokens;
-            const els = cssSelector && $(cssSelector);
-            const el = els && els[0];
-            const eventId = parseInt(e.lastEventId);
-            const data = e.data;
-            const type = eventMessageType(cmd) || "ServerEventMessage";
-            const request = { eventId, data, type,
-                channel, selector, json, body, op, target: tokens[0], cssSelector, meta: {} };
-            const mergedBody = typeof body == "object"
-                ? Object.assign({}, request, body)
-                : request;
-            if (opt.validate && opt.validate(request) === false)
-                return;
-            let headers = new Headers();
-            headers.set("Content-Type", "text/plain");
-            if (op === "cmd") {
-                if (cmd === "onConnect") {
-                    this.connectionInfo = mergedBody;
-                    if (typeof body.heartbeatIntervalMs == "string")
-                        this.connectionInfo.heartbeatIntervalMs = parseInt(body.heartbeatIntervalMs);
-                    if (typeof body.idleTimeoutMs == "string")
-                        this.connectionInfo.idleTimeoutMs = parseInt(body.idleTimeoutMs);
-                    Object.assign(opt, body);
-                    let fn = opt.handlers["onConnect"];
-                    if (fn) {
-                        fn.call(el || document.body, this.connectionInfo, request);
-                        if (this.stopped)
-                            return;
-                    }
-                    if (opt.heartbeatUrl) {
-                        if (opt.heartbeat) {
-                            clearInterval(opt.heartbeat);
-                        }
-                        opt.heartbeat = setInterval(() => {
-                            if (this.eventSource.readyState === EventSource.CLOSED) {
-                                clearInterval(opt.heartbeat);
-                                const stopFn = opt.handlers["onStop"];
-                                if (stopFn != null)
-                                    stopFn.apply(this.eventSource);
-                                this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
-                                return;
-                            }
-                            fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials }))
-                                .then(res => { if (!res.ok)
-                                throw new Error(`${res.status} - ${res.statusText}`); })
-                                .catch(error => this.reconnectServerEvents({ error }));
-                        }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
-                    }
-                    if (opt.unRegisterUrl) {
-                        if (typeof window != "undefined") {
-                            window.onunload = () => {
-                                if (navigator.sendBeacon) { // Chrome https://developers.google.com/web/updates/2019/12/chrome-80-deps-rems
-                                    this.stopped = true;
-                                    if (this.eventSource)
-                                        this.eventSource.close();
-                                    navigator.sendBeacon(opt.unRegisterUrl);
-                                }
-                                else {
-                                    this.stop();
-                                }
-                            };
-                        }
-                    }
-                    this.updateSubscriberUrl = opt.updateSubscriberUrl;
-                    this.updateChannels((opt.channels || "").split(","));
-                }
-                else {
-                    let isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
-                    let fn = opt.handlers[cmd];
-                    if (fn) {
-                        if (isCmdMsg) {
-                            fn.call(el || document.body, mergedBody);
-                        }
-                        else {
-                            fn.call(el || document.body, body, request);
-                        }
-                    }
-                    else {
-                        if (!isCmdMsg) { //global receiver
-                            let r = opt.receivers && opt.receivers["cmd"];
-                            this.invokeReceiver(r, cmd, el, request, "cmd");
-                        }
-                    }
-                    if (isCmdMsg) {
-                        fn = opt.handlers["onCommand"];
-                        if (fn) {
-                            fn.call(el || document.body, mergedBody);
-                        }
-                    }
-                }
-            }
-            else if (op === "trigger") {
-                this.raiseEvent(target, request);
-            }
-            else if (op === "css") {
-                css(els || $("body"), cmd, body);
-            }
-            //Named Receiver
-            let r = opt.receivers && opt.receivers[op];
-            this.invokeReceiver(r, cmd, el, request, op);
-            if (!eventMessageType(cmd)) {
-                let fn = opt.handlers["onMessage"];
-                if (fn) {
-                    fn.call(el || document.body, mergedBody);
-                }
-            }
-            if (opt.onTick)
-                opt.onTick();
-        };
-        this.onError = (error) => {
-            if (this.stopped)
-                return;
-            if (!error)
-                error = event;
-            let fn = this.options.onException;
-            if (fn != null)
-                fn.call(this.eventSource, error);
-            if (this.options.onTick)
-                this.options.onTick();
-        };
         if (this.channels.length === 0)
             throw "at least 1 channel is required";
         this.resolver = this.options.resolver || new NewInstanceResolver();
@@ -318,6 +245,170 @@ class ServerEventsClient {
         if (!this.options.handlers)
             this.options.handlers = {};
     }
+    onMessage = (e) => {
+        if (typeof document == "undefined") { //node
+            //latest node-fetch + eventsource doesn't split SSE messages properly
+            let requireSplitPos = e.data ? e.data.indexOf('\n') : -1;
+            if (requireSplitPos >= 0) {
+                let data = e.data;
+                let lastEventId = e.lastEventId;
+                let e1 = Object.assign({}, { lastEventId, data: data.substring(0, requireSplitPos) }), e2 = Object.assign({}, { lastEventId, data: data.substring(requireSplitPos + 1) });
+                this._onMessage(e1);
+                this._onMessage(e2);
+                return;
+            }
+        }
+        this._onMessage(e);
+    };
+    _onMessage = (e) => {
+        if (this.stopped)
+            return;
+        let opt = this.options;
+        if (typeof document == "undefined") {
+            var document = {
+                querySelectorAll: sel => []
+            };
+        }
+        let $ = document.querySelectorAll.bind(document);
+        let parts = splitOnFirst(e.data, " ");
+        let channel = null;
+        let selector = parts[0];
+        let selParts = splitOnFirst(selector, "@");
+        if (selParts.length > 1) {
+            channel = selParts[0];
+            selector = selParts[1];
+        }
+        const json = parts[1];
+        let body = null;
+        try {
+            body = json ? JSON.parse(json) : null;
+        }
+        catch (ignore) { }
+        parts = splitOnFirst(selector, ".");
+        if (parts.length <= 1)
+            throw "invalid selector format: " + selector;
+        let op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
+        const tokens = splitOnFirst(target, "$");
+        const [cmd, cssSelector] = tokens;
+        const els = cssSelector && $(cssSelector);
+        const el = els && els[0];
+        const eventId = parseInt(e.lastEventId);
+        const data = e.data;
+        const type = eventMessageType(cmd) || "ServerEventMessage";
+        const request = { eventId, data, type,
+            channel, selector, json, body, op, target: tokens[0], cssSelector, meta: {} };
+        const mergedBody = typeof body == "object"
+            ? Object.assign({}, request, body)
+            : request;
+        if (opt.validate && opt.validate(request) === false)
+            return;
+        let headers = new Headers();
+        headers.set("Content-Type", "text/plain");
+        if (op === "cmd") {
+            if (cmd === "onConnect") {
+                this.connectionInfo = mergedBody;
+                if (typeof body.heartbeatIntervalMs == "string")
+                    this.connectionInfo.heartbeatIntervalMs = parseInt(body.heartbeatIntervalMs);
+                if (typeof body.idleTimeoutMs == "string")
+                    this.connectionInfo.idleTimeoutMs = parseInt(body.idleTimeoutMs);
+                Object.assign(opt, body);
+                let fn = opt.handlers["onConnect"];
+                if (fn) {
+                    fn.call(el || document.body, this.connectionInfo, request);
+                    if (this.stopped)
+                        return;
+                }
+                if (opt.heartbeatUrl) {
+                    if (opt.heartbeat) {
+                        clearInterval(opt.heartbeat);
+                    }
+                    opt.heartbeat = setInterval(() => {
+                        if (this.eventSource.readyState === EventSource.CLOSED) {
+                            clearInterval(opt.heartbeat);
+                            const stopFn = opt.handlers["onStop"];
+                            if (stopFn != null)
+                                stopFn.apply(this.eventSource);
+                            this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
+                            return;
+                        }
+                        fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials }))
+                            .then(res => { if (!res.ok)
+                            throw new Error(`${res.status} - ${res.statusText}`); })
+                            .catch(error => this.reconnectServerEvents({ error }));
+                    }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
+                }
+                if (opt.unRegisterUrl) {
+                    if (typeof window != "undefined") {
+                        window.onunload = () => {
+                            if (navigator.sendBeacon) { // Chrome https://developers.google.com/web/updates/2019/12/chrome-80-deps-rems
+                                this.stopped = true;
+                                if (this.eventSource)
+                                    this.eventSource.close();
+                                navigator.sendBeacon(opt.unRegisterUrl);
+                            }
+                            else {
+                                this.stop();
+                            }
+                        };
+                    }
+                }
+                this.updateSubscriberUrl = opt.updateSubscriberUrl;
+                this.updateChannels((opt.channels || "").split(","));
+            }
+            else {
+                let isCmdMsg = cmd == "onJoin" || cmd == "onLeave" || cmd == "onUpdate";
+                let fn = opt.handlers[cmd];
+                if (fn) {
+                    if (isCmdMsg) {
+                        fn.call(el || document.body, mergedBody);
+                    }
+                    else {
+                        fn.call(el || document.body, body, request);
+                    }
+                }
+                else {
+                    if (!isCmdMsg) { //global receiver
+                        let r = opt.receivers && opt.receivers["cmd"];
+                        this.invokeReceiver(r, cmd, el, request, "cmd");
+                    }
+                }
+                if (isCmdMsg) {
+                    fn = opt.handlers["onCommand"];
+                    if (fn) {
+                        fn.call(el || document.body, mergedBody);
+                    }
+                }
+            }
+        }
+        else if (op === "trigger") {
+            this.raiseEvent(target, request);
+        }
+        else if (op === "css") {
+            css(els || $("body"), cmd, body);
+        }
+        //Named Receiver
+        let r = opt.receivers && opt.receivers[op];
+        this.invokeReceiver(r, cmd, el, request, op);
+        if (!eventMessageType(cmd)) {
+            let fn = opt.handlers["onMessage"];
+            if (fn) {
+                fn.call(el || document.body, mergedBody);
+            }
+        }
+        if (opt.onTick)
+            opt.onTick();
+    };
+    onError = (error) => {
+        if (this.stopped)
+            return;
+        if (!error)
+            error = event;
+        let fn = this.options.onException;
+        if (fn != null)
+            fn.call(this.eventSource, error);
+        if (this.options.onTick)
+            this.options.onTick();
+    };
     getEventSourceOptions() {
         return { withCredentials: this.withCredentials };
     }
@@ -568,49 +659,80 @@ class ServerEventsClient {
         return to;
     }
 }
-exports.ServerEventsClient = ServerEventsClient;
-ServerEventsClient.UnknownChannel = "*";
-class ServerEventReceiver {
+export class ServerEventReceiver {
+    client;
+    request;
     noSuchMethod(selector, message) { }
 }
-exports.ServerEventReceiver = ServerEventReceiver;
-class UpdateEventSubscriber {
+export class UpdateEventSubscriber {
+    id;
+    subscribeChannels;
+    unsubscribeChannels;
     createResponse() { return new UpdateEventSubscriberResponse(); }
     getTypeName() { return "UpdateEventSubscriber"; }
 }
-exports.UpdateEventSubscriber = UpdateEventSubscriber;
-class UpdateEventSubscriberResponse {
+export class UpdateEventSubscriberResponse {
+    responseStatus;
 }
-exports.UpdateEventSubscriberResponse = UpdateEventSubscriberResponse;
-class GetEventSubscribers {
+export class GetEventSubscribers {
+    channels;
     createResponse() { return []; }
     getTypeName() { return "GetEventSubscribers"; }
 }
-exports.GetEventSubscribers = GetEventSubscribers;
-class ServerEventUser {
+export class ServerEventUser {
+    userId;
+    displayName;
+    profileUrl;
+    channels;
+    meta;
 }
-exports.ServerEventUser = ServerEventUser;
-class HttpMethods {
+export class HttpMethods {
+    static Get = "GET";
+    static Post = "POST";
+    static Put = "PUT";
+    static Delete = "DELETE";
+    static Patch = "PATCH";
+    static Head = "HEAD";
+    static Options = "OPTIONS";
+    static hasRequestBody = (method) => !(method === "GET" || method === "DELETE" || method === "HEAD" || method === "OPTIONS");
 }
-exports.HttpMethods = HttpMethods;
-HttpMethods.Get = "GET";
-HttpMethods.Post = "POST";
-HttpMethods.Put = "PUT";
-HttpMethods.Delete = "DELETE";
-HttpMethods.Patch = "PATCH";
-HttpMethods.Head = "HEAD";
-HttpMethods.Options = "OPTIONS";
-HttpMethods.hasRequestBody = (method) => !(method === "GET" || method === "DELETE" || method === "HEAD" || method === "OPTIONS");
 class GetAccessToken {
     constructor(init) { Object.assign(this, init); }
+    refreshToken;
+    useTokenCookie;
     createResponse() { return new GetAccessTokenResponse(); }
     getTypeName() { return 'GetAccessToken'; }
     getMethod() { return 'POST'; }
 }
-class GetAccessTokenResponse {
+export class GetAccessTokenResponse {
+    accessToken;
+    responseStatus;
 }
-exports.GetAccessTokenResponse = GetAccessTokenResponse;
-class JsonServiceClient {
+export class JsonServiceClient {
+    baseUrl;
+    replyBaseUrl;
+    oneWayBaseUrl;
+    mode;
+    credentials;
+    headers;
+    userName;
+    password;
+    bearerToken;
+    refreshToken;
+    refreshTokenUri;
+    useTokenCookie;
+    enableAutoRefreshToken;
+    requestFilter;
+    static globalRequestFilter;
+    responseFilter;
+    static globalResponseFilter;
+    exceptionFilter;
+    urlFilter;
+    onAuthenticationRequired;
+    manageCookies;
+    cookies;
+    parseJson;
+    static toBase64;
     constructor(baseUrl = "/") {
         this.baseUrl = baseUrl;
         this.replyBaseUrl = combinePaths(baseUrl, "json", "reply") + "/";
@@ -958,80 +1080,70 @@ class JsonServiceClient {
     sendVoid(request, args, url) {
         return this.sendRequest({ method: getMethod(request), request, args, url });
     }
-    api(request, args, method) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield this.fetch(getMethod(request, method), request, args);
-                return new ApiResult({ response: result });
-            }
-            catch (e) {
-                return new ApiResult({ error: getResponseStatus(e) });
-            }
-        });
+    async api(request, args, method) {
+        try {
+            const result = await this.fetch(getMethod(request, method), request, args);
+            return new ApiResult({ response: result });
+        }
+        catch (e) {
+            return new ApiResult({ error: getResponseStatus(e) });
+        }
     }
-    apiVoid(request, args, method) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield this.fetch(getMethod(request, method), request, args);
-                return new ApiResult({ response: result !== null && result !== void 0 ? result : new EmptyResponse() });
-            }
-            catch (e) {
-                return new ApiResult({ error: getResponseStatus(e) });
-            }
-        });
+    async apiVoid(request, args, method) {
+        try {
+            const result = await this.fetch(getMethod(request, method), request, args);
+            return new ApiResult({ response: result ?? new EmptyResponse() });
+        }
+        catch (e) {
+            return new ApiResult({ error: getResponseStatus(e) });
+        }
     }
-    apiForm(request, body, args, method) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield this.fetchBody(getMethod(request, method), request, body, args);
-                return new ApiResult({ response: result });
-            }
-            catch (e) {
-                return new ApiResult({ error: getResponseStatus(e) });
-            }
-        });
+    async apiForm(request, body, args, method) {
+        try {
+            const result = await this.fetchBody(getMethod(request, method), request, body, args);
+            return new ApiResult({ response: result });
+        }
+        catch (e) {
+            return new ApiResult({ error: getResponseStatus(e) });
+        }
     }
-    apiFormVoid(request, body, args, method) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield this.fetchBody(getMethod(request, method), request, body, args);
-                return new ApiResult({ response: result !== null && result !== void 0 ? result : new EmptyResponse() });
-            }
-            catch (e) {
-                return new ApiResult({ error: getResponseStatus(e) });
-            }
-        });
+    async apiFormVoid(request, body, args, method) {
+        try {
+            const result = await this.fetchBody(getMethod(request, method), request, body, args);
+            return new ApiResult({ response: result ?? new EmptyResponse() });
+        }
+        catch (e) {
+            return new ApiResult({ error: getResponseStatus(e) });
+        }
     }
 }
-exports.JsonServiceClient = JsonServiceClient;
-function getMethod(request, method) {
-    return (method !== null && method !== void 0 ? method : typeof request.getMethod == "function")
+export function getMethod(request, method) {
+    return (method ?? typeof request.getMethod == "function")
         ? request.getMethod()
         : HttpMethods.Post;
 }
-exports.getMethod = getMethod;
-function getResponseStatus(e) {
-    var _a, _b;
-    return (_b = (_a = e.responseStatus) !== null && _a !== void 0 ? _a : e.ResponseStatus) !== null && _b !== void 0 ? _b : (e.errorCode
-        ? e
-        : (e.message ? createErrorStatus(e.message, e.errorCode) : null));
+export function getResponseStatus(e) {
+    return e.responseStatus ?? e.ResponseStatus ??
+        (e.errorCode
+            ? e
+            : (e.message ? createErrorStatus(e.message, e.errorCode) : null));
 }
-exports.getResponseStatus = getResponseStatus;
-class ApiResult {
+export class ApiResult {
+    response;
+    error;
     constructor(init) { Object.assign(this, init); }
     get completed() { return this.response != null || this.error != null; }
-    get failed() { var _a, _b; return ((_a = this.error) === null || _a === void 0 ? void 0 : _a.errorCode) != null || ((_b = this.error) === null || _b === void 0 ? void 0 : _b.message) != null; }
+    get failed() { return this.error?.errorCode != null || this.error?.message != null; }
     get succeeded() { return !this.failed && this.response != null; }
-    get errorMessage() { var _a; return (_a = this.error) === null || _a === void 0 ? void 0 : _a.message; }
-    get errorCode() { var _a; return (_a = this.error) === null || _a === void 0 ? void 0 : _a.errorCode; }
-    get errors() { var _a, _b; return (_b = (_a = this.error) === null || _a === void 0 ? void 0 : _a.errors) !== null && _b !== void 0 ? _b : []; }
+    get errorMessage() { return this.error?.message; }
+    get errorCode() { return this.error?.errorCode; }
+    get errors() { return this.error?.errors ?? []; }
     get errorSummary() { return this.error != null && this.errors.length == 0 ? this.errorMessage : null; }
     fieldError(fieldName) {
-        var _a;
         let matchField = fieldName.toLowerCase();
-        return (_a = this.errors) === null || _a === void 0 ? void 0 : _a.find(x => x.fieldName.toLowerCase() == matchField);
+        return this.errors?.find(x => x.fieldName.toLowerCase() == matchField);
     }
-    fieldErrorMessage(fieldName) { var _a; return (_a = this.fieldError(fieldName)) === null || _a === void 0 ? void 0 : _a.message; }
+    fieldErrorMessage(fieldName) { return this.fieldError(fieldName)?.message; }
     hasFieldError(fieldName) { return this.fieldError(fieldName) != null; }
     showSummary(exceptFields = []) {
         if (!this.failed)
@@ -1043,7 +1155,7 @@ class ApiResult {
             // Return first field error that's not visible
             let fieldSet = exceptFields.map(x => x.toLowerCase());
             let fieldError = fieldSet.find(x => fieldSet.indexOf(x.toLowerCase()) == -1);
-            return fieldError !== null && fieldError !== void 0 ? fieldError : this.errorMessage;
+            return fieldError ?? this.errorMessage;
         }
     }
     addFieldError(fieldName, message, errorCode = 'Exception') {
@@ -1059,17 +1171,13 @@ class ApiResult {
         }
     }
 }
-exports.ApiResult = ApiResult;
-function createErrorStatus(message, errorCode = 'Exception') {
+export function createErrorStatus(message, errorCode = 'Exception') {
     return new ResponseStatus({ errorCode, message });
 }
-exports.createErrorStatus = createErrorStatus;
-function createFieldError(fieldName, message, errorCode = 'Exception') {
+export function createFieldError(fieldName, message, errorCode = 'Exception') {
     return new ResponseStatus({ errors: [new ResponseError({ fieldName, errorCode, message })] });
 }
-exports.createFieldError = createFieldError;
-function isFormData(body) { return typeof window != "undefined" && body instanceof FormData; }
-exports.isFormData = isFormData;
+export function isFormData(body) { return typeof window != "undefined" && body instanceof FormData; }
 function createErrorResponse(errorCode, message, type = null) {
     const error = apply(new ErrorResponse(), e => {
         if (type != null)
@@ -1081,7 +1189,7 @@ function createErrorResponse(errorCode, message, type = null) {
     });
     return error;
 }
-function createError(errorCode, message, fieldName) {
+export function createError(errorCode, message, fieldName) {
     return new ErrorResponse({
         responseStatus: new ResponseStatus({
             errorCode,
@@ -1090,12 +1198,9 @@ function createError(errorCode, message, fieldName) {
         })
     });
 }
-exports.createError = createError;
-function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
-exports.toCamelCase = toCamelCase;
-function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
-exports.toPascalCase = toPascalCase;
-function sanitize(status) {
+export function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
+export function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
+export function sanitize(status) {
     if (status.responseStatus)
         return status;
     if (status.errors)
@@ -1121,8 +1226,7 @@ function sanitize(status) {
     }
     return to;
 }
-exports.sanitize = sanitize;
-function nameOf(o) {
+export function nameOf(o) {
     if (!o)
         return "null";
     if (typeof o.getTypeName == "function")
@@ -1135,13 +1239,12 @@ function nameOf(o) {
     let str = ctor.toString();
     return str.substring(9, str.indexOf("(")); //"function ".length == 9
 }
-exports.nameOf = nameOf;
 /* utils */
 function log(o, prefix = "LOG") {
     console.log(prefix, o);
     return o;
 }
-function css(selector, name, value) {
+export function css(selector, name, value) {
     const els = typeof selector == "string"
         ? document.querySelectorAll(selector)
         : selector;
@@ -1152,15 +1255,13 @@ function css(selector, name, value) {
         }
     }
 }
-exports.css = css;
-function splitOnFirst(s, c) {
+export function splitOnFirst(s, c) {
     if (!s)
         return [s];
     let pos = s.indexOf(c);
     return pos >= 0 ? [s.substring(0, pos), s.substring(pos + 1)] : [s];
 }
-exports.splitOnFirst = splitOnFirst;
-function splitOnLast(s, c) {
+export function splitOnLast(s, c) {
     if (!s)
         return [s];
     let pos = s.lastIndexOf(c);
@@ -1168,8 +1269,7 @@ function splitOnLast(s, c) {
         ? [s.substring(0, pos), s.substring(pos + 1)]
         : [s];
 }
-exports.splitOnLast = splitOnLast;
-function leftPart(s, needle) {
+export function leftPart(s, needle) {
     if (s == null)
         return null;
     let pos = s.indexOf(needle);
@@ -1177,8 +1277,7 @@ function leftPart(s, needle) {
         ? s
         : s.substring(0, pos);
 }
-exports.leftPart = leftPart;
-function rightPart(s, needle) {
+export function rightPart(s, needle) {
     if (s == null)
         return null;
     let pos = s.indexOf(needle);
@@ -1186,8 +1285,7 @@ function rightPart(s, needle) {
         ? s
         : s.substring(pos + needle.length);
 }
-exports.rightPart = rightPart;
-function lastLeftPart(s, needle) {
+export function lastLeftPart(s, needle) {
     if (s == null)
         return null;
     let pos = s.lastIndexOf(needle);
@@ -1195,8 +1293,7 @@ function lastLeftPart(s, needle) {
         ? s
         : s.substring(0, pos);
 }
-exports.lastLeftPart = lastLeftPart;
-function lastRightPart(s, needle) {
+export function lastRightPart(s, needle) {
     if (s == null)
         return null;
     let pos = s.lastIndexOf(needle);
@@ -1204,33 +1301,25 @@ function lastRightPart(s, needle) {
         ? s
         : s.substring(pos + needle.length);
 }
-exports.lastRightPart = lastRightPart;
-function chop(str, len = 1) {
+export function chop(str, len = 1) {
     len = Math.abs(len);
     return str ? len < str.length ? str.substring(0, str.length - len) : '' : str;
 }
-exports.chop = chop;
-function onlyProps(obj, keys) {
+export function onlyProps(obj, keys) {
     let to = {};
     keys.forEach(key => to[key] = obj[key]);
     return to;
 }
-exports.onlyProps = onlyProps;
 function splitCase(t) {
     return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim();
 }
-function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))); }
-exports.humanize = humanize;
-const ucFirst = (s) => s.charAt(0).toUpperCase() + s.substring(1);
-exports.ucFirst = ucFirst;
-const isUpper = (c) => c >= 'A' && c <= 'Z';
-exports.isUpper = isUpper;
-const isLower = (c) => c >= 'a' && c <= 'z';
-exports.isLower = isLower;
-const isDigit = (c) => c >= '0' && c <= '9';
-exports.isDigit = isDigit;
-const upperOrDigit = (c) => (0, exports.isUpper)(c) || (0, exports.isDigit)(c);
-function splitTitleCase(s) {
+export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))); }
+export const ucFirst = (s) => s.charAt(0).toUpperCase() + s.substring(1);
+export const isUpper = (c) => c >= 'A' && c <= 'Z';
+export const isLower = (c) => c >= 'a' && c <= 'z';
+export const isDigit = (c) => c >= '0' && c <= '9';
+const upperOrDigit = (c) => isUpper(c) || isDigit(c);
+export function splitTitleCase(s) {
     let to = [];
     if (typeof s != 'string')
         return to;
@@ -1247,10 +1336,8 @@ function splitTitleCase(s) {
     to.push(s.substring(lastSplit, s.length));
     return to.filter(x => !!x);
 }
-exports.splitTitleCase = splitTitleCase;
-const humanify = s => !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' '));
-exports.humanify = humanify;
-function queryString(url) {
+export const humanify = s => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '));
+export function queryString(url) {
     if (!url || url.indexOf('?') === -1)
         return {};
     let pairs = splitOnFirst(url, '?')[1].split('&');
@@ -1263,8 +1350,7 @@ function queryString(url) {
     }
     return map;
 }
-exports.queryString = queryString;
-function combinePaths(...paths) {
+export function combinePaths(...paths) {
     let parts = [], i, l;
     for (i = 0, l = paths.length; i < l; i++) {
         let arg = paths[i];
@@ -1286,8 +1372,7 @@ function combinePaths(...paths) {
         combinedPaths.unshift("");
     return combinedPaths.join("/") || (combinedPaths.length ? "/" : ".");
 }
-exports.combinePaths = combinePaths;
-function createPath(route, args) {
+export function createPath(route, args) {
     let argKeys = {};
     for (let k in args) {
         argKeys[k.toLowerCase()] = k;
@@ -1311,13 +1396,11 @@ function createPath(route, args) {
     }
     return url;
 }
-exports.createPath = createPath;
-function createUrl(route, args) {
+export function createUrl(route, args) {
     let url = createPath(route, args);
     return appendQueryString(url, args);
 }
-exports.createUrl = createUrl;
-function appendQueryString(url, args) {
+export function appendQueryString(url, args) {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             url += url.indexOf("?") >= 0 ? "&" : "?";
@@ -1326,7 +1409,6 @@ function appendQueryString(url, args) {
     }
     return url;
 }
-exports.appendQueryString = appendQueryString;
 function qsValue(arg) {
     if (arg == null)
         return "";
@@ -1335,7 +1417,7 @@ function qsValue(arg) {
     return encodeURIComponent(arg) || "";
 }
 //from: https://github.com/madmurphy/stringview.js/blob/master/stringview.js
-function bytesToBase64(aBytes) {
+export function bytesToBase64(aBytes) {
     let eqLen = (3 - (aBytes.length % 3)) % 3, sB64Enc = "";
     for (let nMod3, nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3;
@@ -1349,7 +1431,6 @@ function bytesToBase64(aBytes) {
         ? sB64Enc
         : sB64Enc.substring(0, sB64Enc.length - eqLen) + (eqLen === 1 ? "=" : "==");
 }
-exports.bytesToBase64 = bytesToBase64;
 function uint6ToB64(nUint6) {
     return nUint6 < 26 ?
         nUint6 + 65
@@ -1372,9 +1453,8 @@ function _atob(base64) {
 }
 //from: http://stackoverflow.com/a/30106551/85785
 JsonServiceClient.toBase64 = (str) => _btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode(new Number('0x' + p1).valueOf())));
-function stripQuotes(s) { return s && s[0] == '"' && s[s.length] == '"' ? s.slice(1, -1) : s; }
-exports.stripQuotes = stripQuotes;
-function tryDecode(s) {
+export function stripQuotes(s) { return s && s[0] == '"' && s[s.length] == '"' ? s.slice(1, -1) : s; }
+export function tryDecode(s) {
     try {
         return decodeURIComponent(s);
     }
@@ -1382,8 +1462,7 @@ function tryDecode(s) {
         return s;
     }
 }
-exports.tryDecode = tryDecode;
-function parseCookie(setCookie) {
+export function parseCookie(setCookie) {
     if (!setCookie)
         return null;
     let to = null;
@@ -1418,11 +1497,9 @@ function parseCookie(setCookie) {
     }
     return to;
 }
-exports.parseCookie = parseCookie;
-function normalizeKey(key) { return key.toLowerCase().replace(/_/g, ''); }
-exports.normalizeKey = normalizeKey;
+export function normalizeKey(key) { return key.toLowerCase().replace(/_/g, ''); }
 function isArray(o) { return Object.prototype.toString.call(o) === '[object Array]'; }
-function normalize(dto, deep) {
+export function normalize(dto, deep) {
     if (isArray(dto)) {
         if (!deep)
             return dto;
@@ -1440,14 +1517,12 @@ function normalize(dto, deep) {
     }
     return o;
 }
-exports.normalize = normalize;
-function getField(o, name) {
+export function getField(o, name) {
     return o == null || name == null ? null :
         o[name] ||
             o[Object.keys(o).filter(k => normalizeKey(k) === normalizeKey(name))[0] || ''];
 }
-exports.getField = getField;
-function parseResponseStatus(json, defaultMsg = null) {
+export function parseResponseStatus(json, defaultMsg = null) {
     try {
         let err = JSON.parse(json);
         return sanitize(err.ResponseStatus || err.responseStatus);
@@ -1459,8 +1534,7 @@ function parseResponseStatus(json, defaultMsg = null) {
         };
     }
 }
-exports.parseResponseStatus = parseResponseStatus;
-function toFormData(o) {
+export function toFormData(o) {
     if (typeof window == "undefined")
         return;
     let formData = new FormData();
@@ -1469,8 +1543,7 @@ function toFormData(o) {
     }
     return formData;
 }
-exports.toFormData = toFormData;
-function toObject(keys) {
+export function toObject(keys) {
     const to = {};
     if (!keys)
         return to;
@@ -1484,8 +1557,7 @@ function toObject(keys) {
     });
     return to;
 }
-exports.toObject = toObject;
-function errorResponseSummary() {
+export function errorResponseSummary() {
     const responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
         return undefined;
@@ -1494,8 +1566,7 @@ function errorResponseSummary() {
         ? status.message || status.errorCode
         : undefined;
 }
-exports.errorResponseSummary = errorResponseSummary;
-function errorResponseExcept(fieldNames) {
+export function errorResponseExcept(fieldNames) {
     const responseStatus = this.responseStatus || this.ResponseStatus;
     if (responseStatus == null)
         return undefined;
@@ -1516,8 +1587,7 @@ function errorResponseExcept(fieldNames) {
     }
     return status.message || status.errorCode || undefined;
 }
-exports.errorResponseExcept = errorResponseExcept;
-function errorResponse(fieldName) {
+export function errorResponse(fieldName) {
     if (fieldName == null)
         return errorResponseSummary.call(this);
     const responseStatus = this.responseStatus || this.ResponseStatus;
@@ -1531,10 +1601,8 @@ function errorResponse(fieldName) {
         ? field.message || field.errorCode
         : undefined;
 }
-exports.errorResponse = errorResponse;
-function isDate(d) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d); }
-exports.isDate = isDate;
-function toDate(s) {
+export function isDate(d) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d); }
+export function toDate(s) {
     return !s ? null
         : isDate(s)
             ? s
@@ -1542,26 +1610,19 @@ function toDate(s) {
                 ? new Date(parseFloat(/Date\(([^)]+)\)/.exec(s)[1]))
                 : new Date(s);
 }
-exports.toDate = toDate;
-function toDateFmt(s) { return dateFmt(toDate(s)); }
-exports.toDateFmt = toDateFmt;
-function padInt(n) { return n < 10 ? '0' + n : n; }
-exports.padInt = padInt;
-function dateFmt(d = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()); }
-exports.dateFmt = dateFmt;
-function dateFmtHM(d = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes()); }
-exports.dateFmtHM = dateFmtHM;
-function timeFmt12(d = new Date()) { return padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM"); }
-exports.timeFmt12 = timeFmt12;
-function toLocalISOString(d = new Date()) {
+export function toDateFmt(s) { return dateFmt(toDate(s)); }
+export function padInt(n) { return n < 10 ? '0' + n : n; }
+export function dateFmt(d = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()); }
+export function dateFmtHM(d = new Date()) { return d.getFullYear() + '/' + padInt(d.getMonth() + 1) + '/' + padInt(d.getDate()) + ' ' + padInt(d.getHours()) + ":" + padInt(d.getMinutes()); }
+export function timeFmt12(d = new Date()) { return padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM"); }
+export function toLocalISOString(d = new Date()) {
     return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
 }
-exports.toLocalISOString = toLocalISOString;
 function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
 function attr(e, name) { return e.getAttribute(name); }
 function sattr(e, name, value) { return e.setAttribute(name, value); }
 function rattr(e, name) { return e.removeAttribute(name); }
-function createElement(tagName, options, attrs) {
+export function createElement(tagName, options, attrs) {
     const keyAliases = { className: 'class', htmlFor: 'for' };
     const el = document.createElement(tagName);
     if (attrs) {
@@ -1574,7 +1635,6 @@ function createElement(tagName, options, attrs) {
     }
     return el;
 }
-exports.createElement = createElement;
 function showInvalidInputs() {
     let errorMsg = attr(this, 'data-invalid');
     if (errorMsg) {
@@ -1621,17 +1681,15 @@ function remClass(el, cls) {
                 ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ')
                 : null;
 }
-function $1(sel, el) {
+export function $1(sel, el) {
     return typeof sel === "string" ? (el || document).querySelector(sel) : sel || null;
 }
-exports.$1 = $1;
-function $$(sel, el) {
+export function $$(sel, el) {
     return typeof sel === "string"
         ? Array.prototype.slice.call((el || document).querySelectorAll(sel))
         : Array.isArray(sel) ? sel : [sel];
 }
-exports.$$ = $$;
-function on(sel, handlers) {
+export function on(sel, handlers) {
     $$(sel).forEach(e => {
         Object.keys(handlers).forEach(function (evt) {
             let fn = handlers[evt];
@@ -1641,21 +1699,18 @@ function on(sel, handlers) {
         });
     });
 }
-exports.on = on;
-function delaySet(f, opt) {
+export function delaySet(f, opt) {
     let duration = opt && opt.duration || 300;
     let timeout = setTimeout(() => f(true), duration);
     return () => { clearTimeout(timeout); f(false); };
 }
-exports.delaySet = delaySet;
 // init generic behavior to bootstrap elements
-function bootstrap(el) {
+export function bootstrap(el) {
     const els = (el || document).querySelectorAll('[data-invalid]');
     for (let i = 0; i < els.length; i++) {
         showInvalidInputs.call(els[i]);
     }
 }
-exports.bootstrap = bootstrap;
 if (typeof window != "undefined" && window.Element !== undefined) { // polyfill IE9+
     if (!Element.prototype.matches) {
         Element.prototype.matches = Element.prototype.msMatchesSelector ||
@@ -1704,7 +1759,7 @@ function handleEvent(handlers, el = document, type) {
         }
     });
 }
-function bindHandlers(handlers, el = document, opt = null) {
+export function bindHandlers(handlers, el = document, opt = null) {
     if (opt && opt.events) {
         opt.events.forEach(evt => handleEvent(handlers, el, evt));
     }
@@ -1717,8 +1772,7 @@ function bindHandlers(handlers, el = document, opt = null) {
         });
     }
 }
-exports.bindHandlers = bindHandlers;
-function bootstrapForm(form, options) {
+export function bootstrapForm(form, options) {
     if (!form)
         return;
     if (options.model)
@@ -1729,7 +1783,6 @@ function bootstrapForm(form, options) {
         return ajaxSubmit(form, options);
     };
 }
-exports.bootstrapForm = bootstrapForm;
 function applyErrors(f, status, opt) {
     const validation = {
         overrideMessages: false,
@@ -1751,7 +1804,7 @@ function applyErrors(f, status, opt) {
     status = sanitize(status);
     addClass(f, "has-errors");
     const bs4 = opt && opt.type === "bootstrap-v4";
-    const v = Object.assign(Object.assign({}, validation), opt);
+    const v = { ...validation, ...opt };
     if (opt.messages) {
         v.overrideMessages = true;
     }
@@ -1852,14 +1905,13 @@ var Types;
     Types["UrlEncoded"] = "application/x-www-form-urlencoded";
     Types["Json"] = "application/json";
 })(Types || (Types = {}));
-function toVarNames(names) {
+export function toVarNames(names) {
     return !names ? [] :
         isArray(names)
             ? names
             : names.split(',').map(s => s.trim());
 }
-exports.toVarNames = toVarNames;
-function formSubmit(options = {}) {
+export function formSubmit(options = {}) {
     const f = this;
     const contentType = attr(f, 'enctype') || Types.UrlEncoded;
     if (contentType == Types.MultiPart && window.FormData === undefined)
@@ -1897,7 +1949,6 @@ function formSubmit(options = {}) {
         return fromResponse(r);
     });
 }
-exports.formSubmit = formSubmit;
 function handleHeaderBehaviors(f, r) {
     const loc = r.headers.get('X-Location');
     if (loc) {
@@ -1911,7 +1962,7 @@ function handleHeaderBehaviors(f, r) {
         triggerEvent(f, cmd, data ? [data] : []);
     }
 }
-function ajaxSubmit(f, options = {}) {
+export function ajaxSubmit(f, options = {}) {
     const type = options.type;
     const bs4 = type === "bootstrap-v4";
     clearErrors(f);
@@ -1935,7 +1986,7 @@ function ajaxSubmit(f, options = {}) {
     }
     function handleError(errMsg, err = null) {
         if (err) {
-            applyErrors(f, err.ResponseStatus || err.responseStatus, Object.assign({}, options));
+            applyErrors(f, err.ResponseStatus || err.responseStatus, { ...options });
         }
         else if (errMsg) {
             addClass(f, "has-errors");
@@ -1982,7 +2033,6 @@ function ajaxSubmit(f, options = {}) {
         }
     });
 }
-exports.ajaxSubmit = ajaxSubmit;
 function fromResponse(r) {
     const contentType = r.headers.get("content-type");
     const isJson = contentType && contentType.indexOf(Types.Json) !== -1;
@@ -1993,14 +2043,13 @@ function fromResponse(r) {
         return null;
     return r.json();
 }
-function serializeForm(form, contentType = null) {
+export function serializeForm(form, contentType = null) {
     return contentType === Types.MultiPart
         ? new FormData(form)
         : contentType == Types.Json
             ? JSON.stringify(serializeToObject(form))
             : serializeToUrlEncoded(form);
 }
-exports.serializeForm = serializeForm;
 function formEntries(form, state, fn) {
     let field, f = form;
     let len = f.elements.length;
@@ -2020,22 +2069,19 @@ function formEntries(form, state, fn) {
     }
     return state;
 }
-function serializeToObject(form) {
+export function serializeToObject(form) {
     return formEntries(form, {}, (to, name, value) => to[name] = value);
 }
-exports.serializeToObject = serializeToObject;
-function serializeToUrlEncoded(form) {
+export function serializeToUrlEncoded(form) {
     const to = formEntries(form, [], (s, name, value) => typeof value == 'string'
         ? s.push(encodeURIComponent(name) + "=" + encodeURIComponent(value))
         : null);
     return to.join('&').replace(/%20/g, '+');
 }
-exports.serializeToUrlEncoded = serializeToUrlEncoded;
-function serializeToFormData(form) {
+export function serializeToFormData(form) {
     return formEntries(form, new FormData(), (to, name, value) => to.append(name, value));
 }
-exports.serializeToFormData = serializeToFormData;
-function sanitizeFormData(formData) {
+export function sanitizeFormData(formData) {
     // @ts-ignore
     for (let [key, value] of formData) {
         // Remove 0 length files
@@ -2045,8 +2091,7 @@ function sanitizeFormData(formData) {
     }
     return formData;
 }
-exports.sanitizeFormData = sanitizeFormData;
-function triggerEvent(el, name, data = null) {
+export function triggerEvent(el, name, data = null) {
     if (document.createEvent) {
         let evt = document.createEvent(name == 'click' || name.startsWith('mouse') ? 'MouseEvents' : 'HTMLEvents');
         evt.initEvent(name, true, true);
@@ -2058,8 +2103,7 @@ function triggerEvent(el, name, data = null) {
         el.fireEvent("on" + name, evt);
     }
 }
-exports.triggerEvent = triggerEvent;
-function populateForm(form, model) {
+export function populateForm(form, model) {
     if (!model)
         return;
     const toggleCase = (s) => !s ? s :
@@ -2103,20 +2147,17 @@ function populateForm(form, model) {
         }
     }
 }
-exports.populateForm = populateForm;
-function trimEnd(s, c) {
+export function trimEnd(s, c) {
     let end = s.length;
     while (end > 0 && s[end - 1] === c) {
         --end;
     }
     return (end < s.length) ? s.substring(0, end) : s;
 }
-exports.trimEnd = trimEnd;
-function safeVarName(s) {
+export function safeVarName(s) {
     return s.replace(/[\W]+/g, '');
 }
-exports.safeVarName = safeVarName;
-function pick(o, keys) {
+export function pick(o, keys) {
     const to = {};
     for (const k in o) {
         if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
@@ -2125,8 +2166,7 @@ function pick(o, keys) {
     }
     return to;
 }
-exports.pick = pick;
-function omit(o, keys) {
+export function omit(o, keys) {
     const to = {};
     for (const k in o) {
         if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
@@ -2135,22 +2175,18 @@ function omit(o, keys) {
     }
     return to;
 }
-exports.omit = omit;
-function apply(x, fn) {
+export function apply(x, fn) {
     fn(x);
     return x;
 }
-exports.apply = apply;
-function each(xs, f, o) {
+export function each(xs, f, o) {
     return xs.reduce((acc, x) => { f(acc, x); return acc; }, o || {});
 }
-exports.each = each;
-function resolve(o, f) {
+export function resolve(o, f) {
     let ret = typeof o == 'function' ? o() : o;
     return typeof f == 'function' ? f(ret) : ret;
 }
-exports.resolve = resolve;
-function mapGet(o, name) {
+export function mapGet(o, name) {
     if (!o || !name)
         return null;
     let ret = o[name];
@@ -2163,8 +2199,7 @@ function mapGet(o, name) {
     }
     return null;
 }
-exports.mapGet = mapGet;
-function apiValue(o) {
+export function apiValue(o) {
     if (o == null)
         return '';
     if (typeof o == 'string')
@@ -2173,8 +2208,7 @@ function apiValue(o) {
             : o.trim();
     return o;
 }
-exports.apiValue = apiValue;
-function apiValueFmt(o) {
+export function apiValueFmt(o) {
     let ret = apiValue(o);
     return (ret != null
         ? isDate(ret)
@@ -2182,27 +2216,24 @@ function apiValueFmt(o) {
             : ret
         : null) || '';
 }
-exports.apiValueFmt = apiValueFmt;
 /* NAV */
-function activeClassNav(x, activePath) {
+export function activeClassNav(x, activePath) {
     return x.href != null && (x.exact || activePath.length <= 1
         ? trimEnd(activePath, '/').toLowerCase() === trimEnd((x.href), '/').toLowerCase()
         : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd((x.href), '/').toLowerCase()))
         ? 'active'
         : null;
 }
-exports.activeClassNav = activeClassNav;
-function activeClass(href, activePath, exact) {
+export function activeClass(href, activePath, exact) {
     return href != null && (exact || activePath.length <= 1
         ? trimEnd(activePath, '/').toLowerCase() === trimEnd(href, '/').toLowerCase()
         : trimEnd(activePath, '/').toLowerCase().startsWith(trimEnd(href, '/').toLowerCase()))
         ? 'active'
         : null;
 }
-exports.activeClass = activeClass;
 function bootstrapColors() { return ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark']; }
-exports.BootstrapColors = bootstrapColors();
-function btnColorClass(props) {
+export const BootstrapColors = bootstrapColors();
+export function btnColorClass(props) {
     for (const color of bootstrapColors()) {
         if (props[color]) {
             return 'btn-' + color;
@@ -2213,10 +2244,9 @@ function btnColorClass(props) {
     }
     return null;
 }
-exports.btnColorClass = btnColorClass;
 function bootstrapSizes() { return ['xs', 'sm', 'md', 'lg']; }
-exports.BootstrapSizes = bootstrapSizes();
-function btnSizeClass(props) {
+export const BootstrapSizes = bootstrapSizes();
+export function btnSizeClass(props) {
     for (const size of bootstrapSizes()) {
         if (props[size]) {
             return 'btn-' + size;
@@ -2224,8 +2254,7 @@ function btnSizeClass(props) {
     }
     return null;
 }
-exports.btnSizeClass = btnSizeClass;
-function btnClasses(props) {
+export function btnClasses(props) {
     const to = [];
     const color = btnColorClass(props);
     if (color) {
@@ -2240,8 +2269,14 @@ function btnClasses(props) {
     }
     return to;
 }
-exports.btnClasses = btnClasses;
-class NavDefaults {
+export class NavDefaults {
+    static navClass = 'nav';
+    static navItemClass = 'nav-item';
+    static navLinkClass = 'nav-link';
+    static childNavItemClass = 'nav-item dropdown';
+    static childNavLinkClass = 'nav-link dropdown-toggle';
+    static childNavMenuClass = 'dropdown-menu';
+    static childNavMenuItemClass = 'dropdown-item';
     static create() { return new NavOptions(); }
     static forNav(options) { return options || NavDefaults.create(); }
     static overrideDefaults(targets, source) {
@@ -2285,38 +2320,26 @@ class NavDefaults {
         return true;
     }
 }
-exports.NavDefaults = NavDefaults;
-NavDefaults.navClass = 'nav';
-NavDefaults.navItemClass = 'nav-item';
-NavDefaults.navLinkClass = 'nav-link';
-NavDefaults.childNavItemClass = 'nav-item dropdown';
-NavDefaults.childNavLinkClass = 'nav-link dropdown-toggle';
-NavDefaults.childNavMenuClass = 'dropdown-menu';
-NavDefaults.childNavMenuItemClass = 'dropdown-item';
-class NavLinkDefaults {
+export class NavLinkDefaults {
     static forNavLink(options) { return options || NavDefaults.create(); }
 }
-exports.NavLinkDefaults = NavLinkDefaults;
-class NavbarDefaults {
+export class NavbarDefaults {
+    static navClass = 'navbar-nav';
     static create() { return new NavOptions({ navClass: NavbarDefaults.navClass }); }
     static forNavbar(options) { return NavDefaults.overrideDefaults(options, NavbarDefaults.create()); }
 }
-exports.NavbarDefaults = NavbarDefaults;
-NavbarDefaults.navClass = 'navbar-nav';
-class NavButtonGroupDefaults {
+export class NavButtonGroupDefaults {
+    static navClass = 'btn-group';
+    static navItemClass = 'btn btn-primary';
     static create() { return new NavOptions({ navClass: NavButtonGroupDefaults.navClass, navItemClass: NavButtonGroupDefaults.navItemClass }); }
     static forNavButtonGroup(options) { return NavDefaults.overrideDefaults(options, NavButtonGroupDefaults.create()); }
 }
-exports.NavButtonGroupDefaults = NavButtonGroupDefaults;
-NavButtonGroupDefaults.navClass = 'btn-group';
-NavButtonGroupDefaults.navItemClass = 'btn btn-primary';
-class LinkButtonDefaults {
+export class LinkButtonDefaults {
+    static navItemClass = 'btn';
     static create() { return new NavOptions({ navItemClass: LinkButtonDefaults.navItemClass }); }
     static forLinkButton(options) { return NavDefaults.overrideDefaults(options || null, LinkButtonDefaults.create()); }
 }
-exports.LinkButtonDefaults = LinkButtonDefaults;
-LinkButtonDefaults.navItemClass = 'btn';
-class UserAttributes {
+export class UserAttributes {
     static fromSession(session) {
         const to = [];
         if (session != null) {
@@ -2331,13 +2354,22 @@ class UserAttributes {
         return to;
     }
 }
-exports.UserAttributes = UserAttributes;
-class NavOptions {
+export class NavOptions {
     static fromSession(session, to) {
         to = to || new NavOptions();
         to.attributes = UserAttributes.fromSession(session);
         return to;
     }
+    attributes;
+    activePath;
+    baseHref;
+    navClass;
+    navItemClass;
+    navLinkClass;
+    childNavItemClass;
+    childNavLinkClass;
+    childNavMenuClass;
+    childNavMenuItemClass;
     constructor(init) {
         this.attributes = [];
         this.navClass = NavDefaults.navClass;
@@ -2350,8 +2382,7 @@ class NavOptions {
         Object.assign(this, init);
     }
 }
-exports.NavOptions = NavOptions;
-function classNames(...args) {
+export function classNames(...args) {
     const classes = [];
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
@@ -2377,8 +2408,7 @@ function classNames(...args) {
     }
     return classes.join(' ');
 }
-exports.classNames = classNames;
-function fromXsdDuration(xsd) {
+export function fromXsdDuration(xsd) {
     let days = 0;
     let hours = 0;
     let minutes = 0;
@@ -2409,7 +2439,6 @@ function fromXsdDuration(xsd) {
     let totalSecs = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds;
     return totalSecs + ms;
 }
-exports.fromXsdDuration = fromXsdDuration;
 function timeFmt(time, asXsd) {
     let totalSeconds = time;
     let wholeSeconds = time | 0;
@@ -2460,21 +2489,16 @@ function timeFmt(time, asXsd) {
     }
     return sb;
 }
-function toXsdDuration(time) { return timeFmt(time, true); }
-exports.toXsdDuration = toXsdDuration;
-function toTimeSpanFmt(time) { return timeFmt(time, false); }
-exports.toTimeSpanFmt = toTimeSpanFmt;
-function flatMap(f, xs) { return xs.reduce((r, x) => r.concat(f(x)), []); }
-exports.flatMap = flatMap;
-function uniq(xs) { return Array.from(new Set(xs)).sort((x, y) => x > y ? 1 : -1); }
-exports.uniq = uniq;
-function enc(o) {
+export function toXsdDuration(time) { return timeFmt(time, true); }
+export function toTimeSpanFmt(time) { return timeFmt(time, false); }
+export function flatMap(f, xs) { return xs.reduce((r, x) => r.concat(f(x)), []); }
+export function uniq(xs) { return Array.from(new Set(xs)).sort((x, y) => x > y ? 1 : -1); }
+export function enc(o) {
     return o == null ? null : typeof o == 'string'
         ? o.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&#34;')
         : `${o}`;
 }
-exports.enc = enc;
-function htmlAttrs(o) {
+export function htmlAttrs(o) {
     let sb = [];
     Object.keys(o).forEach(k => {
         if (sb.length > 0)
@@ -2486,8 +2510,7 @@ function htmlAttrs(o) {
     });
     return sb.join('');
 }
-exports.htmlAttrs = htmlAttrs;
-function indexOfAny(str, needles) {
+export function indexOfAny(str, needles) {
     for (let i = 0, len = needles.length; i < len; i++) {
         let pos = str.indexOf(needles[i]);
         if (pos >= 0)
@@ -2495,43 +2518,35 @@ function indexOfAny(str, needles) {
     }
     return -1;
 }
-exports.indexOfAny = indexOfAny;
-function isNullOrEmpty(o) {
+export function isNullOrEmpty(o) {
     return (o === null || o === undefined || o === "");
 }
-exports.isNullOrEmpty = isNullOrEmpty;
 // From .NET DateTime (WCF JSON or ISO Date) to JS Date
-function fromDateTime(dateTime) {
+export function fromDateTime(dateTime) {
     return toDate(dateTime);
 }
-exports.fromDateTime = fromDateTime;
 // From JS Date to .NET DateTime (WCF JSON Date)
-function toDateTime(date) {
+export function toDateTime(date) {
     return `\/Date(${date.getTime()})\/`;
 }
-exports.toDateTime = toDateTime;
 // From .NET TimeSpan (XSD Duration) to JS String
-function fromTimeSpan(xsdDuration) {
+export function fromTimeSpan(xsdDuration) {
     return xsdDuration;
 }
-exports.fromTimeSpan = fromTimeSpan;
 // From JS String to .NET TimeSpan (XSD Duration)
-function toTimeSpan(xsdDuration) {
+export function toTimeSpan(xsdDuration) {
     return xsdDuration;
 }
-exports.toTimeSpan = toTimeSpan;
 // From .NET Guid to JS String
-function fromGuid(xsdDuration) {
+export function fromGuid(xsdDuration) {
     return xsdDuration;
 }
-exports.fromGuid = fromGuid;
 // From JS String to .NET Guid
-function toGuid(xsdDuration) {
+export function toGuid(xsdDuration) {
     return xsdDuration;
 }
-exports.toGuid = toGuid;
 // From .NET byte[] (Base64 String) to JVM signed byte[]
-function fromByteArray(base64) {
+export function fromByteArray(base64) {
     let binaryStr = _atob(base64);
     let len = binaryStr.length;
     let bytes = new Uint8Array(len);
@@ -2540,21 +2555,18 @@ function fromByteArray(base64) {
     }
     return bytes;
 }
-exports.fromByteArray = fromByteArray;
 // From JS Uint8Array to .NET byte[] (Base64 String)
-function toByteArray(bytes) {
+export function toByteArray(bytes) {
     let str = String.fromCharCode.apply(null, bytes);
     return _btoa(str);
 }
-exports.toByteArray = toByteArray;
 // From JS String to Base64 String
-function toBase64String(source) {
+export function toBase64String(source) {
     return JsonServiceClient.toBase64(source);
 }
-exports.toBase64String = toBase64String;
-class StringBuffer {
+export class StringBuffer {
+    buffer_ = '';
     constructor(opt_a1, ...var_args) {
-        this.buffer_ = '';
         if (opt_a1 != null)
             this.append.apply(this, arguments);
     }
@@ -2574,8 +2586,8 @@ class StringBuffer {
     getLength() { return this.buffer_.length; }
     toString() { return this.buffer_; }
 }
-exports.StringBuffer = StringBuffer;
-class JSV {
+export class JSV {
+    static ESCAPE_CHARS = ['"', ':', ',', '{', '}', '[', ']', '\r', '\n'];
     static encodeString(str) {
         if (str == null)
             return null;
@@ -2644,9 +2656,7 @@ class JSV {
         }
     }
 }
-exports.JSV = JSV;
-JSV.ESCAPE_CHARS = ['"', ':', ',', '{', '}', '[', ']', '\r', '\n'];
-function uniqueKeys(rows) {
+export function uniqueKeys(rows) {
     let to = [];
     rows.forEach(o => Object.keys(o).forEach(k => {
         if (to.indexOf(k) === -1) {
@@ -2655,8 +2665,7 @@ function uniqueKeys(rows) {
     }));
     return to;
 }
-exports.uniqueKeys = uniqueKeys;
-function alignLeft(str, len, pad = ' ') {
+export function alignLeft(str, len, pad = ' ') {
     if (len < 0)
         return '';
     let aLen = len + 1 - str.length;
@@ -2664,8 +2673,7 @@ function alignLeft(str, len, pad = ' ') {
         return str;
     return pad + str + pad.repeat(len + 1 - str.length);
 }
-exports.alignLeft = alignLeft;
-function alignCenter(str, len, pad = ' ') {
+export function alignCenter(str, len, pad = ' ') {
     if (len < 0)
         return '';
     if (!str)
@@ -2675,8 +2683,7 @@ function alignCenter(str, len, pad = ' ') {
     let odds = Math.abs((nLen % 2) - (len % 2));
     return pad.repeat(half + 1) + str + pad.repeat(half + 1 + odds);
 }
-exports.alignCenter = alignCenter;
-function alignRight(str, len, pad = ' ') {
+export function alignRight(str, len, pad = ' ') {
     if (len < 0)
         return '';
     let aLen = len + 1 - str.length;
@@ -2684,8 +2691,7 @@ function alignRight(str, len, pad = ' ') {
         return str;
     return pad.repeat(len + 1 - str.length) + str + pad;
 }
-exports.alignRight = alignRight;
-function alignAuto(obj, len, pad = ' ') {
+export function alignAuto(obj, len, pad = ' ') {
     let str = `${obj}`;
     if (str.length <= len) {
         return typeof obj === "number"
@@ -2694,14 +2700,12 @@ function alignAuto(obj, len, pad = ' ') {
     }
     return str;
 }
-exports.alignAuto = alignAuto;
-function EventBus() {
+export function EventBus() {
     let { subscribe, publish } = createBus();
     this.subscribe = subscribe;
     this.publish = publish;
 }
-exports.EventBus = EventBus;
-function createBus() {
+export function createBus() {
     let subscriptions = {};
     function subscribe(type, callback) {
         let id = Symbol('id');
@@ -2725,8 +2729,7 @@ function createBus() {
     }
     return { subscribe, publish };
 }
-exports.createBus = createBus;
-class Inspect {
+export class Inspect {
     static vars(obj) {
         let R = nodeRequire();
         if (typeof R !== 'function')
@@ -2787,4 +2790,3 @@ class Inspect {
     }
     static printDumpTable(rows) { console.log(Inspect.dumpTable(rows)); }
 }
-exports.Inspect = Inspect;

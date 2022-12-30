@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "esnext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "lib": ["es2015","dom","dom.iterable"]
+   },
+   "files": [
+    "./src/index.ts"
+   ]
+}

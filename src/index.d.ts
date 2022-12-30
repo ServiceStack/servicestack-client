@@ -187,7 +187,7 @@ export declare class MetadataType {
     };
     constructor(init?: Partial<MetadataType>);
 }
-export declare type ErrorResponseType = null | "RefreshTokenException";
+export type ErrorResponseType = null | "RefreshTokenException";
 export interface IAuthSession {
     userName: string;
     displayName: string;
