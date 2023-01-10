@@ -1533,6 +1533,10 @@ export function toCamelCase (s: string) { return !s ? s : s.charAt(0).toLowerCas
 
 export function toPascalCase(s: string) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1) }
 
+export function toKebabCase(s: string) { return (s || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() }
+
+export function map(o:any, f:(x:any) => any) { return o == null ? null : f(o) }
+
 export function sanitize (status: any): any {
     if (status.responseStatus)
         return status

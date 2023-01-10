@@ -1200,6 +1200,8 @@ export function createError(errorCode, message, fieldName) {
 }
 export function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
 export function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
+export function toKebabCase(s) { return (s || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(); }
+export function map(o, f) { return o == null ? null : f(o); }
 export function sanitize(status) {
     if (status.responseStatus)
         return status;
