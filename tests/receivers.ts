@@ -73,21 +73,21 @@ export class TestJavaScriptReceiver extends ServerEventReceiver {
     static BackgroundImageReceived: string;
     static BackgroundImageRequestReceived: ServerEventMessage;
 
-    chat(request: ChatMessage) {
+    public chat(request: ChatMessage) {
         TestJavaScriptReceiver.ChatReceived = request;
     }
 
-    announce(message:string) {
+    public announce(message:string) {
         TestJavaScriptReceiver.AnnounceReceived = message;
         this.AnnounceInstance = message;
     }
 
-    toggle(message:string) {
+    public toggle(message:string) {
         TestJavaScriptReceiver.ToggleReceived = message;
         TestJavaScriptReceiver.ToggleRequestReceived = this.request;
     }
 
-    backgroundImage(message:string) {
+    public backgroundImage(message:string) {
         TestJavaScriptReceiver.BackgroundImageReceived = message;
         TestJavaScriptReceiver.BackgroundImageRequestReceived = this.request;
     }

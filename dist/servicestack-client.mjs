@@ -1,20 +1,3 @@
-function nodeRequire() {
-    //node require(), using dynamic access to fix web ng aot build
-    try {
-        let isNode = typeof process === 'object' &&
-            typeof process.versions === 'object' &&
-            typeof process.versions.node !== 'undefined';
-        if (isNode)
-            return eval('require');
-        return null;
-    }
-    catch (e) {
-        return null;
-    }
-}
-let R = nodeRequire();
-if (R)
-    R('cross-fetch/polyfill'); //fetch polyfill only required for node.js
 export class ResponseStatus {
     constructor(init) { Object.assign(this, init); }
     errorCode;
@@ -496,7 +479,7 @@ export class ServerEventsClient {
                     return;
                 }
                 let cmdLower = cmd.toLowerCase();
-                for (let k in r) {
+                getAllMembers(r).forEach(k => {
                     if (k.toLowerCase() == cmdLower) {
                         if (typeof r[k] == "function") {
                             r[k].call(el || r, request.body, request);
@@ -506,7 +489,7 @@ export class ServerEventsClient {
                         }
                         return;
                     }
-                }
+                });
                 let noSuchMethod = r["noSuchMethod"];
                 if (typeof noSuchMethod == "function") {
                     noSuchMethod.call(el || r, request.target, request);
@@ -658,6 +641,22 @@ export class ServerEventsClient {
         }
         return to;
     }
+}
+export function getAllMembers(o) {
+    let props = [];
+    do {
+        const l = Object.getOwnPropertyNames(o)
+            .concat(Object.getOwnPropertySymbols(o).map(s => s.toString()))
+            .sort()
+            .filter((p, i, arr) => p !== 'constructor' && //not the constructor
+            (i == 0 || p !== arr[i - 1]) && //not overriding in this prototype
+            props.indexOf(p) === -1 //not overridden in a child
+        );
+        props = props.concat(l);
+    } while ((o = Object.getPrototypeOf(o)) && //walk-up the prototype chain
+        Object.getPrototypeOf(o) //not the the Object prototype methods (hasOwnProperty, etc...)
+    );
+    return props;
 }
 export class ServerEventReceiver {
     client;
@@ -901,7 +900,9 @@ export class JsonServiceClient {
     json(res) {
         if (this.parseJson)
             return this.parseJson(res);
-        return res.json();
+        return res.text().then(txt => {
+            return txt.length > 0 ? JSON.parse(txt) : null;
+        });
     }
     applyResponseFilters(res) {
         if (this.responseFilter != null)
@@ -2736,12 +2737,22 @@ export function createBus() {
 }
 export class Inspect {
     static vars(obj) {
-        let R = nodeRequire();
-        if (typeof R !== 'function')
-            return;
-        let inspectVarsPath = process.env.INSPECT_VARS;
+        let inspectVarsPath = typeof process === 'object' && process.env.INSPECT_VARS;
         if (!inspectVarsPath || !obj)
             return;
+        let R = null;
+        //node require(), using dynamic access to fix web ng aot build
+        try {
+            let isNode = typeof process === 'object' &&
+                typeof process.versions === 'object' &&
+                typeof process.versions.node !== 'undefined';
+            if (!isNode)
+                return;
+            R = eval('require');
+        }
+        catch (e) {
+            return;
+        }
         let fs = R('fs');
         let varsPath = inspectVarsPath.replace(/\\/g, '/');
         if (varsPath.indexOf('/') >= 0) {

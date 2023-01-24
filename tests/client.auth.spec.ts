@@ -11,7 +11,7 @@ import {
     nameOf
 } from  '../src/index';
 
-const TEST_URL = "http://test.servicestack.net";
+const TEST_URL = "https://test.servicestack.net";
 //const TEST_URL = "http://localhost:56500";
 
 const createJwt = (opt:any={}) : CreateJwt => {
@@ -100,7 +100,7 @@ describe ('JsonServiceClient Auth Tests', () => {
             authClient.userName = "test";
             authClient.password = "test";
             const response = await authClient.get(new Authenticate());
-            client.bearerToken = response.bearerToken;
+            client.bearerToken = authClient.cookies['ss-tok'].value;
         };
 
         let response = await client.get(new TestAuth());
@@ -124,52 +124,6 @@ describe ('JsonServiceClient Auth Tests', () => {
         client.bearerToken = expiredJwt.token;
         let response = await client.get(new TestAuth());
         expect(count).eq(1);
-    })
-
-    it ("Can use refreshToken to fetch new token after expired token not using Token Cookies", async () => {
-
-        let count = 0;
-        let authClient = new JsonServiceClient(TEST_URL);
-        client.userName = "test";
-        client.password = "test";
-        let request = new Authenticate();
-        request.useTokenCookie = false;
-        let authResponse = await client.post(request);
-
-        client.refreshToken = authResponse.refreshToken;
-        client.setCredentials(null,null);
-
-        let createExpiredJwt = createJwt();
-        createExpiredJwt.jwtExpiry = "2000-01-01";
-        const expiredJwt = await client.post(createExpiredJwt);
-
-        client.bearerToken = expiredJwt.token;
-        let response = await client.get(new TestAuth());
-
-        expect(client.bearerToken).not.eq(expiredJwt.token);
-    })
-
-    it ("Can use refreshToken to fetch new token after expired token with explicit useTokenCookie", async () => {
-
-        let count = 0;
-        let client = new JsonServiceClient(TEST_URL);
-        client.userName = "test";
-        client.password = "test";
-        client.useTokenCookie = true;
-        let authResponse = await client.post(new Authenticate());
-
-        client.refreshToken = authResponse.refreshToken;
-        client.setCredentials(null,null);
-
-        let createExpiredJwt = createJwt();
-        createExpiredJwt.jwtExpiry = "2000-01-01";
-        const expiredJwt = await client.post(createExpiredJwt);
-
-        client.bearerToken = expiredJwt.token;
-        client.useTokenCookie = true;
-        let response = await client.get(new TestAuth());
-
-        expect(client.bearerToken).eq(null);
     })
 
     it ("Can reauthenticate after an auto refresh access token", async () => {

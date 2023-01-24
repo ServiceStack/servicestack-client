@@ -2,7 +2,7 @@
 Date: 2017-03-01 17:16:47
 Version: 4.00
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: http://test.servicestack.net
+BaseUrl: https://test.servicestack.net
 
 GlobalNamespace: interfaces
 //MakePropertiesOptional: True

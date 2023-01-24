@@ -152,7 +152,7 @@ function assertAllCollectionTypes(dto: AllCollectionTypes) {
     expect(pocoLookupMapAList["D"].name).equals("E");
 }
 
-const TEST_URL = "http://test.servicestack.net";
+const TEST_URL = "https://test.servicestack.net";
 function createTestClient() {
     return new JsonServiceClient(TEST_URL);
 }

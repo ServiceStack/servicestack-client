@@ -99,7 +99,7 @@ const complete = (done:Function, ...clients:ServerEventsClient[]) => {
         .then(r => done());
 }
 
-const SERVER_EVENTS_URL = 'http://test.servicestack.net';
+const SERVER_EVENTS_URL = 'https://test.servicestack.net';
 //const SERVER_EVENTS_URL = 'http://localhost:5000';
 
 describe ('ServerEventsClient Tests', () => {
@@ -463,6 +463,8 @@ describe ('ServerEventsClient Tests', () => {
             },
             onTick: run(states)
         }).start();
+
+        client1.hasConnected();
         
         states.unshift({
             test: () => client1.hasConnected(),
@@ -470,7 +472,7 @@ describe ('ServerEventsClient Tests', () => {
                 const request = new CustomType();
                 request.id = 1;
                 request.name = "Foo";
-                return postObject(client1, request, "test.FooMethod");
+                return postObject(client1, request, "test.fooMethod");
             }
         }, {test: () => msgs1.length >= 1,
             fn(){
@@ -482,7 +484,7 @@ describe ('ServerEventsClient Tests', () => {
                 const request = new CustomType();
                 request.id = 2;
                 request.name = "Bar";
-                return postObject(client1, request, "test.BarMethod");
+                return postObject(client1, request, "test.barMethod");
             } 
         }, {test: () => msgs1.length >= 2,
             fn(){

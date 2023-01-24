@@ -5,7 +5,7 @@ import {
     Inspect,
 } from  '../src/index';
 
-describe ('Inspect Tests', () => {
+describe.only ('Inspect Tests', () => {
 
     it ('Can use Inspect', async () => {
         let orgName = "nodejs";

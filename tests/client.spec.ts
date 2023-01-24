@@ -1,4 +1,5 @@
 /// <reference path="./dtos/test.interfaces.d.ts" />
+//import 'cross-fetch/polyfill'
 
 import * as dtos from "./dtos/techstacks.dtos"
 import { 
@@ -25,8 +26,8 @@ declare var process:any
 
 const { expect, assert } = chai
 
-const TECHSTACKS_URL = "https://www.techstacks.io"
-const TEST_URL = "http://test.servicestack.net"
+const TECHSTACKS_URL = "https://techstacks.io"
+const TEST_URL = "https://test.servicestack.net"
 
 //Clear existing User Session
 const clearSession = async (client:JsonServiceClient) => {
@@ -161,7 +162,8 @@ describe ('JsonServiceClient Tests', () => {
             password: "test",
         })
         let authApi = await testClient.api(request)
-        const jwtToken = authApi.response!.bearerToken
+        expect(authApi.succeeded)
+        const jwtToken = testClient.cookies['ss-tok'].value
         expect(jwtToken).not.empty
 
         //Clear existing User Session
@@ -291,7 +293,7 @@ describe ('JsonServiceClient Tests', () => {
 
     it ('Can GET using absolute url', async () => {
 
-        const r = await testClient.get<HelloResponse>("http://test.servicestack.net/hello/World")
+        const r = await testClient.get<HelloResponse>("https://test.servicestack.net/hello/World")
         expect(r.result).to.equal("Hello, World!")
     })
 

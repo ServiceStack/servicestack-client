@@ -339,6 +339,7 @@ export declare class ServerEventsClient {
         [id: string]: string;
     }): ServerEventUser;
 }
+export declare function getAllMembers(o: any): string[];
 export interface IReceiver {
     noSuchMethod(selector: string, message: any): any;
 }
