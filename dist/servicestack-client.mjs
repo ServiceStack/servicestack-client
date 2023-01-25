@@ -1118,6 +1118,18 @@ export class JsonServiceClient {
         }
     }
 }
+export class JsonApiClient {
+    static create(baseUrl = "/", f) {
+        let client = new JsonServiceClient(baseUrl).apply(c => {
+            c.basePath = "/api";
+            c.headers = new Headers(); //avoid pre-flight CORS requests
+            if (f) {
+                f(c);
+            }
+        });
+        return client;
+    }
+}
 export function getMethod(request, method) {
     return (method ?? typeof request.getMethod == "function")
         ? request.getMethod()

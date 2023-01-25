@@ -1429,6 +1429,19 @@ export class JsonServiceClient {
     }
 }
 
+export class JsonApiClient {
+    static create(baseUrl: string = "/", f?:(client:JsonServiceClient) => void) {
+        let client = new JsonServiceClient(baseUrl).apply(c => {
+            c.basePath = "/api"
+            c.headers = new Headers() //avoid pre-flight CORS requests
+            if (f) {
+                f(c)
+            }
+        })
+        return client
+    }
+}
+
 export function getMethod(request:any, method?:string) {
     return method ?? typeof (request as any).getMethod == "function"
         ? (request as any).getMethod()

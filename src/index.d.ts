@@ -479,6 +479,9 @@ export declare class JsonServiceClient {
     apiForm<TResponse>(request: IReturn<TResponse> | ApiRequest, body: FormData, args?: any, method?: string): Promise<ApiResult<TResponse>>;
     apiFormVoid(request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string): Promise<ApiResult<EmptyResponse>>;
 }
+export declare class JsonApiClient {
+    static create(baseUrl?: string, f?: (client: JsonServiceClient) => void): JsonServiceClient;
+}
 export declare function getMethod(request: any, method?: string): any;
 export declare function getResponseStatus(e: any): any;
 export interface ApiResponse {
