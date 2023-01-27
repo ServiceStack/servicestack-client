@@ -203,7 +203,7 @@ class ServerEventsClient {
                         if (opt.heartbeat) {
                             clearInterval(opt.heartbeat);
                         }
-                        opt.heartbeat = setInterval(() => {
+                        opt.heartbeat = setInterval(() => __awaiter(this, void 0, void 0, function* () {
                             if (this.eventSource.readyState === EventSource.CLOSED) {
                                 clearInterval(opt.heartbeat);
                                 const stopFn = opt.handlers["onStop"];
@@ -212,11 +212,23 @@ class ServerEventsClient {
                                 this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
                                 return;
                             }
-                            fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials }))
-                                .then(res => { if (!res.ok)
-                                throw new Error(`${res.status} - ${res.statusText}`); })
-                                .catch(error => this.reconnectServerEvents({ error }));
-                        }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
+                            const reqHeartbeat = new Request(opt.heartbeatUrl, {
+                                method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials
+                            });
+                            try {
+                                let res = yield fetch(reqHeartbeat);
+                                if (!res.ok) {
+                                    const error = new Error(`${res.status} - ${res.statusText}`);
+                                    this.reconnectServerEvents({ error });
+                                }
+                                else {
+                                    yield res.text();
+                                }
+                            }
+                            catch (error) {
+                                this.reconnectServerEvents({ error });
+                            }
+                        }), (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                     }
                     if (opt.unRegisterUrl) {
                         if (typeof window != "undefined") {

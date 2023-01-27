@@ -305,7 +305,7 @@ export class ServerEventsClient {
                     if (opt.heartbeat) {
                         clearInterval(opt.heartbeat);
                     }
-                    opt.heartbeat = setInterval(() => {
+                    opt.heartbeat = setInterval(async () => {
                         if (this.eventSource.readyState === EventSource.CLOSED) {
                             clearInterval(opt.heartbeat);
                             const stopFn = opt.handlers["onStop"];
@@ -314,10 +314,22 @@ export class ServerEventsClient {
                             this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
                             return;
                         }
-                        fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials }))
-                            .then(res => { if (!res.ok)
-                            throw new Error(`${res.status} - ${res.statusText}`); })
-                            .catch(error => this.reconnectServerEvents({ error }));
+                        const reqHeartbeat = new Request(opt.heartbeatUrl, {
+                            method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials
+                        });
+                        try {
+                            let res = await fetch(reqHeartbeat);
+                            if (!res.ok) {
+                                const error = new Error(`${res.status} - ${res.statusText}`);
+                                this.reconnectServerEvents({ error });
+                            }
+                            else {
+                                await res.text();
+                            }
+                        }
+                        catch (error) {
+                            this.reconnectServerEvents({ error });
+                        }
                     }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                 }
                 if (opt.unRegisterUrl) {

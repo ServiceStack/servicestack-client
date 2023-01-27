@@ -307,20 +307,45 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                             if (opt.heartbeat) {
                                 clearInterval(opt.heartbeat);
                             }
-                            opt.heartbeat = setInterval(function () {
-                                if (_this.eventSource.readyState === EventSource.CLOSED) {
-                                    clearInterval(opt.heartbeat);
-                                    var stopFn = opt.handlers["onStop"];
-                                    if (stopFn != null)
-                                        stopFn.apply(_this.eventSource);
-                                    _this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
-                                    return;
-                                }
-                                fetch(new Request(opt.heartbeatUrl, { method: "POST", mode: "cors", headers: headers, credentials: _this.serviceClient.credentials }))
-                                    .then(function (res) { if (!res.ok)
-                                    throw new Error("".concat(res.status, " - ").concat(res.statusText)); })
-                                    .catch(function (error) { return _this.reconnectServerEvents({ error: error }); });
-                            }, (_this.connectionInfo && _this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
+                            opt.heartbeat = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
+                                var stopFn, reqHeartbeat, res, error, error_1;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (this.eventSource.readyState === EventSource.CLOSED) {
+                                                clearInterval(opt.heartbeat);
+                                                stopFn = opt.handlers["onStop"];
+                                                if (stopFn != null)
+                                                    stopFn.apply(this.eventSource);
+                                                this.reconnectServerEvents({ error: new Error("EventSource is CLOSED") });
+                                                return [2 /*return*/];
+                                            }
+                                            reqHeartbeat = new Request(opt.heartbeatUrl, {
+                                                method: "POST", mode: "cors", headers: headers, credentials: this.serviceClient.credentials
+                                            });
+                                            _a.label = 1;
+                                        case 1:
+                                            _a.trys.push([1, 6, , 7]);
+                                            return [4 /*yield*/, fetch(reqHeartbeat)];
+                                        case 2:
+                                            res = _a.sent();
+                                            if (!!res.ok) return [3 /*break*/, 3];
+                                            error = new Error("".concat(res.status, " - ").concat(res.statusText));
+                                            this.reconnectServerEvents({ error: error });
+                                            return [3 /*break*/, 5];
+                                        case 3: return [4 /*yield*/, res.text()];
+                                        case 4:
+                                            _a.sent();
+                                            _a.label = 5;
+                                        case 5: return [3 /*break*/, 7];
+                                        case 6:
+                                            error_1 = _a.sent();
+                                            this.reconnectServerEvents({ error: error_1 });
+                                            return [3 /*break*/, 7];
+                                        case 7: return [2 /*return*/];
+                                    }
+                                });
+                            }); }, (_this.connectionInfo && _this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000);
                         }
                         if (opt.unRegisterUrl) {
                             if (typeof window != "undefined") {
