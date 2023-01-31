@@ -536,13 +536,13 @@ export declare function onlyProps(obj: {
 }, keys: string[]): {
     [index: string]: any;
 };
-export declare function humanize(s: any): any;
+export declare function humanize(s?: string | null): string;
 export declare const ucFirst: (s: string) => string;
 export declare const isUpper: (c: string) => boolean;
 export declare const isLower: (c: string) => boolean;
 export declare const isDigit: (c: string) => boolean;
 export declare function splitTitleCase(s: string): any[];
-export declare const humanify: (s: any) => any;
+export declare function humanify(s?: string | null): string;
 export declare function queryString(url: string): any;
 export declare function combinePaths(...paths: string[]): string;
 export declare function createPath(route: string, args: any): string;
@@ -569,6 +569,9 @@ export declare function dateFmt(d?: Date): string;
 export declare function dateFmtHM(d?: Date): string;
 export declare function timeFmt12(d?: Date): string;
 export declare function toLocalISOString(d?: Date): string;
+export declare function toTime(s: number | string): string;
+export declare function msToTime(s: number): string;
+export declare function padStart(s: string, len: number, pad: string): string;
 export interface ICreateElementOptions {
     insertAfter?: Element | null;
 }

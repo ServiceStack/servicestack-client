@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
-exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = void 0;
-exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = void 0;
-exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = void 0;
+exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = void 0;
+exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = void 0;
+exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = void 0;
 class ResponseStatus {
     constructor(init) { Object.assign(this, init); }
 }
@@ -150,7 +150,6 @@ class ServerEventsClient {
                     querySelectorAll: sel => []
                 };
             }
-            let $ = document.querySelectorAll.bind(document);
             let parts = splitOnFirst(e.data, " ");
             let channel = null;
             let selector = parts[0];
@@ -171,7 +170,7 @@ class ServerEventsClient {
             let op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
             const tokens = splitOnFirst(target, "$");
             const [cmd, cssSelector] = tokens;
-            const els = cssSelector && $(cssSelector);
+            const els = cssSelector && $$(cssSelector);
             const el = els && els[0];
             const eventId = parseInt(e.lastEventId);
             const data = e.data;
@@ -277,7 +276,7 @@ class ServerEventsClient {
                 this.raiseEvent(target, request);
             }
             else if (op === "css") {
-                css(els || $("body"), cmd, body);
+                css(els || $$("body"), cmd, body);
             }
             //Named Receiver
             let r = opt.receivers && opt.receivers[op];
@@ -853,7 +852,7 @@ class JsonServiceClient {
         }
         let contentLength = res.headers.get("content-length");
         if (contentLength === "0" || (contentLength == null && !isJson)) {
-            return x;
+            return res.text().then(_ => x);
         }
         return this.json(res).then(o => o); //fallback
     }
@@ -1279,7 +1278,7 @@ function splitTitleCase(s) {
     return to.filter(x => !!x);
 }
 exports.splitTitleCase = splitTitleCase;
-const humanify = s => !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' '));
+function humanify(s) { return !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' ')); }
 exports.humanify = humanify;
 function queryString(url) {
     if (!url || url.indexOf('?') === -1)
@@ -1591,6 +1590,45 @@ function toLocalISOString(d = new Date()) {
     return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
 }
 exports.toLocalISOString = toLocalISOString;
+function toTime(s) {
+    if (typeof s == 'string' && s.indexOf(':') >= 0)
+        return s;
+    const ms = typeof s == 'string'
+        ? fromXsdDuration(s) * 1000
+        : s;
+    return msToTime(ms);
+}
+exports.toTime = toTime;
+function msToTime(s) {
+    const ms = s % 1000;
+    s = (s - ms) / 1000;
+    const secs = s % 60;
+    s = (s - secs) / 60;
+    const mins = s % 60;
+    const hrs = (s - mins) / 60;
+    let t = padInt(hrs) + ':' + padInt(mins) + ':' + padInt(secs);
+    return ms > 0
+        ? t + '.' + padStart(`${ms}`, 3, '0').substring(0, 3)
+        : t;
+}
+exports.msToTime = msToTime;
+function padStart(s, len, pad) {
+    len = Math.floor(len) || 0;
+    if (len < this.length)
+        return s;
+    pad = pad ? String(pad) : ' ';
+    let p = '';
+    let l = len - s.length;
+    let i = 0;
+    while (p.length < l) {
+        if (!pad[i])
+            i = 0;
+        p += pad[i];
+        i++;
+    }
+    return p + s.slice(0);
+}
+exports.padStart = padStart;
 function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
 function attr(e, name) { return e.getAttribute(name); }
 function sattr(e, name, value) { return e.setAttribute(name, value); }
@@ -1791,10 +1829,9 @@ function applyErrors(f, status, opt) {
     }
     const filter = v.errorFilter.bind(v);
     const errors = status.errors;
-    let $ = f.querySelectorAll.bind(f);
     if (errors && errors.length) {
         let fieldMap = {}, fieldLabelMap = {};
-        $("input,textarea,select,button").forEach(x => {
+        $$("input,textarea,select,button").forEach(x => {
             const el = x;
             const prev = el.previousElementSibling;
             const next = el.nextElementSibling;
@@ -1813,7 +1850,7 @@ function applyErrors(f, status, opt) {
                 }
             }
         });
-        $(".help-inline[data-for],.help-block[data-for]").forEach(el => {
+        $$(".help-inline[data-for],.help-block[data-for]").forEach(el => {
             const key = attr(el, "data-for").toLowerCase();
             fieldLabelMap[key] = el;
         });
@@ -1839,7 +1876,7 @@ function applyErrors(f, status, opt) {
             lblErr.innerHTML = filter(error.message, error.errorCode, "field");
             lblErr.style.display = 'block';
         }
-        $("[data-validation-summary]").forEach(el => {
+        $$("[data-validation-summary]").forEach(el => {
             const fields = attr(el, 'data-validation-summary').split(',');
             const summaryMsg = errorResponseExcept.call(status, fields);
             if (summaryMsg)
@@ -1849,36 +1886,35 @@ function applyErrors(f, status, opt) {
     else {
         const htmlSummary = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
         if (!bs4) {
-            $(".error-summary").forEach(el => {
+            $$(".error-summary").forEach(el => {
                 el.innerHTML = htmlSummary(el).style.display = 'block';
             });
         }
         else {
-            $('[data-validation-summary]').forEach(el => el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary));
+            $$('[data-validation-summary]').forEach(el => el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary));
         }
     }
     return f;
 }
 function clearErrors(f) {
     remClass(f, 'has-errors');
-    let $ = f.querySelectorAll.bind(f);
-    $('.error-summary').forEach(el => {
+    $$('.error-summary').forEach(el => {
         el.innerHTML = "";
         el.style.display = "none";
     });
-    $('[data-validation-summary]').forEach(el => {
+    $$('[data-validation-summary]').forEach(el => {
         el.innerHTML = "";
     });
-    $('.error').forEach(el => remClass(el, 'error'));
-    $('.form-check.is-invalid [data-invalid]').forEach(el => {
+    $$('.error').forEach(el => remClass(el, 'error'));
+    $$('.form-check.is-invalid [data-invalid]').forEach(el => {
         rattr(el, 'data-invalid');
     });
-    $('.form-check.is-invalid').forEach(el => remClass(el, 'form-control'));
-    $('.is-invalid').forEach(el => {
+    $$('.form-check.is-invalid').forEach(el => remClass(el, 'form-control'));
+    $$('.is-invalid').forEach(el => {
         remClass(el, 'is-invalid');
         rattr(el, 'data-invalid');
     });
-    $('.is-valid').forEach(el => remClass(el, 'is-valid'));
+    $$('.is-valid').forEach(el => remClass(el, 'is-valid'));
 }
 var Types;
 (function (Types) {
@@ -1956,14 +1992,13 @@ function ajaxSubmit(f, options = {}) {
     catch (e) {
         return false;
     }
-    let $ = f.querySelectorAll.bind(f);
     addClass(f, 'loading');
     const disableSel = options.onSubmitDisable == null
         ? "[type=submit]"
         : options.onSubmitDisable;
     const disable = disableSel != null && disableSel != "";
     if (disable) {
-        $(disableSel).forEach(el => {
+        $$(disableSel).forEach(el => {
             sattr(el, 'disabled', 'disabled');
         });
     }
@@ -1973,12 +2008,12 @@ function ajaxSubmit(f, options = {}) {
         }
         else if (errMsg) {
             addClass(f, "has-errors");
-            const errorSummary = $(".error-summary")[0];
+            const errorSummary = $$(".error-summary")[0];
             if (errorSummary) {
                 errorSummary.innerHTML = errMsg;
             }
             if (bs4) {
-                const elSummary = $('[data-validation-summary]')[0];
+                const elSummary = $$('[data-validation-summary]')[0];
                 if (elSummary) {
                     elSummary.innerHTML = bsAlert(errMsg);
                 }
@@ -1988,7 +2023,7 @@ function ajaxSubmit(f, options = {}) {
             options.error.call(f, err);
         }
         if (bs4) {
-            $('[data-invalid]').forEach(el => showInvalidInputs.call(el));
+            $$('[data-invalid]').forEach(el => showInvalidInputs.call(el));
         }
     }
     const submitFn = options.submit || formSubmit;
@@ -2007,7 +2042,7 @@ function ajaxSubmit(f, options = {}) {
         .finally(() => {
         remClass(f, 'loading');
         if (disable) {
-            $(disableSel).forEach(el => {
+            $$(disableSel).forEach(el => {
                 rattr(el, 'disabled');
             });
         }

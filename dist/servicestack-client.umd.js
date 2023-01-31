@@ -57,7 +57,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
+    exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
     var ResponseStatus = /** @class */ (function () {
         function ResponseStatus(init) {
             Object.assign(this, init);
@@ -255,7 +255,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                         querySelectorAll: function (sel) { return []; }
                     };
                 }
-                var $ = document.querySelectorAll.bind(document);
                 var parts = splitOnFirst(e.data, " ");
                 var channel = null;
                 var selector = parts[0];
@@ -276,7 +275,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 var op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
                 var tokens = splitOnFirst(target, "$");
                 var cmd = tokens[0], cssSelector = tokens[1];
-                var els = cssSelector && $(cssSelector);
+                var els = cssSelector && $$(cssSelector);
                 var el = els && els[0];
                 var eventId = parseInt(e.lastEventId);
                 var data = e.data;
@@ -394,7 +393,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     _this.raiseEvent(target, request);
                 }
                 else if (op === "css") {
-                    css(els || $("body"), cmd, body);
+                    css(els || $$("body"), cmd, body);
                 }
                 //Named Receiver
                 var r = opt.receivers && opt.receivers[op];
@@ -1024,7 +1023,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             }
             var contentLength = res.headers.get("content-length");
             if (contentLength === "0" || (contentLength == null && !isJson)) {
-                return x;
+                return res.text().then(function (_) { return x; });
             }
             return this.json(res).then(function (o) { return o; }); //fallback
         };
@@ -1532,7 +1531,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return to.filter(function (x) { return !!x; });
     }
     exports.splitTitleCase = splitTitleCase;
-    var humanify = function (s) { return !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' ')); };
+    function humanify(s) { return !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' ')); }
     exports.humanify = humanify;
     function queryString(url) {
         if (!url || url.indexOf('?') === -1)
@@ -1866,6 +1865,45 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return "".concat(d.getFullYear(), "-").concat(padInt(d.getMonth() + 1), "-").concat(padInt(d.getDate()), "T").concat(padInt(d.getHours()), ":").concat(padInt(d.getMinutes()), ":").concat(padInt(d.getSeconds()));
     }
     exports.toLocalISOString = toLocalISOString;
+    function toTime(s) {
+        if (typeof s == 'string' && s.indexOf(':') >= 0)
+            return s;
+        var ms = typeof s == 'string'
+            ? fromXsdDuration(s) * 1000
+            : s;
+        return msToTime(ms);
+    }
+    exports.toTime = toTime;
+    function msToTime(s) {
+        var ms = s % 1000;
+        s = (s - ms) / 1000;
+        var secs = s % 60;
+        s = (s - secs) / 60;
+        var mins = s % 60;
+        var hrs = (s - mins) / 60;
+        var t = padInt(hrs) + ':' + padInt(mins) + ':' + padInt(secs);
+        return ms > 0
+            ? t + '.' + padStart("".concat(ms), 3, '0').substring(0, 3)
+            : t;
+    }
+    exports.msToTime = msToTime;
+    function padStart(s, len, pad) {
+        len = Math.floor(len) || 0;
+        if (len < this.length)
+            return s;
+        pad = pad ? String(pad) : ' ';
+        var p = '';
+        var l = len - s.length;
+        var i = 0;
+        while (p.length < l) {
+            if (!pad[i])
+                i = 0;
+            p += pad[i];
+            i++;
+        }
+        return p + s.slice(0);
+    }
+    exports.padStart = padStart;
     function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
     function attr(e, name) { return e.getAttribute(name); }
     function sattr(e, name, value) { return e.setAttribute(name, value); }
@@ -2069,10 +2107,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         }
         var filter = v.errorFilter.bind(v);
         var errors = status.errors;
-        var $ = f.querySelectorAll.bind(f);
         if (errors && errors.length) {
             var fieldMap_1 = {}, fieldLabelMap_1 = {};
-            $("input,textarea,select,button").forEach(function (x) {
+            $$("input,textarea,select,button").forEach(function (x) {
                 var el = x;
                 var prev = el.previousElementSibling;
                 var next = el.nextElementSibling;
@@ -2091,7 +2128,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     }
                 }
             });
-            $(".help-inline[data-for],.help-block[data-for]").forEach(function (el) {
+            $$(".help-inline[data-for],.help-block[data-for]").forEach(function (el) {
                 var key = attr(el, "data-for").toLowerCase();
                 fieldLabelMap_1[key] = el;
             });
@@ -2118,7 +2155,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 lblErr.innerHTML = filter(error.message, error.errorCode, "field");
                 lblErr.style.display = 'block';
             }
-            $("[data-validation-summary]").forEach(function (el) {
+            $$("[data-validation-summary]").forEach(function (el) {
                 var fields = attr(el, 'data-validation-summary').split(',');
                 var summaryMsg = errorResponseExcept.call(status, fields);
                 if (summaryMsg)
@@ -2128,12 +2165,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         else {
             var htmlSummary_1 = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
             if (!bs4) {
-                $(".error-summary").forEach(function (el) {
+                $$(".error-summary").forEach(function (el) {
                     el.innerHTML = htmlSummary_1(el).style.display = 'block';
                 });
             }
             else {
-                $('[data-validation-summary]').forEach(function (el) {
+                $$('[data-validation-summary]').forEach(function (el) {
                     return el.innerHTML = htmlSummary_1[0] === "<" ? htmlSummary_1 : bsAlert(htmlSummary_1);
                 });
             }
@@ -2142,24 +2179,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
     function clearErrors(f) {
         remClass(f, 'has-errors');
-        var $ = f.querySelectorAll.bind(f);
-        $('.error-summary').forEach(function (el) {
+        $$('.error-summary').forEach(function (el) {
             el.innerHTML = "";
             el.style.display = "none";
         });
-        $('[data-validation-summary]').forEach(function (el) {
+        $$('[data-validation-summary]').forEach(function (el) {
             el.innerHTML = "";
         });
-        $('.error').forEach(function (el) { return remClass(el, 'error'); });
-        $('.form-check.is-invalid [data-invalid]').forEach(function (el) {
+        $$('.error').forEach(function (el) { return remClass(el, 'error'); });
+        $$('.form-check.is-invalid [data-invalid]').forEach(function (el) {
             rattr(el, 'data-invalid');
         });
-        $('.form-check.is-invalid').forEach(function (el) { return remClass(el, 'form-control'); });
-        $('.is-invalid').forEach(function (el) {
+        $$('.form-check.is-invalid').forEach(function (el) { return remClass(el, 'form-control'); });
+        $$('.is-invalid').forEach(function (el) {
             remClass(el, 'is-invalid');
             rattr(el, 'data-invalid');
         });
-        $('.is-valid').forEach(function (el) { return remClass(el, 'is-valid'); });
+        $$('.is-valid').forEach(function (el) { return remClass(el, 'is-valid'); });
     }
     var Types;
     (function (Types) {
@@ -2239,14 +2275,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         catch (e) {
             return false;
         }
-        var $ = f.querySelectorAll.bind(f);
         addClass(f, 'loading');
         var disableSel = options.onSubmitDisable == null
             ? "[type=submit]"
             : options.onSubmitDisable;
         var disable = disableSel != null && disableSel != "";
         if (disable) {
-            $(disableSel).forEach(function (el) {
+            $$(disableSel).forEach(function (el) {
                 sattr(el, 'disabled', 'disabled');
             });
         }
@@ -2257,12 +2292,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             }
             else if (errMsg) {
                 addClass(f, "has-errors");
-                var errorSummary = $(".error-summary")[0];
+                var errorSummary = $$(".error-summary")[0];
                 if (errorSummary) {
                     errorSummary.innerHTML = errMsg;
                 }
                 if (bs4) {
-                    var elSummary = $('[data-validation-summary]')[0];
+                    var elSummary = $$('[data-validation-summary]')[0];
                     if (elSummary) {
                         elSummary.innerHTML = bsAlert(errMsg);
                     }
@@ -2272,7 +2307,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                 options.error.call(f, err);
             }
             if (bs4) {
-                $('[data-invalid]').forEach(function (el) { return showInvalidInputs.call(el); });
+                $$('[data-invalid]').forEach(function (el) { return showInvalidInputs.call(el); });
             }
         }
         var submitFn = options.submit || formSubmit;
@@ -2291,7 +2326,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             .finally(function () {
             remClass(f, 'loading');
             if (disable) {
-                $(disableSel).forEach(function (el) {
+                $$(disableSel).forEach(function (el) {
                     rattr(el, 'disabled');
                 });
             }

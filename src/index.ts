@@ -1693,7 +1693,7 @@ function splitCase(t: string) {
     return typeof t != 'string' ? t : t.replace(/([A-Z]|[0-9]+)/g, ' $1').replace(/_/g, ' ').trim()
 }
 
-export function humanize(s) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))) }
+export function humanize(s?:string|null) { return (!s || s.indexOf(' ') >= 0 ? s : splitCase(toPascalCase(s))) }
 
 export const ucFirst = (s:string) => s.charAt(0).toUpperCase() + s.substring(1)
 export const isUpper = (c:string) => c >= 'A' && c <= 'Z'
@@ -1718,7 +1718,7 @@ export function splitTitleCase(s:string) {
     return to.filter(x => !!x)
 }
 
-export const humanify = (s:string) => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '))
+export function humanify(s?:string|null) { return !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' ')) }
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
@@ -2028,6 +2028,41 @@ export function dateFmtHM(d: Date = new Date()) { return d.getFullYear() + '/' +
 export function timeFmt12(d: Date = new Date()) { return padInt((d.getHours() + 24) % 12 || 12) + ":" + padInt(d.getMinutes()) + ":" + padInt(d.getSeconds()) + " " + (d.getHours() > 12 ? "PM" : "AM") }
 export function toLocalISOString(d: Date = new Date()) {
     return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`
+}
+
+export function toTime(s:number|string) {
+    if (typeof s == 'string' && s.indexOf(':') >= 0)
+        return s
+    const ms = typeof s == 'string' 
+        ? fromXsdDuration(s) * 1000
+        : s
+    return msToTime(ms)
+}
+export function msToTime(s:number) {
+    const ms = s % 1000
+    s = (s - ms) / 1000
+    const secs = s % 60
+    s = (s - secs) / 60
+    const mins = s % 60
+    const hrs = (s - mins) / 60
+    let t = padInt(hrs) + ':' + padInt(mins) + ':' + padInt(secs)
+    return ms > 0
+        ? t + '.' + padStart(`${ms}`,3,'0').substring(0,3)
+        : t
+}
+export function padStart(s:string, len:number, pad:string) {
+    len = Math.floor(len) || 0
+    if (len < this.length) return s
+    pad = pad ? String(pad) : ' '
+    let p = ''
+    let l = len - s.length
+    let i = 0
+    while (p.length < l) {
+        if (!pad[i]) i = 0
+        p += pad[i]
+        i++
+    }
+    return p + s.slice(0)
 }
 
 export interface ICreateElementOptions {

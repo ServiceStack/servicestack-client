@@ -252,7 +252,6 @@ export class ServerEventsClient {
                 querySelectorAll: sel => []
             };
         }
-        let $ = document.querySelectorAll.bind(document);
         let parts = splitOnFirst(e.data, " ");
         let channel = null;
         let selector = parts[0];
@@ -273,7 +272,7 @@ export class ServerEventsClient {
         let op = parts[0], target = parts[1].replace(new RegExp("%20", "g"), " ");
         const tokens = splitOnFirst(target, "$");
         const [cmd, cssSelector] = tokens;
-        const els = cssSelector && $(cssSelector);
+        const els = cssSelector && $$(cssSelector);
         const el = els && els[0];
         const eventId = parseInt(e.lastEventId);
         const data = e.data;
@@ -379,7 +378,7 @@ export class ServerEventsClient {
             this.raiseEvent(target, request);
         }
         else if (op === "css") {
-            css(els || $("body"), cmd, body);
+            css(els || $$("body"), cmd, body);
         }
         //Named Receiver
         let r = opt.receivers && opt.receivers[op];
@@ -974,7 +973,7 @@ export class JsonServiceClient {
         }
         let contentLength = res.headers.get("content-length");
         if (contentLength === "0" || (contentLength == null && !isJson)) {
-            return x;
+            return res.text().then(_ => x);
         }
         return this.json(res).then(o => o); //fallback
     }
@@ -1363,7 +1362,7 @@ export function splitTitleCase(s) {
     to.push(s.substring(lastSplit, s.length));
     return to.filter(x => !!x);
 }
-export const humanify = s => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '));
+export function humanify(s) { return !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' ')); }
 export function queryString(url) {
     if (!url || url.indexOf('?') === -1)
         return {};
@@ -1648,6 +1647,42 @@ export function timeFmt12(d = new Date()) { return padInt((d.getHours() + 24) % 
 export function toLocalISOString(d = new Date()) {
     return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`;
 }
+export function toTime(s) {
+    if (typeof s == 'string' && s.indexOf(':') >= 0)
+        return s;
+    const ms = typeof s == 'string'
+        ? fromXsdDuration(s) * 1000
+        : s;
+    return msToTime(ms);
+}
+export function msToTime(s) {
+    const ms = s % 1000;
+    s = (s - ms) / 1000;
+    const secs = s % 60;
+    s = (s - secs) / 60;
+    const mins = s % 60;
+    const hrs = (s - mins) / 60;
+    let t = padInt(hrs) + ':' + padInt(mins) + ':' + padInt(secs);
+    return ms > 0
+        ? t + '.' + padStart(`${ms}`, 3, '0').substring(0, 3)
+        : t;
+}
+export function padStart(s, len, pad) {
+    len = Math.floor(len) || 0;
+    if (len < this.length)
+        return s;
+    pad = pad ? String(pad) : ' ';
+    let p = '';
+    let l = len - s.length;
+    let i = 0;
+    while (p.length < l) {
+        if (!pad[i])
+            i = 0;
+        p += pad[i];
+        i++;
+    }
+    return p + s.slice(0);
+}
 function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div>'; }
 function attr(e, name) { return e.getAttribute(name); }
 function sattr(e, name, value) { return e.setAttribute(name, value); }
@@ -1840,10 +1875,9 @@ function applyErrors(f, status, opt) {
     }
     const filter = v.errorFilter.bind(v);
     const errors = status.errors;
-    let $ = f.querySelectorAll.bind(f);
     if (errors && errors.length) {
         let fieldMap = {}, fieldLabelMap = {};
-        $("input,textarea,select,button").forEach(x => {
+        $$("input,textarea,select,button").forEach(x => {
             const el = x;
             const prev = el.previousElementSibling;
             const next = el.nextElementSibling;
@@ -1862,7 +1896,7 @@ function applyErrors(f, status, opt) {
                 }
             }
         });
-        $(".help-inline[data-for],.help-block[data-for]").forEach(el => {
+        $$(".help-inline[data-for],.help-block[data-for]").forEach(el => {
             const key = attr(el, "data-for").toLowerCase();
             fieldLabelMap[key] = el;
         });
@@ -1888,7 +1922,7 @@ function applyErrors(f, status, opt) {
             lblErr.innerHTML = filter(error.message, error.errorCode, "field");
             lblErr.style.display = 'block';
         }
-        $("[data-validation-summary]").forEach(el => {
+        $$("[data-validation-summary]").forEach(el => {
             const fields = attr(el, 'data-validation-summary').split(',');
             const summaryMsg = errorResponseExcept.call(status, fields);
             if (summaryMsg)
@@ -1898,36 +1932,35 @@ function applyErrors(f, status, opt) {
     else {
         const htmlSummary = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary");
         if (!bs4) {
-            $(".error-summary").forEach(el => {
+            $$(".error-summary").forEach(el => {
                 el.innerHTML = htmlSummary(el).style.display = 'block';
             });
         }
         else {
-            $('[data-validation-summary]').forEach(el => el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary));
+            $$('[data-validation-summary]').forEach(el => el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary));
         }
     }
     return f;
 }
 function clearErrors(f) {
     remClass(f, 'has-errors');
-    let $ = f.querySelectorAll.bind(f);
-    $('.error-summary').forEach(el => {
+    $$('.error-summary').forEach(el => {
         el.innerHTML = "";
         el.style.display = "none";
     });
-    $('[data-validation-summary]').forEach(el => {
+    $$('[data-validation-summary]').forEach(el => {
         el.innerHTML = "";
     });
-    $('.error').forEach(el => remClass(el, 'error'));
-    $('.form-check.is-invalid [data-invalid]').forEach(el => {
+    $$('.error').forEach(el => remClass(el, 'error'));
+    $$('.form-check.is-invalid [data-invalid]').forEach(el => {
         rattr(el, 'data-invalid');
     });
-    $('.form-check.is-invalid').forEach(el => remClass(el, 'form-control'));
-    $('.is-invalid').forEach(el => {
+    $$('.form-check.is-invalid').forEach(el => remClass(el, 'form-control'));
+    $$('.is-invalid').forEach(el => {
         remClass(el, 'is-invalid');
         rattr(el, 'data-invalid');
     });
-    $('.is-valid').forEach(el => remClass(el, 'is-valid'));
+    $$('.is-valid').forEach(el => remClass(el, 'is-valid'));
 }
 var Types;
 (function (Types) {
@@ -2003,14 +2036,13 @@ export function ajaxSubmit(f, options = {}) {
     catch (e) {
         return false;
     }
-    let $ = f.querySelectorAll.bind(f);
     addClass(f, 'loading');
     const disableSel = options.onSubmitDisable == null
         ? "[type=submit]"
         : options.onSubmitDisable;
     const disable = disableSel != null && disableSel != "";
     if (disable) {
-        $(disableSel).forEach(el => {
+        $$(disableSel).forEach(el => {
             sattr(el, 'disabled', 'disabled');
         });
     }
@@ -2020,12 +2052,12 @@ export function ajaxSubmit(f, options = {}) {
         }
         else if (errMsg) {
             addClass(f, "has-errors");
-            const errorSummary = $(".error-summary")[0];
+            const errorSummary = $$(".error-summary")[0];
             if (errorSummary) {
                 errorSummary.innerHTML = errMsg;
             }
             if (bs4) {
-                const elSummary = $('[data-validation-summary]')[0];
+                const elSummary = $$('[data-validation-summary]')[0];
                 if (elSummary) {
                     elSummary.innerHTML = bsAlert(errMsg);
                 }
@@ -2035,7 +2067,7 @@ export function ajaxSubmit(f, options = {}) {
             options.error.call(f, err);
         }
         if (bs4) {
-            $('[data-invalid]').forEach(el => showInvalidInputs.call(el));
+            $$('[data-invalid]').forEach(el => showInvalidInputs.call(el));
         }
     }
     const submitFn = options.submit || formSubmit;
@@ -2054,7 +2086,7 @@ export function ajaxSubmit(f, options = {}) {
         .finally(() => {
         remClass(f, 'loading');
         if (disable) {
-            $(disableSel).forEach(el => {
+            $$(disableSel).forEach(el => {
                 rattr(el, 'disabled');
             });
         }
