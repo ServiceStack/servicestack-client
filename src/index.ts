@@ -2030,12 +2030,14 @@ export function toLocalISOString(d: Date = new Date()) {
     return `${d.getFullYear()}-${padInt(d.getMonth() + 1)}-${padInt(d.getDate())}T${padInt(d.getHours())}:${padInt(d.getMinutes())}:${padInt(d.getSeconds())}`
 }
 
-export function toTime(s:number|string) {
+export function toTime(s:number|string|Date) {
     if (typeof s == 'string' && s.indexOf(':') >= 0)
         return s
-    const ms = typeof s == 'string' 
-        ? fromXsdDuration(s) * 1000
-        : s
+    const ms = s instanceof Date
+        ? s.getTime()
+        : typeof s == 'string' 
+            ? fromXsdDuration(s) * 1000
+            : s
     return msToTime(ms)
 }
 export function msToTime(s:number) {
