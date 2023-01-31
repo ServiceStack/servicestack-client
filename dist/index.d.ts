@@ -11,43 +11,43 @@ export interface IReturn<T> {
 }
 export declare class ResponseStatus {
     constructor(init?: Partial<ResponseStatus>);
-    errorCode: string;
-    message: string;
-    stackTrace: string;
-    errors: ResponseError[];
-    meta: {
+    errorCode?: string;
+    message?: string;
+    stackTrace?: string;
+    errors?: ResponseError[];
+    meta?: {
         [index: string]: string;
     };
 }
 export declare class ResponseError {
     constructor(init?: Partial<ResponseError>);
-    errorCode: string;
-    fieldName: string;
-    message: string;
-    meta: {
+    errorCode?: string;
+    fieldName?: string;
+    message?: string;
+    meta?: {
         [index: string]: string;
     };
 }
 export declare class ErrorResponse {
     constructor(init?: Partial<ErrorResponse>);
-    type: ErrorResponseType;
-    responseStatus: ResponseStatus;
+    type?: ErrorResponseType;
+    responseStatus?: ResponseStatus;
 }
 export declare class EmptyResponse {
     constructor(init?: Partial<ErrorResponse>);
-    responseStatus: ResponseStatus;
+    responseStatus?: ResponseStatus;
 }
 export declare class NavItem {
     label: string;
     href: string;
-    exact: boolean;
+    exact?: boolean;
     id: string;
-    className: string;
-    iconClass: string;
-    show: string;
-    hide: string;
-    children: NavItem[];
-    meta: {
+    className?: string;
+    iconClass?: string;
+    show?: string;
+    hide?: string;
+    children?: NavItem[];
+    meta?: {
         [index: string]: string;
     };
     constructor(init?: Partial<NavItem>);

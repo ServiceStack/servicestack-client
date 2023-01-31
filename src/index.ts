@@ -16,39 +16,39 @@ export interface IReturn<T> {
 }
 export class ResponseStatus {
     public constructor(init?:Partial<ResponseStatus>) { Object.assign(this, init) }
-    errorCode: string
-    message: string
-    stackTrace: string
-    errors: ResponseError[]
-    meta: { [index: string]: string }
+    errorCode?: string
+    message?: string
+    stackTrace?: string
+    errors?: ResponseError[]
+    meta?: { [index: string]: string }
 }
 export class ResponseError {
     public constructor(init?:Partial<ResponseError>) { Object.assign(this, init) }
-    errorCode: string
-    fieldName: string
-    message: string
-    meta: { [index: string]: string }
+    errorCode?: string
+    fieldName?: string
+    message?: string
+    meta?: { [index: string]: string }
 }
 export class ErrorResponse {
     public constructor(init?:Partial<ErrorResponse>) { Object.assign(this, init) }
-    type: ErrorResponseType
-    responseStatus: ResponseStatus
+    type?: ErrorResponseType
+    responseStatus?: ResponseStatus
 }
 export class EmptyResponse {
     public constructor(init?:Partial<ErrorResponse>) { Object.assign(this, init) }
-    responseStatus: ResponseStatus
+    responseStatus?: ResponseStatus
 }
 export class NavItem {
     public label: string
     public href: string
-    public exact: boolean
+    public exact?: boolean
     public id: string
-    public className: string
-    public iconClass: string
-    public show: string
-    public hide: string
-    public children: NavItem[]
-    public meta: { [index:string]: string }
+    public className?: string
+    public iconClass?: string
+    public show?: string
+    public hide?: string
+    public children?: NavItem[]
+    public meta?: { [index:string]: string }
     public constructor(init?:Partial<NavItem>) { (Object as any).assign(this, init) }
 }
 export class GetNavItems {
