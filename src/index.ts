@@ -382,7 +382,6 @@ export class ServerEventsClient {
                 querySelectorAll: sel => []
             }
         }
-        let $ = document.querySelectorAll.bind(document)
 
         let parts = splitOnFirst(e.data, " ")
         let channel = null
@@ -407,7 +406,7 @@ export class ServerEventsClient {
 
         const tokens = splitOnFirst(target, "$")
         const [cmd, cssSelector] = tokens
-        const els = cssSelector && $(cssSelector)
+        const els = cssSelector && $$(cssSelector)
         const el = els && els[0]
 
         const eventId = parseInt((e as any).lastEventId)
@@ -519,7 +518,7 @@ export class ServerEventsClient {
             this.raiseEvent(target, request)
         }
         else if (op === "css") {
-            css(els || $("body"), cmd, body)
+            css(els || $$("body"), cmd, body)
         }
 
         //Named Receiver
@@ -1263,7 +1262,7 @@ export class JsonServiceClient {
 
         let contentLength = res.headers.get("content-length")
         if (contentLength === "0" || (contentLength == null && !isJson)) {
-            return x
+            return res.text().then(_ => x)
         }
 
         return this.json(res).then(o => o as Object as T) //fallback
@@ -1719,7 +1718,7 @@ export function splitTitleCase(s:string) {
     return to.filter(x => !!x)
 }
 
-export const humanify = s => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '))
+export const humanify = (s:string) => !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' '))
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
@@ -2014,7 +2013,7 @@ export function errorResponse(fieldName:string) {
         : undefined
 }
 
-export function isDate(d) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d) }
+export function isDate(d:any) { return d && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d) }
 export function toDate(s: string|any) { return !s ? null 
     : isDate(s)
         ? s as Date 
@@ -2261,11 +2260,10 @@ function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
 
     const filter = v.errorFilter.bind(v)
     const errors = status.errors
-    let $ = f.querySelectorAll.bind(f)
 
     if (errors && errors.length) {
       let fieldMap:any = {}, fieldLabelMap:any = {}
-      $("input,textarea,select,button").forEach(x => {
+      $$("input,textarea,select,button").forEach(x => {
         const el = x as HTMLInputElement
         const prev = el.previousElementSibling
         const next = el.nextElementSibling
@@ -2284,7 +2282,7 @@ function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
         }
       })
       
-      $(".help-inline[data-for],.help-block[data-for]").forEach(el => {
+      $$(".help-inline[data-for],.help-block[data-for]").forEach(el => {
         const key = attr(el,"data-for")!.toLowerCase()
         fieldLabelMap[key] = el
       })
@@ -2311,7 +2309,7 @@ function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
         lblErr.style.display = 'block'
       }
 
-      $("[data-validation-summary]").forEach(el => {
+      $$("[data-validation-summary]").forEach(el => {
         const fields = attr(el,'data-validation-summary')!.split(',')
         const summaryMsg = errorResponseExcept.call(status, fields)
         if (summaryMsg)
@@ -2320,12 +2318,12 @@ function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
     } else {
       const htmlSummary = filter(status.message || splitCase(status.errorCode), status.errorCode, "summary")
       if (!bs4) {
-          $(".error-summary").forEach(el => {
+        $$(".error-summary").forEach(el => {
           el.innerHTML = htmlSummary
           (el as HTMLElement).style.display = 'block'
         })
       } else {
-          $('[data-validation-summary]').forEach(el => 
+        $$('[data-validation-summary]').forEach(el => 
               el.innerHTML = htmlSummary[0] === "<" ? htmlSummary : bsAlert(htmlSummary))
       }
     }
@@ -2334,24 +2332,23 @@ function applyErrors(f: HTMLFormElement, status:any, opt:IAjaxFormOptions) {
 
 function clearErrors(f: HTMLFormElement) {
   remClass(f,'has-errors')
-  let $ = f.querySelectorAll.bind(f)
-  $('.error-summary').forEach(el => {
+  $$('.error-summary').forEach(el => {
     el.innerHTML = "";
     (el as HTMLElement).style.display = "none"
   })
-  $('[data-validation-summary]').forEach(el => {
+  $$('[data-validation-summary]').forEach(el => {
     el.innerHTML = ""
   })
-  $('.error').forEach(el => remClass(el,'error'))
-  $('.form-check.is-invalid [data-invalid]').forEach(el => {
+  $$('.error').forEach(el => remClass(el,'error'))
+  $$('.form-check.is-invalid [data-invalid]').forEach(el => {
     rattr(el,'data-invalid')
   })
-  $('.form-check.is-invalid').forEach(el => remClass(el,'form-control'))
-  $('.is-invalid').forEach(el => {
+  $$('.form-check.is-invalid').forEach(el => remClass(el,'form-control'))
+  $$('.is-invalid').forEach(el => {
     remClass(el, 'is-invalid')
     rattr(el,'data-invalid')
   })
-  $('.is-valid').forEach(el => remClass(el,'is-valid'))
+  $$('.is-valid').forEach(el => remClass(el,'is-valid'))
 }
 
 enum Types {
@@ -2438,14 +2435,13 @@ export function ajaxSubmit(f:HTMLFormElement,options:IAjaxFormOptions={}) {
     return false
   }
   
-  let $ = f.querySelectorAll.bind(f)
   addClass(f, 'loading')
   const disableSel = options.onSubmitDisable == null
     ? "[type=submit]"
     : options.onSubmitDisable
   const disable = disableSel != null && disableSel != ""
   if (disable) {
-    $(disableSel).forEach(el => {
+    $$(disableSel).forEach(el => {
       sattr(el,'disabled','disabled')
     })
   }
@@ -2456,12 +2452,12 @@ export function ajaxSubmit(f:HTMLFormElement,options:IAjaxFormOptions={}) {
     }
     else if (errMsg) {
       addClass(f,"has-errors")
-      const errorSummary = $(".error-summary")[0]
+      const errorSummary = $$(".error-summary")[0]
       if (errorSummary) {
         errorSummary.innerHTML = errMsg
       }
       if (bs4) {
-        const elSummary = $('[data-validation-summary]')[0]
+        const elSummary = $$('[data-validation-summary]')[0]
         if (elSummary) {
           elSummary.innerHTML = bsAlert(errMsg)
         }
@@ -2471,7 +2467,7 @@ export function ajaxSubmit(f:HTMLFormElement,options:IAjaxFormOptions={}) {
       options.error.call(f, err)
     }
     if (bs4) {
-      $('[data-invalid]').forEach(el => showInvalidInputs.call(el as HTMLInputElement))
+        $$('[data-invalid]').forEach(el => showInvalidInputs.call(el as HTMLInputElement))
     }
   }
 
@@ -2491,7 +2487,7 @@ export function ajaxSubmit(f:HTMLFormElement,options:IAjaxFormOptions={}) {
     .finally(() => {
       remClass(f, 'loading')
       if (disable) {
-        $(disableSel).forEach(el => {
+        $$(disableSel).forEach(el => {
           rattr(el,'disabled')
         })
       }
