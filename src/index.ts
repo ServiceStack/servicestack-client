@@ -2054,7 +2054,7 @@ export function msToTime(s:number) {
 }
 export function padStart(s:string, len:number, pad:string) {
     len = Math.floor(len) || 0
-    if (len < this.length) return s
+    if (len < s.length) return s
     pad = pad ? String(pad) : ' '
     let p = ''
     let l = len - s.length

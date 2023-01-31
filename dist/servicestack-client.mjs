@@ -1650,9 +1650,11 @@ export function toLocalISOString(d = new Date()) {
 export function toTime(s) {
     if (typeof s == 'string' && s.indexOf(':') >= 0)
         return s;
-    const ms = typeof s == 'string'
-        ? fromXsdDuration(s) * 1000
-        : s;
+    const ms = s instanceof Date
+        ? s.getTime()
+        : typeof s == 'string'
+            ? fromXsdDuration(s) * 1000
+            : s;
     return msToTime(ms);
 }
 export function msToTime(s) {
@@ -1669,7 +1671,7 @@ export function msToTime(s) {
 }
 export function padStart(s, len, pad) {
     len = Math.floor(len) || 0;
-    if (len < this.length)
+    if (len < s.length)
         return s;
     pad = pad ? String(pad) : ' ';
     let p = '';

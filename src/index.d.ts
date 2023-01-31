@@ -569,7 +569,7 @@ export declare function dateFmt(d?: Date): string;
 export declare function dateFmtHM(d?: Date): string;
 export declare function timeFmt12(d?: Date): string;
 export declare function toLocalISOString(d?: Date): string;
-export declare function toTime(s: number | string): string;
+export declare function toTime(s: number | string | Date): string;
 export declare function msToTime(s: number): string;
 export declare function padStart(s: string, len: number, pad: string): string;
 export interface ICreateElementOptions {

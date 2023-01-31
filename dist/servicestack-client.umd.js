@@ -1868,9 +1868,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function toTime(s) {
         if (typeof s == 'string' && s.indexOf(':') >= 0)
             return s;
-        var ms = typeof s == 'string'
-            ? fromXsdDuration(s) * 1000
-            : s;
+        var ms = s instanceof Date
+            ? s.getTime()
+            : typeof s == 'string'
+                ? fromXsdDuration(s) * 1000
+                : s;
         return msToTime(ms);
     }
     exports.toTime = toTime;
@@ -1889,7 +1891,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.msToTime = msToTime;
     function padStart(s, len, pad) {
         len = Math.floor(len) || 0;
-        if (len < this.length)
+        if (len < s.length)
             return s;
         pad = pad ? String(pad) : ' ';
         var p = '';
