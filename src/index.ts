@@ -473,7 +473,7 @@ export class ServerEventsClient {
                         catch (error) {
                             this.reconnectServerEvents({ error })
                         }
-                    }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000)
+                    }, (this.connectionInfo && this.connectionInfo.heartbeatIntervalMs) || opt.heartbeatIntervalMs || 10000) as any
                 }
                 if (opt.unRegisterUrl) {
                     if (typeof window != "undefined") {
@@ -2594,7 +2594,7 @@ export function sanitizeFormData(formData:FormData) {
     // @ts-ignore
     for (let [key, value] of formData) {
         // Remove 0 length files
-        if (typeof value == 'object' && value.size === 0) {
+        if (typeof value == 'object' && (value as any).size === 0) {
             formData.delete(key)
         }
     }
@@ -3259,30 +3259,26 @@ export function createBus() {
 }
 
 export class Inspect {
-    static vars(obj:any) {        
-        let inspectVarsPath = typeof process === 'object' && process.env.INSPECT_VARS
+    static async vars(obj:any) {        
+        if (typeof process != 'object') 
+            return
+
+        let inspectVarsPath = process.env.INSPECT_VARS
         if (!inspectVarsPath || !obj)
             return
 
-        let R = null
-        //node require(), using dynamic access to fix web ng aot build
-        try {
-            let isNode = typeof process === 'object' &&
-                typeof process.versions === 'object' &&
-                typeof process.versions.node !== 'undefined'
-            if (!isNode) return
-            R = eval('require')
-        } catch (e) { return }
-
-        let fs = R('fs')
-        let varsPath = inspectVarsPath.replace(/\\/g,'/')
-        if (varsPath.indexOf('/') >= 0) {
-            let dir = R('path').dirname(varsPath)
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir)
-            }
-        }
-        fs.writeFileSync(varsPath,JSON.stringify(obj))
+        await import('node:fs').then(async fs => {
+            await import('node:path').then(path => {
+                let varsPath = inspectVarsPath.replace(/\\/g,'/')
+                if (varsPath.indexOf('/') >= 0) {
+                    let dir = path.dirname(varsPath)
+                    if (!fs.existsSync(dir)) {
+                        fs.mkdirSync(dir)
+                    }
+                }
+                fs.writeFileSync(varsPath, JSON.stringify(obj))
+            })
+        })
     }
   
     static dump(obj:any) {
