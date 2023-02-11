@@ -5,13 +5,13 @@ any TypeScript or JavaScript project.
 
 ### v2.x Changes
 
- - @servicestack/client now dependency-free
+ - **@servicestack/client** now dependency-free
 
-Now that [fetch is available in Node.js v18+ LTS](https://blog.logrocket.com/fetch-api-node-js/) we've removed all polyfills to make **@servicestack/client** dependency-free in its latest major **v2.x** version.
+As [fetch is available in Node.js v18+ LTS](https://blog.logrocket.com/fetch-api-node-js/) all polyfills have been removed to make **@servicestack/client** dependency-free in its latest major **v2.x** version.
 
-This should have no effect when using [JsonServiceClient](/javascript-client) in Browsers which uses its native `fetch()` or from Node.js v18+ that now has native `fetch` support as well. 
+This should have no effect when using [JsonServiceClient](/javascript-client) in Browsers which uses its native `fetch()` or from Node.js v18+ that now has native `fetch` support. 
 
-### ServerEventsClient in Node.js
+#### ServerEventsClient in Node.js
 
 Node.js projects using [ServerEventsClient](/typescript-server-events-client) (e.g. in tests) now require a polyfill:
 
@@ -25,7 +25,7 @@ Then polyfill with:
 globalThis.EventSource = require("eventsource")
 ```
 
-### JsonServiceClient in Node.js < v18
+#### JsonServiceClient in Node.js < v18
 
 Older Node.js runtimes using `JsonServiceClient` can continue using the existing **v1.x** version or polyfill `fetch` with:
 
@@ -41,7 +41,7 @@ require('cross-fetch/polyfill')
 
 ## Usage in ServiceStack Projects
 
-All ServiceStack Project Templates are already pre-configured with **@servicestack/client**:
+All ServiceStack Project Templates are already pre-configured with **@servicestack/client**, create from:
 
 ### [https://servicestack.net/start](https://servicestack.net/start)
 
@@ -57,7 +57,7 @@ Which can be used with your APIs typed DTOs that TypeScript projects can generat
 [TypeScript Add ServiceStack Reference](https://docs.servicestack.net/typescript-add-servicestack-reference#typescript-serviceclient) with:
 
 ```bash
-`x ts https://localhost:5001`
+x ts https://localhost:5001
 ```
 
 Which will save your API DTOs to **dtos.ts** that can be referenced in your code with:
@@ -68,7 +68,7 @@ import { Hello } from "./dtos"
 
 ### JavaScript npm projects
 
-Non-TypeScript npm projects can choose to either have TypeScript generate the DTOs into the preferred JavaScript target:
+Non-TypeScript npm projects can choose to have TypeScript generate the DTOs into the preferred JavaScript target:
 
 ```bash
 tsc dtos.ts 
@@ -77,7 +77,7 @@ tsc dtos.ts
 Alternatively they can generate ES6 annotated DTOs using [JavaScript Add ServiceStack Reference](https://docs.servicestack.net/javascript-add-servicestack-reference) with:
 
 ```bash
-`x mjs https://localhost:5001`
+x mjs https://localhost:5001
 ```
 
 Which will save your API DTOs to **dtos.mjs** where they can be referenced in your code with:
@@ -114,7 +114,8 @@ Modern JavaScript Apps not using an npm build system like the [Razor Vue Tailwin
 Then use an [importmap](https://docs.servicestack.net/javascript-add-servicestack-reference#import-maps) to specify where to load **@servicestack/client** from, e.g:
 
 ```html
-<script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script><!--safari-->
+<!-- polyfill for safari -->
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 <script type="importmap">
 {
     "imports": {
@@ -254,7 +255,7 @@ let succeeded = results.filter(x => x.api.succeeded)
 console.log(`\n${succeeded.length} succeeded: ${succeeded.map(x => x.request.getTypeName()).join(', ')}`)
 
 let r = succeeded.find(x => x.request.getTypeName() == 'AppOverview')?.api.response as AppOverviewResponse
-if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,4).map(tech => tech.name).join(', ')}`)
+if (r) console.log(`Top 5 Technologies:${r.topTechnologies.slice(0,4).map(tech => tech.name).join(', ')}`)
 ```
 
 Output:
