@@ -40,7 +40,7 @@ require('cross-fetch/polyfill')
 
 ## Usage in ServiceStack Projects
 
-All ServiceStack Project Templates are already pre-configured with **@servicestack/client**, create from:
+All ServiceStack Project Templates are pre-configured to use **@servicestack/client**, they can be created from:
 
 ### [https://servicestack.net/start](https://servicestack.net/start)
 
