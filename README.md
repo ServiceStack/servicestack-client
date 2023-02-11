@@ -1,7 +1,6 @@
 # @servicestack/client
 
-The **@servicestack/client** library enables the best end-to-end typed developer experience for calling ServiceStack APIs in
-any TypeScript or JavaScript project.
+The **@servicestack/client** library enables the best end-to-end typed developer experience for calling [ServiceStack APIs](https://servicestack.net/) in any TypeScript or JavaScript project.
 
 ### v2.x Changes
 
@@ -227,7 +226,7 @@ console.log(`API Says: ${api.response.result}`) //api.succeeded
 
 ### Simplified API Handling
 
-Being able to treat errors as values greatly increases the ability to programmatically handle and genericise api handling
+Being able to treat errors as values greatly increases the ability to programmatically handle and genericize api handling
 and greatly simplifies functionality needing to handle both successful and error responses like binding to UI components.
 
 An example of this is below where we're able to concurrently fire off multiple unrelated async requests in parallel, 
