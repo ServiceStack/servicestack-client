@@ -8,11 +8,11 @@ The **@servicestack/client** library enables the best end-to-end typed developer
 
 As [fetch is available in Node.js v18+ LTS](https://blog.logrocket.com/fetch-api-node-js/) all polyfills have been removed to make **@servicestack/client** dependency-free in its latest major **v2.x** version.
 
-This should have no effect when using [JsonServiceClient](/javascript-client) in Browsers which uses its native `fetch()` or from Node.js v18+ that now has native `fetch` support. 
+This should have no effect when using [JsonServiceClient](https://docs.servicestack.net/javascript-client) in Browsers which uses its native `fetch()` or from Node.js v18+ that now has native `fetch` support. 
 
 #### ServerEventsClient in Node.js
 
-Node.js projects using [ServerEventsClient](/typescript-server-events-client) (e.g. in tests) now require a polyfill:
+Node.js projects using [ServerEventsClient](https://docs.servicestack.net/typescript-server-events-client) (e.g. in tests) now require a polyfill:
 
 ```bash
 $ npm install eventsource
