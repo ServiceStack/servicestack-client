@@ -2799,31 +2799,25 @@ function createBus() {
 exports.createBus = createBus;
 class Inspect {
     static vars(obj) {
-        let inspectVarsPath = typeof process === 'object' && process.env.INSPECT_VARS;
-        if (!inspectVarsPath || !obj)
-            return;
-        let R = null;
-        //node require(), using dynamic access to fix web ng aot build
-        try {
-            let isNode = typeof process === 'object' &&
-                typeof process.versions === 'object' &&
-                typeof process.versions.node !== 'undefined';
-            if (!isNode)
+        return __awaiter(this, void 0, void 0, function* () {
+            if (typeof process != 'object')
                 return;
-            R = eval('require');
-        }
-        catch (e) {
-            return;
-        }
-        let fs = R('fs');
-        let varsPath = inspectVarsPath.replace(/\\/g, '/');
-        if (varsPath.indexOf('/') >= 0) {
-            let dir = R('path').dirname(varsPath);
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
-            }
-        }
-        fs.writeFileSync(varsPath, JSON.stringify(obj));
+            let inspectVarsPath = process.env.INSPECT_VARS;
+            if (!inspectVarsPath || !obj)
+                return;
+            yield Promise.resolve().then(() => require('node:fs')).then((fs) => __awaiter(this, void 0, void 0, function* () {
+                yield Promise.resolve().then(() => require('node:path')).then(path => {
+                    let varsPath = inspectVarsPath.replace(/\\/g, '/');
+                    if (varsPath.indexOf('/') >= 0) {
+                        let dir = path.dirname(varsPath);
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir);
+                        }
+                    }
+                    fs.writeFileSync(varsPath, JSON.stringify(obj));
+                });
+            }));
+        });
     }
     static dump(obj) {
         let to = JSON.stringify(obj, null, 4);

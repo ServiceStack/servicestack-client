@@ -56,6 +56,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     else if (typeof window != "undefined") factory(window.require||function(){}, window["@servicestack/client"]={});
 })(function (require, exports) {
     "use strict";
+    var __syncRequire = typeof module === "object" && typeof module.exports === "object";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
     var ResponseStatus = /** @class */ (function () {
@@ -3132,31 +3133,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         function Inspect() {
         }
         Inspect.vars = function (obj) {
-            var inspectVarsPath = typeof process === 'object' && process.env.INSPECT_VARS;
-            if (!inspectVarsPath || !obj)
-                return;
-            var R = null;
-            //node require(), using dynamic access to fix web ng aot build
-            try {
-                var isNode = typeof process === 'object' &&
-                    typeof process.versions === 'object' &&
-                    typeof process.versions.node !== 'undefined';
-                if (!isNode)
-                    return;
-                R = eval('require');
-            }
-            catch (e) {
-                return;
-            }
-            var fs = R('fs');
-            var varsPath = inspectVarsPath.replace(/\\/g, '/');
-            if (varsPath.indexOf('/') >= 0) {
-                var dir = R('path').dirname(varsPath);
-                if (!fs.existsSync(dir)) {
-                    fs.mkdirSync(dir);
-                }
-            }
-            fs.writeFileSync(varsPath, JSON.stringify(obj));
+            return __awaiter(this, void 0, void 0, function () {
+                var inspectVarsPath;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (typeof process != 'object')
+                                return [2 /*return*/];
+                            inspectVarsPath = process.env.INSPECT_VARS;
+                            if (!inspectVarsPath || !obj)
+                                return [2 /*return*/];
+                            return [4 /*yield*/, (__syncRequire ? Promise.resolve().then(function () { return require('node:fs'); }) : new Promise(function (resolve_1, reject_1) { require(['node:fs'], resolve_1, reject_1); })).then(function (fs) { return __awaiter(_this, void 0, void 0, function () {
+                                    return __generator(this, function (_a) {
+                                        switch (_a.label) {
+                                            case 0: return [4 /*yield*/, (__syncRequire ? Promise.resolve().then(function () { return require('node:path'); }) : new Promise(function (resolve_2, reject_2) { require(['node:path'], resolve_2, reject_2); })).then(function (path) {
+                                                    var varsPath = inspectVarsPath.replace(/\\/g, '/');
+                                                    if (varsPath.indexOf('/') >= 0) {
+                                                        var dir = path.dirname(varsPath);
+                                                        if (!fs.existsSync(dir)) {
+                                                            fs.mkdirSync(dir);
+                                                        }
+                                                    }
+                                                    fs.writeFileSync(varsPath, JSON.stringify(obj));
+                                                })];
+                                            case 1:
+                                                _a.sent();
+                                                return [2 /*return*/];
+                                        }
+                                    });
+                                }); })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         };
         Inspect.dump = function (obj) {
             var to = JSON.stringify(obj, null, 4);

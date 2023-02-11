@@ -1,9 +1,4 @@
-declare let global;
-
-if (typeof global === "undefined" && typeof window !== "undefined") global = window; //browser
-
-declare function require(name:string);
-global.EventSource = require("eventsource");
+globalThis.EventSource = require("eventsource")
 
 import * as chai from "chai";
 const { expect, assert } = chai
