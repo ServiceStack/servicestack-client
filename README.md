@@ -1,36 +1,216 @@
 # @servicestack/client
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)](http://docs.servicestack.net/typescript-add-servicestack-reference)
+The **@servicestack/client** library enables the best end-to-end typed developer experience for calling ServiceStack APIs in
+any TypeScript or JavaScript project.
 
-This library contains the Typed ServiceStack Client library that is an idiomatic port of ServiceStack's
-[ss-utils.js JavaScript Client](http://docs.servicestack.net/ss-utils-js) 
-in native TypeScript. It provides integration with many ServiceStack features 
-including [TypeScript Add ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
-and [Server Events](http://docs.servicestack.net/server-events).
+### v2.x Changes
 
-### Web, Node.js and React Native
+ - @servicestack/client now dependency-free
 
-It contains a clean "jQuery-free" implementation based on JavaScript's new 
-[Fetch API standard](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), 
-utilizing the [fetch-everywhere](https://www.npmjs.com/package/isomorphic-fetch) implementation
-so it can be used in both JavaScript Web apps, Node.js server and test projects as well as 
-React Native iOS and Android Mobile Apps as seen in [TypeScript Server Event Examples](https://github.com/ServiceStackApps/typescript-server-events).
+Now that [fetch is available in Node.js v18+ LTS](https://blog.logrocket.com/fetch-api-node-js/) we've removed all polyfills to make **@servicestack/client** dependency-free in its latest major **v2.x** version.
 
-## Install
+This should have no effect when using [JsonServiceClient](/javascript-client) in Browsers which uses its native `fetch()` or from Node.js v18+ that now has native `fetch` support as well. 
 
-This package is pre-configured in all [ServiceStackVS TypeScript VS.NET Templates](https://github.com/ServiceStack/ServiceStackVS) or can be installed with:
+### ServerEventsClient in Node.js
 
-    npm install @servicestack/client
+Node.js projects using [ServerEventsClient](/typescript-server-events-client) (e.g. in tests) now require a polyfill:
 
-#### v1.x Changes
+```bash
+$ npm install eventsource
+```
 
- - new `api` and `apiVoid` APIs return an `ApiResult<TResponse>` encapsulating both `response` and `error`
- - old `send` API renamed to `fetch`
- - new `send` and `sendVoid` APIs can infer [IVerb Interface Markers](https://docs.servicestack.net/routing#http-verb-interface-markers)
+Then polyfill with:
 
-### New API
+```ts
+globalThis.EventSource = require("eventsource")
+```
 
-The new `api` returns a typed `ApiResult<Response>` Value Result that encapsulates either a Typed Response or a 
+### JsonServiceClient in Node.js < v18
+
+Older Node.js runtimes using `JsonServiceClient` can continue using the existing **v1.x** version or polyfill `fetch` with:
+
+```bash
+$ npm install cross-fetch
+```
+
+Then polyfill with:
+
+```js
+require('cross-fetch/polyfill')
+```
+
+## Usage in ServiceStack Projects
+
+All ServiceStack Project Templates are already pre-configured with **@servicestack/client**:
+
+### [https://servicestack.net/start](https://servicestack.net/start)
+
+## Usage in TypeScript or npm projects
+
+Projects using TypeScript or any npm build system can install the dependency-free library with:
+
+```bash
+npm install @servicestack/client
+```
+
+Which can be used with your APIs typed DTOs that TypeScript projects can generate using 
+[TypeScript Add ServiceStack Reference](https://docs.servicestack.net/typescript-add-servicestack-reference#typescript-serviceclient) with:
+
+```bash
+`x ts https://localhost:5001`
+```
+
+Which will save your API DTOs to **dtos.ts** that can be referenced in your code with:
+
+```ts
+import { Hello } from "./dtos"
+```
+
+### JavaScript npm projects
+
+Non-TypeScript npm projects can choose to either have TypeScript generate the DTOs into the preferred JavaScript target:
+
+```bash
+tsc dtos.ts 
+```
+
+Alternatively they can generate ES6 annotated DTOs using [JavaScript Add ServiceStack Reference](https://docs.servicestack.net/javascript-add-servicestack-reference) with:
+
+```bash
+`x mjs https://localhost:5001`
+```
+
+Which will save your API DTOs to **dtos.mjs** where they can be referenced in your code with:
+
+```ts
+import { Hello } from "./dtos.mjs"
+```
+
+### Example Usage
+
+Either solution gives you the same productive end-to-end Typed API access, e.g:
+
+```ts
+import { JsonApiClient } from "@servicestack/client"
+
+const client = JsonApiClient.create(baseUrl)
+
+const api = await client.api(new Hello({ Name: 'World' }))
+if (api.succeeded) {
+    console.log(api.response.result)
+} else {
+    console.log(api.error)
+}
+```
+
+## Usage in .NET Apps without npm
+
+Modern JavaScript Apps not using an npm build system like the [Razor Vue Tailwind templates](https://docs.servicestack.net/vue/#getting-started) can download 
+**@servicestack/client** from:
+
+ - https://unpkg.com/@servicestack/client@2/dist/servicestack-client.mjs
+ - https://unpkg.com/@servicestack/client@2/dist/servicestack-client.min.mjs (minified)
+
+Then use an [importmap](https://docs.servicestack.net/javascript-add-servicestack-reference#import-maps) to specify where to load **@servicestack/client** from, e.g:
+
+```html
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script><!--safari-->
+<script type="importmap">
+{
+    "imports": {
+        "@servicestack/client": "/js/servicestack-client.mjs"
+    }
+}
+</script>
+```
+
+### ImportMap in Razor Pages or MVC
+
+Razor Pages or MVC projects can use `@Html.ImportMap()` in **_Layout.cshtml** to use different builds for development and production, e.g:
+
+```csharp
+@if (Context.Request.Headers.UserAgent.Any(x => x.Contains("Safari") && !x.Contains("Chrome")))
+{
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+}
+@Html.ImportMap(new()
+{
+    ["@servicestack/client"] = ("/js/servicestack-client.mjs", "/js/servicestack-client.min.mjs"),
+})
+```
+
+This lets your source code reference the library by package name to enable using the same source code in a 
+[JavaScript Module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), e.g:
+
+```html
+<script type="module">
+import { JsonApiClient } from "@servicestack/client"
+
+const client = JsonApiClient.create(baseUrl)
+
+const api = await client.api(new Hello({ Name: 'World' }))
+</script>
+```
+
+### JavaScript API DTOs
+
+Your [JavaScript API DTOs](https://docs.servicestack.net/javascript-add-servicestack-reference) can either directly reference the **/types/mjs** endpoint:
+
+```js
+import { Hello } from '/types/mjs'
+```
+
+### Enable static analysis and intelli-sense 
+
+Or for better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the [x dotnet tool](https://docs.servicestack.net/dotnet-tool):
+
+```sh
+x mjs
+```
+
+Then reference it instead to enable IDE static analysis when calling Typed APIs from JavaScript:
+
+```js
+import { Hello } from '/js/dtos.mjs'
+client.api(new Hello({ name }))
+```
+    
+To also enable static analysis for **@servicestack/client**, install the dependency-free library as a dev dependency:
+    
+```sh
+npm install -D @servicestack/client
+```
+
+Where only its TypeScript definitions are used by the IDE during development to enable its type-checking and intelli-sense.
+
+#### Support Legacy Browsers
+
+JavaScript Projects needing to support legacy browsers can use [ES3 Common.js DTOs](https://docs.servicestack.net/commonjs-add-servicestack-reference) to 
+enable access using old-style `<script>` includes.
+
+## JsonServiceClient
+
+To create `JsonServiceClient` instances in v6+ projects using the [JSON /api route](https://docs.servicestack.net/routing#json-api-pre-defined-route) use:
+
+```js
+const client = JsonApiClient.create(baseUrl)
+```
+
+Where it's configured to not use any JSON HTTP Headers to enable more efficient CORS requests without preflight requests.
+
+Alternatively all other projects can use the default constructor:
+
+```js
+const client = new JsonServiceClient(baseUrl)
+```
+
+### API Reference
+
+[![](https://raw.githubusercontent.com/ServiceStack/docs/master/docs/images/clients/JsonServiceClient-ui-reference.png)](https://api.locode.dev/classes/client.JsonServiceClient.html)
+
+### API method
+
+The `api` returns a typed `ApiResult<Response>` Value Result that encapsulates either a Typed Response or a 
 structured API Error populated in `ResponseStatus` allowing you to handle API responses programmatically without
 `try/catch` handling:
 
@@ -79,22 +259,21 @@ if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,4).map(tech 
 
 Output:
 
-    1 failed
-    DeleteTechnology Request Failed: Unauthorized
-    
-    3 succeeded: AppOverview, GetAllTechnologies, GetAllTechnologyStacks
-    Top 5 Technologies: Redis, MySQL, Amazon EC2, Nginx
+```
+1 failed
+DeleteTechnology Request Failed: Unauthorized
 
+3 succeeded: AppOverview, GetAllTechnologies, GetAllTechnologyStacks
+Top 5 Technologies: Redis, MySQL, Amazon EC2, Nginx
+```
 
 Being able to treat Errors as values has dramatically reduced the effort required to accomplish the same feat if needing 
 to handle errors with `try/catch`.
 
-> Requires ServiceStack v5.13+
-
 ### Ideal Typed Message-based API
 
 The TypeScript `JsonServiceClient` enables the same productive, typed API development experience available 
-in ServiceStack's other [1st-class supported client platforms](http://docs.servicestack.net/typescript-add-servicestack-reference). 
+in ServiceStack's other [1st-class supported client platforms](https://docs.servicestack.net/typescript-add-servicestack-reference). 
 
 The `JsonServiceClient` leverages the additional type hints ServiceStack embeds in each TypeScript Request DTO 
 to achieve the ideal typed, message-based API - so all API requests benefit from a succinct, boilerplate-free 
@@ -102,7 +281,7 @@ Typed API.
 
 Here's a quick look at what it looks like. The example below shows how to create a 
 [C# Gist in Gistlyn](https://github.com/ServiceStack/Gistlyn) 
-after adding a [TypeScript ServiceStack Reference](http://docs.servicestack.net/typescript-add-servicestack-reference)
+after adding a [TypeScript ServiceStack Reference](https://docs.servicestack.net/typescript-add-servicestack-reference)
 to `gistlyn.com` and installing the [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) 
 npm package: 
 
@@ -135,7 +314,7 @@ Where the `response` param is typed to `StoreGistResponse` DTO Type.
 ### Sending additional arguments with Typed API Requests
 
 Many AutoQuery Services utilize 
-[implicit conventions](http://docs.servicestack.net/autoquery-rdbms#implicit-conventions) 
+[implicit conventions](https://docs.servicestack.net/autoquery-rdbms#implicit-conventions) 
 to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can now be queried by specifying additional arguments with the typed Request DTO, e.g:
 
 ```ts
@@ -203,7 +382,7 @@ Or use `client.setCredentials()` to have them set both together.
 ### Authenticating using Credentials
 
 Alternatively you can authenticate using userName/password credentials by 
-[adding a TypeScript Reference](http://docs.servicestack.net/typescript-add-servicestack-reference#add-typescript-reference) 
+[adding a TypeScript Reference](https://docs.servicestack.net/typescript-add-servicestack-reference#add-typescript-reference) 
 to your remote ServiceStack Instance and sending a populated `Authenticate` Request DTO, e.g:
 
 ```ts
@@ -212,18 +391,18 @@ const response = await client.post(new Authenticate({
 ```
 
 This will populate the `JsonServiceClient` with 
-[Session Cookies](http://docs.servicestack.net/sessions#cookie-session-ids) 
+[Session Cookies](https://docs.servicestack.net/sessions#cookie-session-ids) 
 which will transparently be sent on subsequent requests to make authenticated requests.
 
 ### Authenticating using JWT
 
-Use the `bearerToken` property to Authenticate with a [ServiceStack JWT Provider](http://docs.servicestack.net/jwt-authprovider) using a JWT Token:
+Use the `bearerToken` property to Authenticate with a [ServiceStack JWT Provider](https://docs.servicestack.net/jwt-authprovider) using a JWT Token:
 
 ```ts
 client.bearerToken = jwtToken;
 ```
 
-Alternatively you can use a [Refresh Token](http://docs.servicestack.net/jwt-authprovider#refresh-tokens) instead:
+Alternatively you can use a [Refresh Token](https://docs.servicestack.net/jwt-authprovider#refresh-tokens) instead:
 
 ```ts
 client.refreshToken = refreshToken;
@@ -231,7 +410,7 @@ client.refreshToken = refreshToken;
 
 ### Authenticating using an API Key
 
-Use the `bearerToken` property to Authenticate with an [API Key](http://docs.servicestack.net/api-key-authprovider):
+Use the `bearerToken` property to Authenticate with an [API Key](https://docs.servicestack.net/api-key-authprovider):
 
 ```ts
 client.bearerToken = apiKey;
@@ -258,7 +437,7 @@ var response = await client.get(new Secured());
 
 ### Automatically refresh Access Tokens
 
-With the [Refresh Token support in JWT](http://docs.servicestack.net/jwt-authprovider#refresh-tokens) 
+With the [Refresh Token support in JWT](https://docs.servicestack.net/jwt-authprovider#refresh-tokens) 
 you can use the `refreshToken` property to instruct the Service Client to automatically fetch new 
 JWT Tokens behind the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:
 
@@ -283,13 +462,13 @@ client.refreshToken = refreshToken;
 client.refreshTokenUri = authBaseUrl + "/access-token";
 ```
 
-### [ServerEvents Client](http://docs.servicestack.net/typescript-server-events-client)
+### [ServerEvents Client](https://docs.servicestack.net/typescript-server-events-client)
 
-The [TypeScript ServerEventClient](http://docs.servicestack.net/typescript-server-events-client) 
+The [TypeScript ServerEventClient](https://docs.servicestack.net/typescript-server-events-client) 
 is an idiomatic port of ServiceStack's 
-[C# Server Events Client](http://docs.servicestack.net/csharp-server-events-client) 
+[C# Server Events Client](https://docs.servicestack.net/csharp-server-events-client) 
 in native TypeScript providing a productive client to consume ServiceStack's 
-[real-time Server Events](http://docs.servicestack.net/server-events) that can be used in TypeScript 
+[real-time Server Events](https://docs.servicestack.net/server-events) that can be used in TypeScript 
 [Web, Node.js Server and React Native iOS and Android Mobile Apps](https://github.com/ServiceStackApps/typescript-server-events).
 
 ```ts
@@ -341,31 +520,23 @@ const client = new ServerEventsClient("/", channels, {
 .start();                                             // Start listening for Server Events!
 ```
 
-When publishing a DTO Type for your Server Events message, your clients will be able to benefit from the generated DTOs in [TypeScript ServiceStack References](http://docs.servicestack.net/typescript-add-servicestack-reference).
+When publishing a DTO Type for your Server Events message, your clients will be able to benefit from the generated DTOs in [TypeScript ServiceStack References](https://docs.servicestack.net/typescript-add-servicestack-reference).
+
+## Rich intelli-sense support
+
+Even pure HTML/JS Apps that don't use TypeScript or any external dependencies will still benefit from the Server 
+generated `dtos.ts` and TypeScript definitions where you'll be able to benefit from rich intelli-sense support 
+in smart IDEs like [Rider](https://www.jetbrains.com/rider/) for both the client library:
+
+![](https://raw.githubusercontent.com/ServiceStack/docs/master/docs/images/mix/init-rider-ts-client.png)
+
+As well as your App's server generated DTOs:
+
+![](https://raw.githubusercontent.com/ServiceStack/docs/master/docs/images/release-notes/v6.6/mjs-intellisense.png)
+
+So even simple Apps without complex bundling solutions or external dependencies can still benefit from a rich typed authoring 
+experience without any additional build time or tooling complexity.
 
 ## Feedback and Support
 
-Support is available from the [ServiceStack Customer Forums](https://forums.servicestack.net) 
-or [StackOverflow](https://stackoverflow.com/questions/ask) using the `[servicestack]` tag.
-
-Any reproducible issues can be submitted to [ServiceStack's Issue Tracker](https://github.com/ServiceStack/Issues).
-
-## Troubleshooting
-
-If you're getting missing Type Definitions for `Headers`, `Response`, `Request`, etc. You'll need to import
-the Type Definitions for W3C's `fetch` API, preferably by using the latest version of TypeScript and
-referencing the core **es2016** and **dom** libs in TypeScript's `tsconfig.json`, e.g:
-
-```json
-{
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": [ "es2015", "dom" ]
-  }
-}
-```
-
-Alternatively you can import the [whatwg-fetch](https://www.npmjs.com/package/@types/whatwg-fetch) Type Definitions with:
-
-    npm install @types/whatwg-fetch --save-dev
+Support is available from the ServiceStack [Customer Forums](https://forums.servicestack.net) or [GitHub Discussions](https://servicestack.net/ask).
