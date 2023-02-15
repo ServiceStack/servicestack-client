@@ -548,6 +548,7 @@ export declare function combinePaths(...paths: string[]): string;
 export declare function createPath(route: string, args: any): string;
 export declare function createUrl(route: string, args: any): string;
 export declare function appendQueryString(url: string, args: any): string;
+export declare function setQueryString(url: string, args: any): string;
 export declare function bytesToBase64(aBytes: Uint8Array): string;
 export declare function stripQuotes(s: string): string;
 export declare function tryDecode(s: string): string;
