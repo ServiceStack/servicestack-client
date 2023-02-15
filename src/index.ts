@@ -1722,7 +1722,7 @@ export function humanify(s?:string|null) { return !s || s.indexOf(' ') >= 0 ? s 
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
-    let pairs = splitOnFirst(url, '?')[1].split('&')
+    let pairs = rightPart(url, '?').split('&')
     let map = {}
     for (let i = 0; i < pairs.length; ++i) {
         let p = pairs[i].split('=')
@@ -1786,10 +1786,16 @@ export function appendQueryString(url: string, args: any): string {
             let val = args[k]
             if (typeof val == 'undefined') continue
             url += url.indexOf("?") >= 0 ? "&" : "?"
-            url += k + "=" + qsValue(val)
+            url += k + (val === null ? '' :  "=" + qsValue(val))
         }
     }
     return url
+}
+
+export function setQueryString(url:string, args:any) {
+    const baseUrl = leftPart(url, '?')
+    const qs = Object.assign(queryString(url), args)
+    return appendQueryString(baseUrl, qs)
 }
 
 function qsValue(arg: any) {
