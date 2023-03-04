@@ -3140,9 +3140,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         }
         Inspect.vars = function (obj) {
             return __awaiter(this, void 0, void 0, function () {
-                var inspectVarsPath;
+                var inspectVarsPath, nodeModule;
                 var _this = this;
                 return __generator(this, function (_a) {
+                    var _b;
                     switch (_a.label) {
                         case 0:
                             if (typeof process != 'object')
@@ -3150,10 +3151,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                             inspectVarsPath = process.env.INSPECT_VARS;
                             if (!inspectVarsPath || !obj)
                                 return [2 /*return*/];
-                            return [4 /*yield*/, (__syncRequire ? Promise.resolve().then(function () { return require('node:fs'); }) : new Promise(function (resolve_1, reject_1) { require(['node:fs'], resolve_1, reject_1); })).then(function (fs) { return __awaiter(_this, void 0, void 0, function () {
+                            nodeModule = function (m) { return 'no' + 'de:' + "".concat(m); };
+                            return [4 /*yield*/, (_b = nodeModule('fs'), __syncRequire ? Promise.resolve().then(function () { return require(_b); }) : new Promise(function (resolve_1, reject_1) { require([_b], resolve_1, reject_1); })).then(function (fs) { return __awaiter(_this, void 0, void 0, function () {
                                     return __generator(this, function (_a) {
+                                        var _b;
                                         switch (_a.label) {
-                                            case 0: return [4 /*yield*/, (__syncRequire ? Promise.resolve().then(function () { return require('node:path'); }) : new Promise(function (resolve_2, reject_2) { require(['node:path'], resolve_2, reject_2); })).then(function (path) {
+                                            case 0: return [4 /*yield*/, (_b = nodeModule('path'), __syncRequire ? Promise.resolve().then(function () { return require(_b); }) : new Promise(function (resolve_2, reject_2) { require([_b], resolve_2, reject_2); })).then(function (path) {
                                                     var varsPath = inspectVarsPath.replace(/\\/g, '/');
                                                     if (varsPath.indexOf('/') >= 0) {
                                                         var dir = path.dirname(varsPath);
