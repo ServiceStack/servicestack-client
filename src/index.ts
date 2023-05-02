@@ -2152,11 +2152,12 @@ export function on(sel, handlers) {
     $$(sel).forEach(e => {
         Object.keys(handlers).forEach(function (evt) {
             let fn = handlers[evt]
-            if (typeof evt === 'string' && typeof fn === 'function') {
-                e.addEventListener(evt, fn.bind(e))
+            if (typeof evt === 'string' && typeof fn === 'function') {                
+                e.addEventListener(evt, handlers[evt] = fn.bind(e))
             }
         })
     })
+    return handlers
 }
 
 export function delaySet(f:(loading:boolean) => any, opt?:{ duration?:number }) {
