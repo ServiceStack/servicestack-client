@@ -997,7 +997,7 @@ export class JsonServiceClient {
         }).catch(error => {
             // No responseStatus body, set from `res` Body object
             if (error instanceof Error
-                || (typeof window != "undefined" && error instanceof window.DOMException /*MS Edge*/)) {
+                || (typeof window != "undefined" && window.DOMException && error instanceof window.DOMException /*MS Edge*/)) {
                 throw this.raiseError(res, createErrorResponse(res.status, res.statusText, type));
             }
             throw this.raiseError(res, error);
@@ -1766,10 +1766,11 @@ export function on(sel, handlers) {
         Object.keys(handlers).forEach(function (evt) {
             let fn = handlers[evt];
             if (typeof evt === 'string' && typeof fn === 'function') {
-                e.addEventListener(evt, fn.bind(e));
+                e.addEventListener(evt, handlers[evt] = fn.bind(e));
             }
         });
     });
+    return handlers;
 }
 export function delaySet(f, opt) {
     let duration = opt && opt.duration || 300;

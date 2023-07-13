@@ -579,7 +579,7 @@ export interface ICreateElementOptions {
 export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
 export declare function $1(sel: string | any, el?: HTMLElement): any;
 export declare function $$(sel: string | any, el?: HTMLElement): any;
-export declare function on(sel: any, handlers: any): void;
+export declare function on(sel: any, handlers: any): any;
 export declare function delaySet(f: (loading: boolean) => any, opt?: {
     duration?: number;
 }): () => void;
