@@ -16,9 +16,10 @@
   "scripts": {
     "pretest": "tsc",
     "typecheck": "tsc --noEmit",
-    "uglify": "uglifyjs dist\\servicestack-client.umd.js --compress --mangle -o dist\\servicestack-client.min.js",
-    "mjs": "tsc -p tsconfig.mjs.json && move dist\\index.js dist\\servicestack-client.mjs && uglifyjs dist\\servicestack-client.mjs --compress --mangle -o dist\\servicestack-client.min.mjs",
-    "publish": "tsc && npm run mjs && tsc -p tsconfig.umd.json && move dist\\index.js dist\\servicestack-client.umd.js && bash inject-umd.sh && npm run uglify && move src\\index.js dist && copy src\\index.d.ts dist",
+    "uglify": "uglifyjs dist/servicestack-client.umd.js --compress --mangle -o dist/servicestack-client.min.js",
+    "uglify-mjs": "uglifyjs dist/servicestack-client.mjs --compress --mangle -o dist/servicestack-client.min.mjs",
+    "mjs": "tsc -p tsconfig.mjs.json && shx mv dist/index.js dist/servicestack-client.mjs && npm run uglify-mjs",
+    "publish": "tsc && npm run mjs && tsc -p tsconfig.umd.json && shx mv dist/index.js dist/servicestack-client.umd.js && bash inject-umd.sh && npm run uglify && shx mv src/index.js dist && shx cp src/index.d.ts dist",
     "dtos": "cd tests/dtos && typescript-ref",
     "test": "mocha -t 5000 ./tests/*.js",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js",
@@ -53,6 +54,7 @@
     "chai": "^4.3.4",
     "eventsource": "^2.0.2",
     "mocha": "^9.1.3",
+    "shx": "^0.3.4",
     "typescript": "^4.9.4"
   }
 }
