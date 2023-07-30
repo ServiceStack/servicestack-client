@@ -2074,20 +2074,25 @@ export function padStart(s:string, len:number, pad:string) {
 }
 
 export interface ICreateElementOptions {
-  insertAfter?:Element|null
+  insertAfter?:Element|null,
+  attrs?:{[name:string]:string}|null,
+  events?:{[name:string]:Function}|null,
 }
 function bsAlert(msg:string) { return '<div class="alert alert-danger">' + msg + '</div>' }
 function attr(e:Element,name:string) { return e.getAttribute(name) }
 function sattr(e:Element,name:string,value:string) { return e.setAttribute(name,value) }
 function rattr(e:Element,name:string) { return e.removeAttribute(name) }
   
-export function createElement(tagName:string, options?:ICreateElementOptions, attrs?:any) {
+export function createElement(tagName:string, options?:ICreateElementOptions) {
     const keyAliases:{ [index:string]: string } = {className: 'class', htmlFor: 'for'}
     const el = document.createElement(tagName)
-  if (attrs) {
-    for (const key in attrs) {
-      sattr(el,keyAliases[key] || key,attrs[key])
+  if (options?.attrs) {
+    for (const key in options.attrs) {
+      sattr(el, keyAliases[key] || key, options.attrs[key])
     }
+  }
+  if (options?.events) {
+    on(el, options.events)
   }
   if (options && options.insertAfter) {
     options.insertAfter.parentNode!.insertBefore(el, options.insertAfter.nextSibling)
@@ -2111,7 +2116,7 @@ function showInvalidInputs(this:HTMLInputElement) {
         : this
     const elError = elLast != null && elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
         ? elLast.nextElementSibling
-        : createElement("div", {insertAfter: elLast}, {className: 'invalid-feedback'})
+        : createElement("div", {insertAfter: elLast, attrs: { className: 'invalid-feedback' }})
     elError.innerHTML = errorMsg
   }
 }
@@ -2148,7 +2153,7 @@ export function $$(sel:string|any, el?:HTMLElement) {
         ? Array.prototype.slice.call((el || document).querySelectorAll(sel))
         : Array.isArray(sel) ? sel : [sel]
 }
-export function on(sel, handlers) {
+export function on(sel:any, handlers: {[name:string]:Function}) {
     $$(sel).forEach(e => {
         Object.keys(handlers).forEach(function (evt) {
             let fn = handlers[evt]
@@ -2158,6 +2163,17 @@ export function on(sel, handlers) {
         })
     })
     return handlers
+}
+export function addScript(src:string) {
+    return new Promise((resolve:Function, reject:Function) => {
+        document.body.appendChild(createElement('script', { 
+            attrs: { src },
+            events: {
+                load: resolve,
+                error: reject,
+            }
+        }))
+    })
 }
 
 export function delaySet(f:(loading:boolean) => any, opt?:{ duration?:number }) {

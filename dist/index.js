@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
-exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.setQueryString = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = void 0;
-exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = void 0;
-exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = void 0;
+exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.addScript = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.setQueryString = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = void 0;
+exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = void 0;
+exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = void 0;
 class ResponseStatus {
     constructor(init) { Object.assign(this, init); }
 }
@@ -1641,13 +1641,16 @@ function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div
 function attr(e, name) { return e.getAttribute(name); }
 function sattr(e, name, value) { return e.setAttribute(name, value); }
 function rattr(e, name) { return e.removeAttribute(name); }
-function createElement(tagName, options, attrs) {
+function createElement(tagName, options) {
     const keyAliases = { className: 'class', htmlFor: 'for' };
     const el = document.createElement(tagName);
-    if (attrs) {
-        for (const key in attrs) {
-            sattr(el, keyAliases[key] || key, attrs[key]);
+    if (options === null || options === void 0 ? void 0 : options.attrs) {
+        for (const key in options.attrs) {
+            sattr(el, keyAliases[key] || key, options.attrs[key]);
         }
+    }
+    if (options === null || options === void 0 ? void 0 : options.events) {
+        on(el, options.events);
     }
     if (options && options.insertAfter) {
         options.insertAfter.parentNode.insertBefore(el, options.insertAfter.nextSibling);
@@ -1671,7 +1674,7 @@ function showInvalidInputs() {
             : this;
         const elError = elLast != null && elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
             ? elLast.nextElementSibling
-            : createElement("div", { insertAfter: elLast }, { className: 'invalid-feedback' });
+            : createElement("div", { insertAfter: elLast, attrs: { className: 'invalid-feedback' } });
         elError.innerHTML = errorMsg;
     }
 }
@@ -1723,6 +1726,18 @@ function on(sel, handlers) {
     return handlers;
 }
 exports.on = on;
+function addScript(src) {
+    return new Promise((resolve, reject) => {
+        document.body.appendChild(createElement('script', {
+            attrs: { src },
+            events: {
+                load: resolve,
+                error: reject,
+            }
+        }));
+    });
+}
+exports.addScript = addScript;
 function delaySet(f, opt) {
     let duration = opt && opt.duration || 300;
     let timeout = setTimeout(() => f(true), duration);

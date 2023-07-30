@@ -1694,13 +1694,16 @@ function bsAlert(msg) { return '<div class="alert alert-danger">' + msg + '</div
 function attr(e, name) { return e.getAttribute(name); }
 function sattr(e, name, value) { return e.setAttribute(name, value); }
 function rattr(e, name) { return e.removeAttribute(name); }
-export function createElement(tagName, options, attrs) {
+export function createElement(tagName, options) {
     const keyAliases = { className: 'class', htmlFor: 'for' };
     const el = document.createElement(tagName);
-    if (attrs) {
-        for (const key in attrs) {
-            sattr(el, keyAliases[key] || key, attrs[key]);
+    if (options?.attrs) {
+        for (const key in options.attrs) {
+            sattr(el, keyAliases[key] || key, options.attrs[key]);
         }
+    }
+    if (options?.events) {
+        on(el, options.events);
     }
     if (options && options.insertAfter) {
         options.insertAfter.parentNode.insertBefore(el, options.insertAfter.nextSibling);
@@ -1723,7 +1726,7 @@ function showInvalidInputs() {
             : this;
         const elError = elLast != null && elLast.nextElementSibling && hasClass(elLast.nextElementSibling, 'invalid-feedback')
             ? elLast.nextElementSibling
-            : createElement("div", { insertAfter: elLast }, { className: 'invalid-feedback' });
+            : createElement("div", { insertAfter: elLast, attrs: { className: 'invalid-feedback' } });
         elError.innerHTML = errorMsg;
     }
 }
@@ -1771,6 +1774,17 @@ export function on(sel, handlers) {
         });
     });
     return handlers;
+}
+export function addScript(src) {
+    return new Promise((resolve, reject) => {
+        document.body.appendChild(createElement('script', {
+            attrs: { src },
+            events: {
+                load: resolve,
+                error: reject,
+            }
+        }));
+    });
 }
 export function delaySet(f, opt) {
     let duration = opt && opt.duration || 300;

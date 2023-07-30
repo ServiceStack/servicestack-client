@@ -575,11 +575,18 @@ export declare function msToTime(s: number): string;
 export declare function padStart(s: string, len: number, pad: string): string;
 export interface ICreateElementOptions {
     insertAfter?: Element | null;
+    attrs?: any;
+    events?: any;
 }
-export declare function createElement(tagName: string, options?: ICreateElementOptions, attrs?: any): HTMLElement;
+export declare function createElement(tagName: string, options?: ICreateElementOptions): HTMLElement;
 export declare function $1(sel: string | any, el?: HTMLElement): any;
 export declare function $$(sel: string | any, el?: HTMLElement): any;
-export declare function on(sel: any, handlers: any): any;
+export declare function on(sel: any, handlers: {
+    [name: string]: Function;
+}): {
+    [name: string]: Function;
+};
+export declare function addScript(src: string): Promise<unknown>;
 export declare function delaySet(f: (loading: boolean) => any, opt?: {
     duration?: number;
 }): () => void;
