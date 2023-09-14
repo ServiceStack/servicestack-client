@@ -575,8 +575,12 @@ export declare function msToTime(s: number): string;
 export declare function padStart(s: string, len: number, pad: string): string;
 export interface ICreateElementOptions {
     insertAfter?: Element | null;
-    attrs?: any;
-    events?: any;
+    attrs?: {
+        [name: string]: string;
+    } | null;
+    events?: {
+        [name: string]: Function;
+    } | null;
 }
 export declare function createElement(tagName: string, options?: ICreateElementOptions): HTMLElement;
 export declare function $1(sel: string | any, el?: HTMLElement): any;
