@@ -1226,30 +1226,32 @@ export function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.s
 export function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
 export function toKebabCase(s) { return (s || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(); }
 export function map(o, f) { return o == null ? null : f(o); }
+export function camelCaseAny(o) {
+    if (!o || !(o instanceof Object) || Array.isArray(o))
+        return o;
+    let to = {};
+    for (let k in o) {
+        if (o.hasOwnProperty(k)) {
+            const key = toCamelCase(k);
+            const val = o[k];
+            if (Array.isArray(val))
+                to[key] = val.map(x => camelCaseAny(x));
+            else if (val instanceof Object)
+                to[key] = camelCaseAny(val);
+            else
+                to[key] = val;
+        }
+    }
+    return to;
+}
 export function sanitize(status) {
+    if (!sanitize)
+        return sanitize;
     if (status.responseStatus)
         return status;
     if (status.errors)
         return status;
-    let to = {};
-    for (let k in status) {
-        if (status.hasOwnProperty(k)) {
-            if (status[k] instanceof Object)
-                to[toCamelCase(k)] = sanitize(status[k]);
-            else
-                to[toCamelCase(k)] = status[k];
-        }
-    }
-    to.errors = [];
-    if (status.Errors != null) {
-        for (let i = 0, len = status.Errors.length; i < len; i++) {
-            let o = status.Errors[i];
-            let err = {};
-            for (let k in o)
-                err[toCamelCase(k)] = o[k];
-            to.errors.push(err);
-        }
-    }
+    let to = camelCaseAny(status);
     return to;
 }
 export function nameOf(o) {

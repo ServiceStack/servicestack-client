@@ -521,6 +521,7 @@ export declare function toCamelCase(s: string): string;
 export declare function toPascalCase(s: string): string;
 export declare function toKebabCase(s: string): string;
 export declare function map(o: any, f: (x: any) => any): any;
+export declare function camelCaseAny(o: any): any;
 export declare function sanitize(status: any): any;
 export declare function nameOf(o: any): any;
 export declare function css(selector: string | NodeListOf<Element>, name: string, value: string): void;

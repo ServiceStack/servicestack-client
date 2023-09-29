@@ -58,7 +58,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     "use strict";
     var __syncRequire = typeof module === "object" && typeof module.exports === "object";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.addScript = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.setQueryString = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
+    exports.Inspect = exports.createBus = exports.EventBus = exports.alignAuto = exports.alignRight = exports.alignCenter = exports.alignLeft = exports.uniqueKeys = exports.JSV = exports.StringBuffer = exports.toBase64String = exports.toByteArray = exports.fromByteArray = exports.toGuid = exports.fromGuid = exports.toTimeSpan = exports.fromTimeSpan = exports.toDateTime = exports.fromDateTime = exports.isNullOrEmpty = exports.indexOfAny = exports.htmlAttrs = exports.enc = exports.uniq = exports.flatMap = exports.toTimeSpanFmt = exports.toXsdDuration = exports.fromXsdDuration = exports.classNames = exports.NavOptions = exports.UserAttributes = exports.LinkButtonDefaults = exports.NavButtonGroupDefaults = exports.NavbarDefaults = exports.NavLinkDefaults = exports.NavDefaults = exports.btnClasses = exports.btnSizeClass = exports.BootstrapSizes = exports.btnColorClass = exports.BootstrapColors = exports.activeClass = exports.activeClassNav = exports.apiValueFmt = exports.apiValue = exports.mapGet = exports.resolve = exports.each = exports.apply = exports.omit = exports.pick = exports.safeVarName = exports.trimEnd = exports.populateForm = exports.triggerEvent = exports.sanitizeFormData = exports.serializeToFormData = exports.serializeToUrlEncoded = exports.serializeToObject = exports.serializeForm = exports.ajaxSubmit = exports.formSubmit = exports.toVarNames = exports.bootstrapForm = exports.bindHandlers = exports.bootstrap = exports.delaySet = exports.addScript = exports.on = exports.$$ = exports.$1 = exports.createElement = exports.padStart = exports.msToTime = exports.toTime = exports.toLocalISOString = exports.timeFmt12 = exports.dateFmtHM = exports.dateFmt = exports.padInt = exports.toDateFmt = exports.toDate = exports.isDate = exports.errorResponse = exports.errorResponseExcept = exports.errorResponseSummary = exports.toObject = exports.toFormData = exports.parseResponseStatus = exports.getField = exports.normalize = exports.normalizeKey = exports.parseCookie = exports.tryDecode = exports.stripQuotes = exports.bytesToBase64 = exports.setQueryString = exports.appendQueryString = exports.createUrl = exports.createPath = exports.combinePaths = exports.queryString = exports.humanify = exports.splitTitleCase = exports.isDigit = exports.isLower = exports.isUpper = exports.ucFirst = exports.humanize = exports.onlyProps = exports.chop = exports.lastRightPart = exports.lastLeftPart = exports.rightPart = exports.leftPart = exports.splitOnLast = exports.splitOnFirst = exports.css = exports.nameOf = exports.sanitize = exports.camelCaseAny = exports.map = exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.createError = exports.isFormData = exports.createFieldError = exports.createErrorStatus = exports.ApiResult = exports.getResponseStatus = exports.getMethod = exports.JsonApiClient = exports.JsonServiceClient = exports.GetAccessTokenResponse = exports.HttpMethods = exports.ServerEventUser = exports.GetEventSubscribers = exports.UpdateEventSubscriberResponse = exports.UpdateEventSubscriber = exports.ServerEventReceiver = exports.getAllMembers = exports.ServerEventsClient = exports.ReadyState = exports.SingletonInstanceResolver = exports.NewInstanceResolver = exports.MetadataType = exports.MetadataPropertyType = exports.MetadataAttribute = exports.MetadataDataMember = exports.MetadataDataContract = exports.MetadataTypeName = exports.MetadataTypes = exports.MetadataOperationType = exports.MetadataRoute = exports.MetadataTypesConfig = exports.GetNavItemsResponse = exports.GetNavItems = exports.NavItem = exports.EmptyResponse = exports.ErrorResponse = exports.ResponseError = exports.ResponseStatus = void 0;
     var ResponseStatus = /** @class */ (function () {
         function ResponseStatus(init) {
             Object.assign(this, init);
@@ -1377,30 +1377,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.toKebabCase = toKebabCase;
     function map(o, f) { return o == null ? null : f(o); }
     exports.map = map;
+    function camelCaseAny(o) {
+        if (!o || !(o instanceof Object) || Array.isArray(o))
+            return o;
+        var to = {};
+        for (var k in o) {
+            if (o.hasOwnProperty(k)) {
+                var key = toCamelCase(k);
+                var val = o[k];
+                if (Array.isArray(val))
+                    to[key] = val.map(function (x) { return camelCaseAny(x); });
+                else if (val instanceof Object)
+                    to[key] = camelCaseAny(val);
+                else
+                    to[key] = val;
+            }
+        }
+        return to;
+    }
+    exports.camelCaseAny = camelCaseAny;
     function sanitize(status) {
+        if (!sanitize)
+            return sanitize;
         if (status.responseStatus)
             return status;
         if (status.errors)
             return status;
-        var to = {};
-        for (var k in status) {
-            if (status.hasOwnProperty(k)) {
-                if (status[k] instanceof Object)
-                    to[toCamelCase(k)] = sanitize(status[k]);
-                else
-                    to[toCamelCase(k)] = status[k];
-            }
-        }
-        to.errors = [];
-        if (status.Errors != null) {
-            for (var i = 0, len = status.Errors.length; i < len; i++) {
-                var o = status.Errors[i];
-                var err = {};
-                for (var k in o)
-                    err[toCamelCase(k)] = o[k];
-                to.errors.push(err);
-            }
-        }
+        var to = camelCaseAny(status);
         return to;
     }
     exports.sanitize = sanitize;
