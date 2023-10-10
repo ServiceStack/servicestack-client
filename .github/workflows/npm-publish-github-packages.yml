@@ -31,6 +31,7 @@ jobs:
         with:
           node-version: 18
       - run: npm ci
+      - run: npm install uglifyjs -g
       - run: npm run publish
 
       - name: Upload build artifact
