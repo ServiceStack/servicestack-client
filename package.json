@@ -57,6 +57,7 @@
     "mocha": "10.1.0",
     "mocha-headless-chrome": "^4.0.0",
     "shx": "^0.3.4",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "uglifyjs": "^2.4.11"
   }
 }
