@@ -21,7 +21,8 @@
     "mjs": "tsc -p tsconfig.mjs.json && shx mv dist/index.js dist/servicestack-client.mjs && npm run uglify-mjs",
     "publish": "tsc && npm run mjs && tsc -p tsconfig.umd.json && shx mv dist/index.js dist/servicestack-client.umd.js && bash inject-umd.sh && npm run uglify && shx mv src/index.js dist && shx cp src/index.d.ts dist",
     "dtos": "cd tests/dtos && typescript-ref",
-    "test": "mocha -t 5000 ./tests/*.js",
+    "test:node": "mocha -t 5000 ./tests/*.js",
+    "test:browser": "mocha-headless-chrome -f http://localhost:8080/testrunner.html",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js",
     "postversion": "git push && git push --tags"
   },
@@ -54,7 +55,9 @@
     "chai": "^4.3.4",
     "eventsource": "^2.0.2",
     "mocha": "10.1.0",
+    "mocha-headless-chrome": "^4.0.0",
     "shx": "^0.3.4",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "http-server": "^14.1.1"
   }
 }

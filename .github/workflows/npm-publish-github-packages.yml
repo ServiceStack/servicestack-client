@@ -16,7 +16,10 @@ jobs:
           node-version: 18
 
       - run: npm ci
-      - run: npm run test
+      - run: |
+          http-server ./ -p 8080 &
+          sleep 5 # Wait for 5 seconds to ensure http-server is up
+          npm run test:browser
 
   package:
     needs: test
