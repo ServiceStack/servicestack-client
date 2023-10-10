@@ -75,8 +75,8 @@ function createAllTypes() {
         double: 2.2,
         decimal: 3.0,
         string: "string",
-        dateTime: toDateTime(new Date(2001,0,1)),
-        dateTimeOffset: toDateTime(new Date(2001,0,1)),
+        dateTime: toDateTime(new Date(Date.UTC(2001,0,1))),
+        dateTimeOffset: toDateTime(new Date(Date.UTC(2001,0,1))),
         timeSpan: "PT1H",
         guid: "ea762009b66c410b9bf5ce21ad519249",
         stringList: ["A", "B", "C"],
@@ -109,8 +109,8 @@ function assertAllTypes(dto: AllTypes) {
     expect(dto.double).equals(2.2);
     expect(dto.decimal).equals(3.0);
     expect(dto.string).equals("string");
-    expect(dto.dateTime).equals("/Date(978278400000)/");
-    expect(dto.dateTimeOffset).equals("/Date(978278400000)/");
+    expect(dto.dateTime).equals("/Date(978307200000)/");
+    expect(dto.dateTimeOffset).equals("/Date(978307200000)/");
     expect(dto.timeSpan).equals("PT1H");
     expect(dto.guid).equals("ea762009b66c410b9bf5ce21ad519249");
     expect(dto.stringList).deep.equals(["A", "B", "C"]);
