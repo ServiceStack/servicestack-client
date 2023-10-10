@@ -16,6 +16,7 @@ jobs:
           node-version: 18
 
       - run: npm ci
+      - run: npm install http-server -g
       - run: |
           http-server ./ -p 8080 &
           sleep 5 # Wait for 5 seconds to ensure http-server is up
