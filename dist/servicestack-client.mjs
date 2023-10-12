@@ -1142,9 +1142,9 @@ export class JsonApiClient {
     }
 }
 export function getMethod(request, method) {
-    return (method ?? typeof request.getMethod == "function")
+    return method ?? (typeof request.getMethod == "function"
         ? request.getMethod()
-        : HttpMethods.Post;
+        : HttpMethods.Post);
 }
 export function getResponseStatus(e) {
     return e.responseStatus ?? e.ResponseStatus ??

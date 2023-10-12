@@ -1031,9 +1031,9 @@ class JsonApiClient {
 }
 exports.JsonApiClient = JsonApiClient;
 function getMethod(request, method) {
-    return (method !== null && method !== void 0 ? method : typeof request.getMethod == "function")
+    return method !== null && method !== void 0 ? method : (typeof request.getMethod == "function"
         ? request.getMethod()
-        : HttpMethods.Post;
+        : HttpMethods.Post);
 }
 exports.getMethod = getMethod;
 function getResponseStatus(e) {
