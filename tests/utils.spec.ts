@@ -7,8 +7,10 @@ import {
     errorResponse,
     errorResponseExcept,
     toObject,
+    getMethod,
 } from  '../src/index';
 import {humanify} from "../dist";
+import { Hello } from "./dtos/test.dtos";
 
 describe ('Util Tests', () => {
     it ('Can parse cookie', done => {
@@ -118,5 +120,11 @@ describe ('Util Tests', () => {
         expect(humanify('TheIDWithWord')).eq('The ID With Word')
         expect(humanify('TheID2WithWord')).eq('The ID2 With Word')
         expect(humanify('Leave me Alone!')).eq('Leave me Alone!')
+    })
+
+    it ('Resolves correct HTTP Method', () => {
+        expect(getMethod(new Hello())).eq('POST')
+        expect(getMethod(new Hello(), 'GET')).eq('GET')
+        expect(getMethod(new Hello(), 'PUT')).eq('PUT')
     })
 });
