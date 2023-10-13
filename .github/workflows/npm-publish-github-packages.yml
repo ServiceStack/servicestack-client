@@ -39,9 +39,12 @@ jobs:
         with:
           name: servicestack-client
           path: |
+            ./dist/index.js
+            ./dist/index.d.ts
             ./dist/servicestack-client.mjs
+            ./dist/servicestack-client.min.js
             ./dist/servicestack-client.min.mjs
-            ./dist/servicestack-client.umd.cjs
+            ./dist/servicestack-client.umd.js
 
   publish:
     needs: package
