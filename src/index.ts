@@ -2144,14 +2144,18 @@ function remClass(el:Element|HTMLElement|null, cls:string) { return !el ? null
             ? el.className = el.className.replace(/(\s|^)someclass(\s|$)/, ' ') 
             : null
 }
-
+export function isElement(el:any) {
+    return typeof window != "undefined" && (el instanceof window.Element || el == window.document)
+}
 export function $1(sel:string|any, el?:HTMLElement) {
     return typeof sel === "string" ? (el || document).querySelector(sel) : sel || null
 }
 export function $$(sel:string|any, el?:HTMLElement) {
-    return typeof sel === "string"
-        ? Array.prototype.slice.call((el || document).querySelectorAll(sel))
-        : Array.isArray(sel) ? sel : [sel]
+    if (typeof sel === "string")
+        return Array.prototype.slice.call((el || document).querySelectorAll(sel))
+    if (isElement(sel))
+        return [sel]
+    return (Array.isArray(sel) ? sel : [sel]).flatMap(x => $$(x, el))
 }
 export function on(sel:any, handlers: {[name:string]:Function}) {
     $$(sel).forEach(e => {

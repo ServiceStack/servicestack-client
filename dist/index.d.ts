@@ -584,6 +584,7 @@ export interface ICreateElementOptions {
     } | null;
 }
 export declare function createElement(tagName: string, options?: ICreateElementOptions): HTMLElement;
+export declare function isElement(el: any): boolean;
 export declare function $1(sel: string | any, el?: HTMLElement): any;
 export declare function $$(sel: string | any, el?: HTMLElement): any;
 export declare function on(sel: any, handlers: {
