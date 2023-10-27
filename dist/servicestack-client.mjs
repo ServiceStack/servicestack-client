@@ -1766,10 +1766,10 @@ export function $1(sel, el) {
 }
 export function $$(sel, el) {
     if (typeof sel === "string")
-        return Array.prototype.slice.call((el || document).querySelectorAll(sel));
-    if (isElement(sel))
-        return [sel];
-    return (Array.isArray(sel) ? sel : [sel]).flatMap(x => $$(x, el));
+        return Array.from((el || document).querySelectorAll(sel));
+    if (Array.isArray(sel))
+        return sel.flatMap(x => $$(x, el));
+    return [sel];
 }
 export function on(sel, handlers) {
     $$(sel).forEach(e => {
@@ -2262,6 +2262,16 @@ export function omit(o, keys) {
     for (const k in o) {
         if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
             to[k] = o[k];
+        }
+    }
+    return to;
+}
+export function omitEmpty(o) {
+    const to = {};
+    for (const k in o) {
+        const v = o[k];
+        if (v != null && v !== '') {
+            to[k] = v;
         }
     }
     return to;
