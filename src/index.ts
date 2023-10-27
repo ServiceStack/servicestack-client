@@ -2716,6 +2716,16 @@ export function omit(o:any, keys:string[]) {
     }
     return to
 }
+export function omitEmpty(o:any) {
+    const to = {}
+    for (const k in o) {
+        const v = o[k]
+        if (v != null && v !== '') {
+            to[k] = v
+        }
+    }
+    return to
+}
 export function apply<T>(x:T, fn:(x:T) => void) {
     fn(x)
     return x

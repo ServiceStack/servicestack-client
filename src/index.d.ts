@@ -641,6 +641,7 @@ export declare function trimEnd(s: string, c: string): string;
 export declare function safeVarName(s: string): string;
 export declare function pick(o: any, keys: string[]): {};
 export declare function omit(o: any, keys: string[]): {};
+export declare function omitEmpty(o: any): {};
 export declare function apply<T>(x: T, fn: (x: T) => void): T;
 export declare function each(xs: any[], f: (acc: any, x: any) => void, o?: any): any;
 export declare function resolve<T>(o: T, f?: (x: T) => any): any;
