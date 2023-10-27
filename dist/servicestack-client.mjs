@@ -1053,7 +1053,7 @@ export class JsonServiceClient {
                     let jwtRequest = this.createRequest({ method: HttpMethods.Post, request: jwtReq, args: null, url });
                     return fetch(url, jwtRequest)
                         .then(r => this.createResponse(r, jwtReq).then(jwtResponse => {
-                        this.bearerToken = jwtResponse.accessToken || null;
+                        this.bearerToken = jwtResponse?.accessToken || null;
                         return resendRequest();
                     }))
                         .catch(res => {
@@ -1134,6 +1134,7 @@ export class JsonApiClient {
         let client = new JsonServiceClient(baseUrl).apply(c => {
             c.basePath = "/api";
             c.headers = new Headers(); //avoid pre-flight CORS requests
+            c.enableAutoRefreshToken = false; // Use JWT Cookies by default
             if (f) {
                 f(c);
             }

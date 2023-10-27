@@ -1109,7 +1109,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                         var jwtRequest = _this.createRequest({ method: HttpMethods.Post, request: jwtReq_1, args: null, url: url });
                         return fetch(url, jwtRequest)
                             .then(function (r) { return _this.createResponse(r, jwtReq_1).then(function (jwtResponse) {
-                            _this.bearerToken = jwtResponse.accessToken || null;
+                            _this.bearerToken = (jwtResponse === null || jwtResponse === void 0 ? void 0 : jwtResponse.accessToken) || null;
                             return resendRequest();
                         }); })
                             .catch(function (res) {
@@ -1235,6 +1235,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             var client = new JsonServiceClient(baseUrl).apply(function (c) {
                 c.basePath = "/api";
                 c.headers = new Headers(); //avoid pre-flight CORS requests
+                c.enableAutoRefreshToken = false; // Use JWT Cookies by default
                 if (f) {
                     f(c);
                 }
