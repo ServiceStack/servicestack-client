@@ -2152,10 +2152,10 @@ export function $1(sel:string|any, el?:HTMLElement) {
 }
 export function $$(sel:string|any, el?:HTMLElement) {
     if (typeof sel === "string")
-        return Array.prototype.slice.call((el || document).querySelectorAll(sel))
-    if (isElement(sel))
-        return [sel]
-    return (Array.isArray(sel) ? sel : [sel]).flatMap(x => $$(x, el))
+        return Array.from((el || document).querySelectorAll(sel))
+    if (Array.isArray(sel))
+        return sel.flatMap(x => $$(x, el))
+    return [sel]
 }
 export function on(sel:any, handlers: {[name:string]:Function}) {
     $$(sel).forEach(e => {
