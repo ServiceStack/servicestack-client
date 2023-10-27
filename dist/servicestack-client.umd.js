@@ -1612,7 +1612,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         for (var k in args) {
             if (args.hasOwnProperty(k)) {
                 var val = args[k];
-                if (typeof val == 'undefined')
+                if (typeof val == 'undefined' || typeof val == 'function' || typeof val == 'symbol')
                     continue;
                 url += url.indexOf("?") >= 0 ? "&" : "?";
                 url += k + (val === null ? '' : "=" + qsValue(val));

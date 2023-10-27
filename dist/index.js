@@ -1354,7 +1354,7 @@ function appendQueryString(url, args) {
     for (let k in args) {
         if (args.hasOwnProperty(k)) {
             let val = args[k];
-            if (typeof val == 'undefined')
+            if (typeof val == 'undefined' || typeof val == 'function' || typeof val == 'symbol')
                 continue;
             url += url.indexOf("?") >= 0 ? "&" : "?";
             url += k + (val === null ? '' : "=" + qsValue(val));
