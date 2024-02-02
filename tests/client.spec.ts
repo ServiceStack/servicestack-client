@@ -202,9 +202,9 @@ describe ('JsonServiceClient Tests', () => {
         expect(api.errorMessage).to.be.equal('Invalid Username or Password')
     })
 
-    it ('Should return 401 for failed Auth requests (vue-spa)', async () => {
+    it ('Should return 401 for failed Auth requests (blazor-vue)', async () => {
 
-        const client = new JsonServiceClient("https://vue-spa.web-templates.io")
+        const client = new JsonServiceClient("https://blazor-vue.web-templates.io")
         client.exceptionFilter = (res,error) => {
             expect(error.responseStatus.errorCode).to.be.equal('Unauthorized')
             expect(error.responseStatus.message).to.be.equal('Invalid Username or Password')
@@ -293,12 +293,10 @@ describe ('JsonServiceClient Tests', () => {
 
     it ('Can GET using only path info', async () => {
         const r = await testClient.get<HelloResponse>("/hello/World")
-
         expect(r.result).to.equal("Hello, World!")
     })
 
     it ('Can GET using absolute url', async () => {
-
         const r = await testClient.get<HelloResponse>("https://test.servicestack.net/hello/World")
         expect(r.result).to.equal("Hello, World!")
     })
@@ -377,7 +375,7 @@ describe ('JsonServiceClient Tests', () => {
     it ('Can sendAll batch request', async () => {
         const requests = ["foo","bar","baz"].map(name => Object.assign(new Hello(), { name }))
 
-        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/reply/Hello[]")
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/api/Hello[]")
 
         const responses = await testClient.sendAll(requests)
 
@@ -389,7 +387,7 @@ describe ('JsonServiceClient Tests', () => {
     it ('Can sendAllOneWay IReturn<T> batch request', async () => {
         const requests = ["foo","bar","baz"].map(name => Object.assign(new Hello(), { name }))
 
-        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/oneway/Hello[]")
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/api/Hello[]")
 
         const response = await testClient.sendAllOneWay(requests)
 
@@ -401,7 +399,7 @@ describe ('JsonServiceClient Tests', () => {
     it ('Can sendAllOneWay IReturnVoid batch request', async () => {
         const requests = ["foo","bar","baz"].map(name => Object.assign(new HelloReturnVoid(), { name }))
 
-        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/json/oneway/HelloReturnVoid[]")
+        testClient.urlFilter = url => expect(url).eq(TEST_URL + "/api/HelloReturnVoid[]")
 
         const response = await testClient.sendAllOneWay(requests)
 
@@ -411,14 +409,18 @@ describe ('JsonServiceClient Tests', () => {
     })
 
     it ('Should change base path', () => {
-        let client = new JsonServiceClient('https://example.org')
-            .useBasePath('/api')
-        expect(client.replyBaseUrl).to.eq('https://example.org/api/')
-        expect(client.oneWayBaseUrl).to.eq('https://example.org/api/')
+        let client = new JsonServiceClient('https://test.servicestack.net/')
 
-        client.useBasePath()
-        expect(client.replyBaseUrl).to.eq('https://example.org/json/reply/')
-        expect(client.oneWayBaseUrl).to.eq('https://example.org/json/oneway/')
+        expect(client.replyBaseUrl).to.eq('https://test.servicestack.net/api/')
+        expect(client.oneWayBaseUrl).to.eq('https://test.servicestack.net/api/')
+
+        client.basePath = null
+        expect(client.replyBaseUrl).to.eq('https://test.servicestack.net/json/reply/')
+        expect(client.oneWayBaseUrl).to.eq('https://test.servicestack.net/json/oneway/')
+
+        client.basePath = 'api'
+        expect(client.replyBaseUrl).to.eq('https://test.servicestack.net/api/')
+        expect(client.oneWayBaseUrl).to.eq('https://test.servicestack.net/api/')
     })
 
 })
