@@ -4,6 +4,12 @@ The **@servicestack/client** library enables the best end-to-end typed developer
 
 ### v2.x Changes
 
+ - Switched to use `/api` pre-defined route by default, revert to legacy `/json/reply` pre-defined route with:
+
+```ts
+const client = new JsonServiceClient(baseUrl).useBasePath()
+```
+
  - **@servicestack/client** now dependency-free
 
 As [fetch is available in Node.js v18+ LTS](https://blog.logrocket.com/fetch-api-node-js/) all polyfills have been removed to make **@servicestack/client** dependency-free in its latest major **v2.x** version.
