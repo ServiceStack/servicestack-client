@@ -789,8 +789,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         function JsonServiceClient(baseUrl) {
             if (baseUrl === void 0) { baseUrl = "/"; }
             this.baseUrl = baseUrl;
-            this.replyBaseUrl = combinePaths(baseUrl, "json", "reply") + "/";
-            this.oneWayBaseUrl = combinePaths(baseUrl, "json", "oneway") + "/";
             this.mode = "cors";
             this.credentials = "include";
             this.headers = new Headers();
@@ -798,6 +796,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             this.manageCookies = typeof document == "undefined"; //because node-fetch doesn't
             this.cookies = {};
             this.enableAutoRefreshToken = true;
+            this.basePath = 'api';
         }
         JsonServiceClient.prototype.setCredentials = function (userName, password) {
             this.userName = userName;
@@ -814,9 +813,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
                     this.oneWayBaseUrl = combinePaths(this.baseUrl, "json", "oneway") + "/";
                 }
                 else {
-                    if (path[0] != '/') {
-                        path = '/' + path;
-                    }
                     this.replyBaseUrl = combinePaths(this.baseUrl, path) + "/";
                     this.oneWayBaseUrl = combinePaths(this.baseUrl, path) + "/";
                 }
@@ -1993,8 +1989,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
     exports.$1 = $1;
     function $$(sel, el) {
+        var _a, _b;
         if (typeof sel === "string")
-            return Array.from((el || document).querySelectorAll(sel));
+            return Array.from((_b = (_a = (el || typeof document != "undefined" ? document : null)) === null || _a === void 0 ? void 0 : _a.querySelectorAll(sel)) !== null && _b !== void 0 ? _b : []);
         if (Array.isArray(sel))
             return sel.flatMap(function (x) { return $$(x, el); });
         return [sel];
