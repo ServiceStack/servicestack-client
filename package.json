@@ -43,8 +43,15 @@
     "error-handling"
   ],
   "licenses": [],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/servicestack-client.mjs",
+      "require": "./dist/servicestack-client.umd.cjs"
+    }
+  },  
   "engines": {
     "node": ">=18.0.0"
   },
