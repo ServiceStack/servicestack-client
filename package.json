@@ -24,7 +24,7 @@
     "test": "mocha -t 5000 ./tests/*.js",
     "test:browser": "mocha-headless-chrome -f http://localhost:8080/testrunner.html",
     "testonly": "mocha -t 5000 ./tests/serverevents.spec.js",
-    "postversion": "git push && git push --tags"
+    "release": "bump patch --commit --push --tag && npm publish"
   },
   "files": [
     "dist/index.js",
