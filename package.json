@@ -1,7 +1,7 @@
 {
   "name": "@servicestack/client",
   "title": "ServiceStack Client Utils",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "ServiceStack's TypeScript library providing convenience utilities in developing web apps. Integrates with ServiceStack's Server features including ServiceClient, Server Events, Error Handling and Validation",
   "homepage": "https://github.com/ServiceStack/servicestack-client",
   "license": "BSD-3-Clause",
@@ -51,7 +51,7 @@
       "import": "./dist/servicestack-client.mjs",
       "require": "./dist/servicestack-client.umd.cjs"
     }
-  },  
+  },
   "engines": {
     "node": ">=18.0.0"
   },
