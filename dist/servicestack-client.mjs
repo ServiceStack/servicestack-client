@@ -2256,6 +2256,8 @@ export function pick(o, keys) {
 }
 export function omit(o, keys) {
     const to = {};
+    if (!o)
+        return to;
     for (const k in o) {
         if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
             to[k] = o[k];
@@ -2265,6 +2267,8 @@ export function omit(o, keys) {
 }
 export function omitEmpty(o) {
     const to = {};
+    if (!o)
+        return to;
     for (const k in o) {
         const v = o[k];
         if (v != null && v !== '') {

@@ -2518,6 +2518,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.pick = pick;
     function omit(o, keys) {
         var to = {};
+        if (!o)
+            return to;
         for (var k in o) {
             if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
                 to[k] = o[k];
@@ -2528,6 +2530,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.omit = omit;
     function omitEmpty(o) {
         var to = {};
+        if (!o)
+            return to;
         for (var k in o) {
             var v = o[k];
             if (v != null && v !== '') {
