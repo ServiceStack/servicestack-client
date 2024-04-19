@@ -2247,34 +2247,34 @@ export function safeVarName(s) {
 }
 export function pick(o, keys) {
     const to = {};
-    for (const k in o) {
-        if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
+    Object.keys(o).forEach(k => {
+        if (keys.indexOf(k) >= 0) {
             to[k] = o[k];
         }
-    }
+    });
     return to;
 }
 export function omit(o, keys) {
     const to = {};
     if (!o)
         return to;
-    for (const k in o) {
-        if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
+    Object.keys(o).forEach(k => {
+        if (keys.indexOf(k) < 0) {
             to[k] = o[k];
         }
-    }
+    });
     return to;
 }
 export function omitEmpty(o) {
     const to = {};
     if (!o)
         return to;
-    for (const k in o) {
+    Object.keys(o).forEach(k => {
         const v = o[k];
         if (v != null && v !== '') {
             to[k] = v;
         }
-    }
+    });
     return to;
 }
 export function apply(x, fn) {

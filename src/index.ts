@@ -2696,32 +2696,32 @@ export function safeVarName(s: string) {
 }
 export function pick(o:any, keys:string[]) {
     const to = {}
-    for (const k in o) {
-        if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
+    Object.keys(o).forEach(k => {
+        if (keys.indexOf(k) >= 0) {
             to[k] = o[k]
         }
-    }
+    })
     return to
 }
 export function omit(o:any, keys:string[]) {
     const to = {}
     if (!o) return to
-    for (const k in o) {
-        if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
-            to[k] = o[k]
+    Object.keys(o).forEach(k => {
+        if (keys.indexOf(k) < 0) {
+            to[k] = o[k];
         }
-    }
+    })
     return to
 }
 export function omitEmpty(o:any) {
     const to = {}
     if (!o) return to
-    for (const k in o) {
+    Object.keys(o).forEach(k => {
         const v = o[k]
         if (v != null && v !== '') {
             to[k] = v
         }
-    }
+    })
     return to
 }
 export function apply<T>(x:T, fn:(x:T) => void) {

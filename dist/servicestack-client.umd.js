@@ -2508,11 +2508,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     exports.safeVarName = safeVarName;
     function pick(o, keys) {
         var to = {};
-        for (var k in o) {
-            if (o.hasOwnProperty(k) && keys.indexOf(k) >= 0) {
+        Object.keys(o).forEach(function (k) {
+            if (keys.indexOf(k) >= 0) {
                 to[k] = o[k];
             }
-        }
+        });
         return to;
     }
     exports.pick = pick;
@@ -2520,11 +2520,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         var to = {};
         if (!o)
             return to;
-        for (var k in o) {
-            if (o.hasOwnProperty(k) && keys.indexOf(k) < 0) {
+        Object.keys(o).forEach(function (k) {
+            if (keys.indexOf(k) < 0) {
                 to[k] = o[k];
             }
-        }
+        });
         return to;
     }
     exports.omit = omit;
@@ -2532,12 +2532,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         var to = {};
         if (!o)
             return to;
-        for (var k in o) {
+        Object.keys(o).forEach(function (k) {
             var v = o[k];
             if (v != null && v !== '') {
                 to[k] = v;
             }
-        }
+        });
         return to;
     }
     exports.omitEmpty = omitEmpty;
