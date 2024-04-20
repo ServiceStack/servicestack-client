@@ -1,6 +1,5 @@
 ﻿//Node globals
 declare let process:any
-declare let require:Function
 
 export interface ApiRequest {
     getTypeName(): string
