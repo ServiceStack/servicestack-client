@@ -49,7 +49,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/servicestack-client.mjs",
-      "require": "./dist/servicestack-client.umd.cjs"
+      "require": "./dist/servicestack-client.umd"
     }
   },
   "engines": {
