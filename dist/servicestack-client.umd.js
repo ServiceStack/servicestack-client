@@ -1532,7 +1532,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return to.filter(function (x) { return !!x; });
     }
     exports.splitTitleCase = splitTitleCase;
-    function humanify(s) { return !s || s.indexOf(' ') >= 0 ? s : (0, exports.ucFirst)(splitTitleCase(s).join(' ')); }
+    function humanify(s) {
+        return !s || indexOfAny(s, [' ', ',', '.', ':', '-']) >= 0
+            ? s
+            : (0, exports.ucFirst)(splitTitleCase(s).join(' '));
+    }
     exports.humanify = humanify;
     function queryString(url) {
         if (!url || url.indexOf('?') === -1)

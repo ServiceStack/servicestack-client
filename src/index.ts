@@ -1713,7 +1713,9 @@ export function splitTitleCase(s:string) {
     return to.filter(x => !!x)
 }
 
-export function humanify(s?:string|null) { return !s || s.indexOf(' ') >= 0 ? s : ucFirst(splitTitleCase(s).join(' ')) }
+export function humanify(s?:string|null) { return !s || indexOfAny(s,[' ',',','.',':','-']) >= 0 
+    ? s 
+    : ucFirst(splitTitleCase(s).join(' ')) }
 
 export function queryString(url: string): any {
     if (!url || url.indexOf('?') === -1) return {}
