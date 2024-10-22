@@ -1534,7 +1534,7 @@ export function createFieldError(fieldName:string, message:string, errorCode:str
     return new ResponseStatus({ errors:[new ResponseError({fieldName, errorCode, message})] })
 }
 
-export function isFormData(body:any) { return typeof window != "undefined" && body instanceof FormData }
+export function isFormData(body:any) { return body instanceof FormData }
 
 function createErrorResponse(errorCode: string|number, message: string, type:ErrorResponseType=null) {
     const error = apply(new ErrorResponse(), e => {

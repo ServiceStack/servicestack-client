@@ -87,7 +87,7 @@ describe ('JsonServiceClient Tests', () => {
         const api = await testClient.api(new dtos.Overview())
 
         expect(api.errorCode).to.be.equal('NotImplementedException')
-        expect(api.errorMessage).to.be.equal('The operation \'Overview\' does not exist for this service')
+        expect(api.errorMessage).to.be.equal('The operation does not exist for this service')
     })
 
     it('Should throw 401', async () => {

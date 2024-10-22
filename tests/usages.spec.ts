@@ -3,6 +3,7 @@ const { expect, assert } = chai
 import {
     each,
     JsonServiceClient,
+    isFormData
 } from '../src/index'
 
 describe ('Usages Tests', () => {
@@ -30,6 +31,11 @@ describe ('Usages Tests', () => {
         expect(r.a).eq(2)
         expect(r.b).eq(4)
         expect(r.c).eq(1)
+    })
+
+    it ('Does allow usage of FormData from node', () => {
+        const formData = new FormData()
+        formData.append('a', 'b')
     })
 
 })
