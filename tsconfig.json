@@ -13,17 +13,17 @@
   },
   "files": [
     "./src/index.ts",
-    "./tests/dtos/techstacks.dtos.ts",
-    "./tests/dtos/test.dtos.ts",
-    "./tests/client.spec.ts",
-    "./tests/client.auth.spec.ts",
-    "./tests/serverevents.spec.ts",
-    "./tests/stringbuffer.spec.ts",
-    "./tests/utils.spec.ts",
-    "./tests/jsv.spec.ts",
-    "./tests/inspect.spec.ts",
-    "./tests/serialization.spec.ts",
-    "./tests/issues.spec.ts",
-    "./tests/usages.spec.ts"
+    "./test/dtos/techstacks.dtos.ts",
+    "./test/dtos/test.dtos.ts",
+    "./test/client.spec.ts",
+    "./test/client.auth.spec.ts",
+    "./test/serverevents.spec.ts",
+    "./test/stringbuffer.spec.ts",
+    "./test/utils.spec.ts",
+    "./test/jsv.spec.ts",
+    "./test/inspect.spec.ts",
+    "./test/serialization.spec.ts",
+    "./test/issues.spec.ts",
+    "./test/usages.spec.ts"
   ]
 }
