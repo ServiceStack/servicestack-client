@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22
 
       - run: npm ci
       - run: npm install http-server -g
@@ -45,20 +45,3 @@ jobs:
             ./dist/servicestack-client.min.mjs
             ./dist/servicestack-client.mjs
             ./dist/servicestack-client.umd.js
-
-  publish:
-    needs: package
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm run release
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

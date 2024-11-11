@@ -11,20 +11,21 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 22
       - run: npm ci
-      - run: npm run build && npm run build-minify
+      - run: npm install uglifyjs -g
+      - run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: servicestack-client
           path: |
-            ./dist/index.js
             ./dist/index.d.ts
-            ./dist/servicestack-client.mjs
+            ./dist/index.js
             ./dist/servicestack-client.min.js
             ./dist/servicestack-client.min.mjs
+            ./dist/servicestack-client.mjs
             ./dist/servicestack-client.umd.js
 
   publish-npm:
@@ -34,10 +35,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: npm run build
-      - run: npm publish
+      - run: npm install uglifyjs bump -g
+      - run: npm release
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
