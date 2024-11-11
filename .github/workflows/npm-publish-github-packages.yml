@@ -29,21 +29,21 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22
       - run: npm ci
       - run: npm install uglifyjs -g
-      - run: npm run publish
+      - run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: servicestack-client
           path: |
-            ./dist/index.js
             ./dist/index.d.ts
-            ./dist/servicestack-client.mjs
+            ./dist/index.js
             ./dist/servicestack-client.min.js
             ./dist/servicestack-client.min.mjs
+            ./dist/servicestack-client.mjs
             ./dist/servicestack-client.umd.js
 
   publish:
@@ -56,15 +56,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
-      - name: Bump version
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          HASH=$(git rev-parse --short HEAD)
-          NEW_VERSION="$VERSION-preview-$HASH"
-          jq --arg nv "$NEW_VERSION" '.version=$nv' package.json > "tmp.json" && mv "tmp.json" "package.json"
-      - run: npm publish
+      - run: npm release
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
