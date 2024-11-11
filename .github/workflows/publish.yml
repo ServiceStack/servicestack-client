@@ -39,6 +39,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm install uglifyjs bump -g
-      - run: npm release
+      - run: npm run release
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
