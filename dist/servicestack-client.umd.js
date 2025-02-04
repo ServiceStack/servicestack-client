@@ -1342,7 +1342,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         return new ResponseStatus({ errors: [new ResponseError({ fieldName: fieldName, errorCode: errorCode, message: message })] });
     }
     exports.createFieldError = createFieldError;
-    function isFormData(body) { return typeof window != "undefined" && body instanceof FormData; }
+    function isFormData(body) { return body instanceof FormData; }
     exports.isFormData = isFormData;
     function createErrorResponse(errorCode, message, type) {
         if (type === void 0) { type = null; }
@@ -1366,11 +1366,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         });
     }
     exports.createError = createError;
-    function toCamelCase(s) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1); }
+    function toCamelCase(s) {
+        s = toPascalCase(s);
+        if (!s)
+            return '';
+        return s.charAt(0).toLowerCase() + s.substring(1);
+    }
     exports.toCamelCase = toCamelCase;
-    function toPascalCase(s) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1); }
+    function toPascalCase(s) {
+        if (!s)
+            return '';
+        var isAllCaps = s.match(/^[A-Z0-9_]+$/);
+        if (isAllCaps) {
+            var words = s.split('_');
+            return words.map(function (x) { return x[0].toUpperCase() + x.substring(1).toLowerCase(); }).join('');
+        }
+        if (s.includes('_')) {
+            return s.split('_').filter(function (x) { return x[0]; }).map(function (x) { return x[0].toUpperCase() + x.substring(1); }).join('');
+        }
+        return s.charAt(0).toUpperCase() + s.substring(1);
+    }
     exports.toPascalCase = toPascalCase;
-    function toKebabCase(s) { return (s || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(); }
+    function toKebabCase(s) {
+        if (!s || s.length <= 1)
+            return s.toLowerCase();
+        // Insert hyphen before capitals and numbers, convert to lowercase
+        return s
+            .replace(/([A-Z0-9])/g, '-$1')
+            .toLowerCase()
+            // Remove leading hyphen if exists
+            .replace(/^-/, '')
+            // Replace multiple hyphens with single hyphen
+            .replace(/-+/g, '-');
+    }
     exports.toKebabCase = toKebabCase;
     function map(o, f) { return o == null ? null : f(o); }
     exports.map = map;
