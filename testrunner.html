@@ -28,7 +28,7 @@
             if (globalImports[url])
                 return globalImports[url];
             if (url.startsWith("./"))
-                url = "tests/" + url.substring(2);
+                url = "test/" + url.substring(2);
 
             url+=/.js$/i.test(url) ? "" : ".js";// to allow loading without js suffix;
 
