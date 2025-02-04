@@ -1558,11 +1558,33 @@ export function createError(errorCode:string, message:string, fieldName?:string)
     })
 }
 
-export function toCamelCase (s: string) { return !s ? s : s.charAt(0).toLowerCase() + s.substring(1) }
+export function toPascalCase(s: string) { 
+    if (!s) return ''
+    const isAllCaps = s.match(/^[A-Z0-9_]+$/)
+    if (isAllCaps) {
+        const words = s.split('_')
+        return words.map(x => x[0].toUpperCase() + x.substring(1).toLowerCase()).join('')
+    }
+    if (s.includes('_')) {
+        return s.split('_').filter(x => x[0]).map(x => x[0].toUpperCase() + x.substring(1)).join('')
+    }
+    return s.charAt(0).toUpperCase() + s.substring(1)
+}
 
-export function toPascalCase(s: string) { return !s ? s : s.charAt(0).toUpperCase() + s.substring(1) }
+export function toCamelCase(s: string) { 
+    s = toPascalCase(s)
+    if (!s) return ''
+    return s.charAt(0).toLowerCase() + s.substring(1)
+}
 
-export function toKebabCase(s: string) { return (s || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() }
+export function toKebabCase(s: string) { 
+    if (!s || s.length <= 1) return s.toLowerCase()
+    return s
+        .replace(/([A-Z0-9])/g, '-$1')
+        .toLowerCase()
+        .replace(/^-/, '')
+        .replace(/-+/g, '-')
+}
 
 export function map(o:any, f:(x:any) => any) { return o == null ? null : f(o) }
 
