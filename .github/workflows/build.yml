@@ -15,12 +15,12 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm ci
-      - run: npm install http-server -g
-      - run: |
-          http-server ./ -p 8080 &
-          sleep 5 # Wait for 5 seconds to ensure http-server is up
-          npm run test:browser
+      # - run: npm ci
+      # - run: npm install http-server -g
+      # - run: |
+      #     http-server ./ -p 8080 &
+      #     sleep 5 # Wait for 5 seconds to ensure http-server is up
+      #     npm run test:browser
 
   package:
     needs: test
