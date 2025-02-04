@@ -517,8 +517,8 @@ export declare function createErrorStatus(message: string, errorCode?: string): 
 export declare function createFieldError(fieldName: string, message: string, errorCode?: string): ResponseStatus;
 export declare function isFormData(body: any): boolean;
 export declare function createError(errorCode: string, message: string, fieldName?: string): ErrorResponse;
-export declare function toCamelCase(s: string): string;
 export declare function toPascalCase(s: string): string;
+export declare function toCamelCase(s: string): string;
 export declare function toKebabCase(s: string): string;
 export declare function map(o: any, f: (x: any) => any): any;
 export declare function camelCaseAny(o: any): any;
