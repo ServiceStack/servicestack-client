@@ -1219,12 +1219,6 @@ export function createError(errorCode, message, fieldName) {
         })
     });
 }
-export function toCamelCase(s) {
-    s = toPascalCase(s);
-    if (!s)
-        return '';
-    return s.charAt(0).toLowerCase() + s.substring(1);
-}
 export function toPascalCase(s) {
     if (!s)
         return '';
@@ -1238,16 +1232,19 @@ export function toPascalCase(s) {
     }
     return s.charAt(0).toUpperCase() + s.substring(1);
 }
+export function toCamelCase(s) {
+    s = toPascalCase(s);
+    if (!s)
+        return '';
+    return s.charAt(0).toLowerCase() + s.substring(1);
+}
 export function toKebabCase(s) {
     if (!s || s.length <= 1)
         return s.toLowerCase();
-    // Insert hyphen before capitals and numbers, convert to lowercase
     return s
         .replace(/([A-Z0-9])/g, '-$1')
         .toLowerCase()
-        // Remove leading hyphen if exists
         .replace(/^-/, '')
-        // Replace multiple hyphens with single hyphen
         .replace(/-+/g, '-');
 }
 export function map(o, f) { return o == null ? null : f(o); }
