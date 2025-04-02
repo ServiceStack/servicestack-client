@@ -3326,10 +3326,10 @@ export class Inspect {
             return
 
         // resolve dynamic path to prevent ng webpack static analysis
+        const I = (s:string) => import(/* @vite-ignore */ s)
         const nodeModule = (m:string) => 'no' + 'de:' + `${m}`
-
-        await import(/* @vite-ignore */ nodeModule('fs')).then(async fs => {
-            await import(/* @vite-ignore */ nodeModule('path')).then(path => {
+        await I(nodeModule('fs')).then(async fs => {
+            await I(nodeModule('path')).then(path => {
                 let varsPath = inspectVarsPath.replace(/\\/g,'/')
                 if (varsPath.indexOf('/') >= 0) {
                     let dir = path.dirname(varsPath)

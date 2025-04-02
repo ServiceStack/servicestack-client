@@ -2873,17 +2873,16 @@ exports.createBus = createBus;
 class Inspect {
     static vars(obj) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             if (typeof process != 'object')
                 return;
             let inspectVarsPath = process.env.INSPECT_VARS;
             if (!inspectVarsPath || !obj)
                 return;
             // resolve dynamic path to prevent ng webpack static analysis
+            const I = (s) => { var _a; return _a = s, Promise.resolve().then(() => require(_a)); };
             const nodeModule = (m) => 'no' + 'de:' + `${m}`;
-            yield (_a = nodeModule('fs'), Promise.resolve().then(() => require(_a))).then((fs) => __awaiter(this, void 0, void 0, function* () {
-                var _b;
-                yield (_b = nodeModule('path'), Promise.resolve().then(() => require(_b))).then(path => {
+            yield I(nodeModule('fs')).then((fs) => __awaiter(this, void 0, void 0, function* () {
+                yield I(nodeModule('path')).then(path => {
                     let varsPath = inspectVarsPath.replace(/\\/g, '/');
                     if (varsPath.indexOf('/') >= 0) {
                         let dir = path.dirname(varsPath);
