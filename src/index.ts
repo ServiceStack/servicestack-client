@@ -162,6 +162,10 @@ export class MetadataPropertyType
     public allowableMin?: number
     public allowableMax?: number
     public attributes?: MetadataAttribute[]
+    uploadTo?: string;
+    input?: InputInfo;
+    format?: FormatInfo;
+    ref?: RefInfo;
     public constructor(init?: Partial<MetadataPropertyType>) { (Object as any).assign(this, init) }
 }
 export class MetadataType
@@ -173,6 +177,8 @@ export class MetadataType
     public implements?: MetadataTypeName[]
     public displayType?: string
     public description?: string
+    public notes?: string;
+    public icon?: ImageInfo;
     public isNested?: boolean
     public isEnum?: boolean
     public isEnumInt?: boolean
@@ -189,7 +195,65 @@ export class MetadataType
     public meta?: { [index: string]: string }
     public constructor(init?: Partial<MetadataType>) { (Object as any).assign(this, init) }
 }
-
+export class ImageInfo {
+    svg?: string;
+    uri?: string;
+    alt?: string;
+    cls?: string;
+}
+export class InputInfo {
+    id: string;
+    name?: string;
+    type: string;
+    value?: string;
+    placeholder?: string;
+    help?: string;
+    label?: string;
+    title?: string;
+    size?: string;
+    pattern?: string;
+    readOnly?: boolean;
+    required?: boolean;
+    disabled?: boolean;
+    autocomplete?: string;
+    autofocus?: string;
+    min?: string;
+    max?: string;
+    step?: number;
+    minLength?: number;
+    maxLength?: number;
+    accept?: string;
+    capture?: string;
+    multiple?: boolean;
+    allowableValues?: string[];
+    allowableEntries?: KeyValuePair<string, string>[];
+    options?: string;
+    ignore?: boolean;
+    css?: FieldCss;
+    meta?: {
+        [index: string]: string;
+    };
+}
+export class FormatInfo {
+    method: string;
+    options?: string;
+    locale?: string;
+}
+export class RefInfo {
+    model: string;
+    selfId: string;
+    refId: string;
+    refLabel: string;
+}
+export class KeyValuePair<TKey, TValue> {
+    key: TKey;
+    value: TValue;
+}
+export class FieldCss {
+    field: string;
+    input: string;
+    label: string;
+}
 
 export type ErrorResponseType = null | "RefreshTokenException"
 

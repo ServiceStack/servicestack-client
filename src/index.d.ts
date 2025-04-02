@@ -159,6 +159,10 @@ export declare class MetadataPropertyType {
     allowableMin?: number;
     allowableMax?: number;
     attributes?: MetadataAttribute[];
+    uploadTo?: string;
+    input?: InputInfo;
+    format?: FormatInfo;
+    ref?: RefInfo;
     constructor(init?: Partial<MetadataPropertyType>);
 }
 export declare class MetadataType {
@@ -169,6 +173,8 @@ export declare class MetadataType {
     implements?: MetadataTypeName[];
     displayType?: string;
     description?: string;
+    notes?: string;
+    icon?: ImageInfo;
     isNested?: boolean;
     isEnum?: boolean;
     isEnumInt?: boolean;
@@ -186,6 +192,65 @@ export declare class MetadataType {
         [index: string]: string;
     };
     constructor(init?: Partial<MetadataType>);
+}
+export declare class ImageInfo {
+    svg?: string;
+    uri?: string;
+    alt?: string;
+    cls?: string;
+}
+export declare class InputInfo {
+    id: string;
+    name?: string;
+    type: string;
+    value?: string;
+    placeholder?: string;
+    help?: string;
+    label?: string;
+    title?: string;
+    size?: string;
+    pattern?: string;
+    readOnly?: boolean;
+    required?: boolean;
+    disabled?: boolean;
+    autocomplete?: string;
+    autofocus?: string;
+    min?: string;
+    max?: string;
+    step?: number;
+    minLength?: number;
+    maxLength?: number;
+    accept?: string;
+    capture?: string;
+    multiple?: boolean;
+    allowableValues?: string[];
+    allowableEntries?: KeyValuePair<string, string>[];
+    options?: string;
+    ignore?: boolean;
+    css?: FieldCss;
+    meta?: {
+        [index: string]: string;
+    };
+}
+export declare class FormatInfo {
+    method: string;
+    options?: string;
+    locale?: string;
+}
+export declare class RefInfo {
+    model: string;
+    selfId: string;
+    refId: string;
+    refLabel: string;
+}
+export declare class KeyValuePair<TKey, TValue> {
+    key: TKey;
+    value: TValue;
+}
+export declare class FieldCss {
+    field: string;
+    input: string;
+    label: string;
 }
 export type ErrorResponseType = null | "RefreshTokenException";
 export interface IAuthSession {
