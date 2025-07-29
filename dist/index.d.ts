@@ -817,7 +817,6 @@ export declare function createBus(): {
     publish: (eventType: string, arg: any) => void;
 };
 export declare class Inspect {
-    static vars(obj: any): Promise<void>;
     static dump(obj: any): string;
     static printDump(obj: any): void;
     static dumpTable(rows: any[]): string;
